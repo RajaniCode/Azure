@@ -1,0 +1,497 @@
+# Deploy a monolithic application on Azure App Service
+Let's start by deploying the application. First, we need to create the Azure resources to host the application.
+
+1. Run this command to deploy the resources that are needed for this application. This deployment takes a few minutes.
+
+Azure CLI
+az deployment group create \
+    --resource-group learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a \
+    --template-uri https://raw.githubusercontent.com/MicrosoftDocs/mslearn-microservices-architecture/master/deployment/azuredeploy.json
+
+$ az deployment group create \
+    --resource-group learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a \
+    --template-uri https://raw.githubusercontent.com/MicrosoftDocs/mslearn-microservices-architecture/master/deployment/azuredeploy.json
+[
+Requesting a Cloud Shell.Succeeded.
+Connecting terminal...
+
+Welcome to Azure Cloud Shell
+
+Type "az" to use Azure CLI
+Type "help" to learn about Cloud Shell
+
+rajani_net@Azure:~$ dotnet --version
+2.2.402
+rajani_net@Azure:~$ az deployment group create \
+>     --resource-group learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a \
+>     --template-uri https://raw.githubusercontent.com/MicrosoftDocs/mslearn-microservices-architecture/master/deployment/azuredeploy.json
+{- Finished ..
+  "id": "/subscriptions/cd95c468-c847-4d77-a75e-1df1ae3a002f/resourceGroups/learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a/providers/Microsoft.Resources/deployments/azuredeploy",
+  "location": null,
+  "name": "azuredeploy",
+  "properties": {
+    "correlationId": "025b8ac0-9cf4-41ac-805f-0d0fd08d22a0",
+    "debugSetting": null,
+    "dependencies": [
+      {
+        "dependsOn": [
+          {
+            "id": "/subscriptions/cd95c468-c847-4d77-a75e-1df1ae3a002f/resourceGroups/learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a/providers/microsoft.insights/components/AI-MicroservicesLearnModule-5gfb25",
+            "resourceGroup": "learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a",
+            "resourceName": "AI-MicroservicesLearnModule-5gfb25",
+            "resourceType": "microsoft.insights/components"
+          },
+          {
+            "id": "/subscriptions/cd95c468-c847-4d77-a75e-1df1ae3a002f/resourceGroups/learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a/providers/Microsoft.Web/serverfarms/microserviceslearnmodule-ASP-5gf",
+            "resourceGroup": "learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a",
+            "resourceName": "microserviceslearnmodule-ASP-5gf",
+            "resourceType": "Microsoft.Web/serverfarms"
+          },
+          {
+            "apiVersion": "2015-05-01",
+            "id": "/subscriptions/cd95c468-c847-4d77-a75e-1df1ae3a002f/resourceGroups/learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a/providers/microsoft.insights/components/AI-MicroservicesLearnModule-5gfb25",
+            "resourceGroup": "learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a",
+            "resourceName": "AI-MicroservicesLearnModule-5gfb25",
+            "resourceType": "microsoft.insights/components"
+          }
+        ],
+        "id": "/subscriptions/cd95c468-c847-4d77-a75e-1df1ae3a002f/resourceGroups/learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a/providers/Microsoft.Web/sites/microserviceslearnmodule-5gf",
+        "resourceGroup": "learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a",
+        "resourceName": "microserviceslearnmodule-5gf",
+        "resourceType": "Microsoft.Web/sites"
+      },
+      {
+        "dependsOn": [
+          {
+            "id": "/subscriptions/cd95c468-c847-4d77-a75e-1df1ae3a002f/resourceGroups/learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a/providers/Microsoft.Storage/storageAccounts/packagesvcfunc5gf",
+            "resourceGroup": "learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a",
+            "resourceName": "packagesvcfunc5gf",
+            "resourceType": "Microsoft.Storage/storageAccounts"
+          },
+          {
+            "actionName": "listKeys",
+            "apiVersion": "2015-05-01-preview",
+            "id": "/subscriptions/cd95c468-c847-4d77-a75e-1df1ae3a002f/resourceGroups/learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a/providers/Microsoft.Storage/storageAccounts/packagesvcfunc5gf",
+            "resourceGroup": "learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a",
+            "resourceName": "packagesvcfunc5gf",
+            "resourceType": "Microsoft.Storage/storageAccounts"
+          },
+          {
+            "apiVersion": "2015-05-01",
+            "id": "/subscriptions/cd95c468-c847-4d77-a75e-1df1ae3a002f/resourceGroups/learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a/providers/microsoft.insights/components/AI-MicroservicesLearnModule-5gfb25",
+            "resourceGroup": "learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a",
+            "resourceName": "AI-MicroservicesLearnModule-5gfb25",
+            "resourceType": "microsoft.insights/components"
+          }
+        ],
+        "id": "/subscriptions/cd95c468-c847-4d77-a75e-1df1ae3a002f/resourceGroups/learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a/providers/Microsoft.Web/sites/packageservicefunction-5gf",
+        "resourceGroup": "learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a",
+        "resourceName": "packageservicefunction-5gf",
+        "resourceType": "Microsoft.Web/sites"
+      }
+    ],
+    "duration": "PT1M21.1404206S",
+    "mode": "Incremental",
+    "onErrorDeployment": null,
+    "outputResources": [
+      {
+        "id": "/subscriptions/cd95c468-c847-4d77-a75e-1df1ae3a002f/resourceGroups/learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a/providers/microsoft.insights/components/AI-MicroservicesLearnModule-5gfb25",
+        "resourceGroup": "learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a"
+      },
+      {
+        "id": "/subscriptions/cd95c468-c847-4d77-a75e-1df1ae3a002f/resourceGroups/learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a/providers/Microsoft.Storage/storageAccounts/packagesvcfunc5gf",
+        "resourceGroup": "learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a"
+      },
+      {
+        "id": "/subscriptions/cd95c468-c847-4d77-a75e-1df1ae3a002f/resourceGroups/learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a/providers/Microsoft.Web/serverfarms/microserviceslearnmodule-ASP-5gf",
+        "resourceGroup": "learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a"
+      },
+      {
+        "id": "/subscriptions/cd95c468-c847-4d77-a75e-1df1ae3a002f/resourceGroups/learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a/providers/Microsoft.Web/sites/microserviceslearnmodule-5gf",
+        "resourceGroup": "learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a"
+      },
+      {
+        "id": "/subscriptions/cd95c468-c847-4d77-a75e-1df1ae3a002f/resourceGroups/learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a/providers/Microsoft.Web/sites/packageservicefunction-5gf",
+        "resourceGroup": "learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a"
+      }
+    ],
+    "outputs": null,
+    "parameters": {
+      "alwaysOn": {
+        "type": "Bool",
+        "value": false
+      },
+      "applicationInsightsName": {
+        "type": "String",
+        "value": "AI-MicroservicesLearnModule-5gfb25"
+      },
+      "currentStack": {
+        "type": "String",
+        "value": "dotnetcore"
+      },
+      "functionName": {
+        "type": "String",
+        "value": "packageservicefunction-5gf"
+      },
+      "hostingPlanName": {
+        "type": "String",
+        "value": "microserviceslearnmodule-ASP-5gf"
+      },
+      "location": {
+        "type": "String",
+        "value": "centralus"
+      },
+      "numberOfWorkers": {
+        "type": "String",
+        "value": "1"
+      },
+      "sku": {
+        "type": "String",
+        "value": "Free"
+      },
+      "skuCode": {
+        "type": "String",
+        "value": "F1"
+      },
+      "storageName": {
+        "type": "String",
+        "value": "packagesvcfunc5gf"
+      },
+      "websiteName": {
+        "type": "String",
+        "value": "microserviceslearnmodule-5gf"
+      },
+      "workerSize": {
+        "type": "String",
+        "value": "0"
+      },
+      "workerSizeId": {
+        "type": "String",
+        "value": "0"
+      }
+    },
+    "parametersLink": null,
+    "providers": [
+      {
+        "id": null,
+        "namespace": "Microsoft.Web",
+        "registrationPolicy": null,
+        "registrationState": null,
+        "resourceTypes": [
+          {
+            "aliases": null,
+            "apiVersions": null,
+            "capabilities": null,
+            "locations": [
+              "centralus"
+            ],
+            "properties": null,
+            "resourceType": "sites"
+          },
+          {
+            "aliases": null,
+            "apiVersions": null,
+            "capabilities": null,
+            "locations": [
+              "centralus"
+            ],
+            "properties": null,
+            "resourceType": "serverfarms"
+          }
+        ]
+      },
+      {
+        "id": null,
+        "namespace": "microsoft.insights",
+        "registrationPolicy": null,
+        "registrationState": null,
+        "resourceTypes": [
+          {
+            "aliases": null,
+            "apiVersions": null,
+            "capabilities": null,
+            "locations": [
+              "centralus"
+            ],
+            "properties": null,
+            "resourceType": "components"
+          }
+        ]
+      },
+      {
+        "id": null,
+        "namespace": "Microsoft.Storage",
+        "registrationPolicy": null,
+        "registrationState": null,
+        "resourceTypes": [
+          {
+            "aliases": null,
+            "apiVersions": null,
+            "capabilities": null,
+            "locations": [
+              "centralus"
+            ],
+            "properties": null,
+            "resourceType": "storageAccounts"
+          }
+        ]
+      }
+    ],
+    "provisioningState": "Succeeded",
+    "template": null,
+    "templateHash": "10404884783551810640",
+    "templateLink": {
+      "contentVersion": "1.0.0.0",
+      "uri": "https://raw.githubusercontent.com/MicrosoftDocs/mslearn-microservices-architecture/master/deployment/azuredeploy.json"
+    },
+    "timestamp": "2020-08-14T12:56:00.126174+00:00"
+  },
+  "resourceGroup": "learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a",
+  "type": "Microsoft.Resources/deployments"
+}
+rajani_net@Azure:~$
+]
+
+2. Now that we have the resources created, let's deploy the application. First, run this command to pull down the source code from the sample repository.
+
+Azure CLI
+git clone https://github.com/MicrosoftDocs/mslearn-microservices-architecture.git ~/mslearn-microservices-architecture
+cd ~/mslearn-microservices-architecture/src/before
+
+$ git clone https://github.com/MicrosoftDocs/mslearn-microservices-architecture.git ~/mslearn-microservices-architecture
+$ cd ~/mslearn-microservices-architecture/src/before
+[
+rajani_net@Azure:~$ git clone https://github.com/MicrosoftDocs/mslearn-microservices-architecture.git ~/mslearn-microservices-architecture
+Cloning into '/home/rajani_net/mslearn-microservices-architecture'...
+remote: Enumerating objects: 199, done.
+remote: Total 199 (delta 0), reused 0 (delta 0), pack-reused 199
+Receiving objects: 100% (199/199), 41.24 KiB | 0 bytes/s, done.
+Resolving deltas: 100% (97/97), done.
+Checking connectivity... done.
+rajani_net@Azure:~$ cd ~/mslearn-microservices-architecture/src/before
+rajani_net@Azure:~/mslearn-microservices-architecture/src/before$
+]
+
+3. Run this command to zip up the application code, which we use to deploy to the app service.
+
+Bash
+zip -r DroneDelivery-before.zip .
+
+$ zip -r DroneDelivery-before.zip .
+[
+rajani_net@Azure:~/mslearn-microservices-architecture/src/before$ zip -r DroneDelivery-before.zip .
+  adding: DroneDelivery-before/ (stored 0%)
+  adding: DroneDelivery-before/Services/ (stored 0%)
+  adding: DroneDelivery-before/Services/PackageProcessor.cs (deflated 45%)
+  adding: DroneDelivery-before/Controllers/ (stored 0%)
+  adding: DroneDelivery-before/Controllers/DeliveriesController.cs (deflated 69%)
+  adding: DroneDelivery-before/Controllers/DeliveryRequestsController.cs (deflated 59%)
+  adding: DroneDelivery-before/Controllers/HomeController.cs (deflated 64%)
+  adding: DroneDelivery-before/Program.cs (deflated 55%)
+  adding: DroneDelivery-before/appsettings.json (deflated 24%)
+  adding: DroneDelivery-before/DroneDelivery-before.csproj (deflated 60%)
+  adding: DroneDelivery-before/Connected Services/ (stored 0%)
+  adding: DroneDelivery-before/Connected Services/Application Insights/ (stored 0%)
+  adding: DroneDelivery-before/Connected Services/Application Insights/ConnectedService.json (deflated 21%)
+  adding: DroneDelivery-before/Startup.cs (deflated 65%)
+  adding: DroneDelivery-before/Views/ (stored 0%)
+  adding: DroneDelivery-before/Views/Home/ (stored 0%)
+  adding: DroneDelivery-before/Views/Home/SendRequests.cshtml (deflated 35%)
+  adding: DroneDelivery-before/Views/Home/Index.cshtml (deflated 36%)
+  adding: DroneDelivery-before/appsettings.Development.json (deflated 36%)
+  adding: DroneDelivery.Common/ (stored 0%)
+  adding: DroneDelivery.Common/Services/ (stored 0%)
+  adding: DroneDelivery.Common/Services/IDeliveryRepository.cs (deflated 37%)
+  adding: DroneDelivery.Common/Services/Utility.cs (deflated 67%)
+  adding: DroneDelivery.Common/Services/RequestProcessor.cs (deflated 75%)
+  adding: DroneDelivery.Common/Services/IDroneScheduler.cs (deflated 29%)
+  adding: DroneDelivery.Common/Services/IPackageProcessor.cs (deflated 30%)
+  adding: DroneDelivery.Common/Services/DeliveryRepository.cs (deflated 47%)
+  adding: DroneDelivery.Common/Services/IRequestProcessor.cs (deflated 33%)
+  adding: DroneDelivery.Common/Services/DroneScheduler.cs (deflated 39%)
+  adding: DroneDelivery.Common/Models/ (stored 0%)
+  adding: DroneDelivery.Common/Models/ContainerSize.cs (deflated 12%)
+  adding: DroneDelivery.Common/Models/DeliveryStatus.cs (deflated 64%)
+  adding: DroneDelivery.Common/Models/Delivery.cs (deflated 63%)
+  adding: DroneDelivery.Common/Models/Location.cs (deflated 59%)
+  adding: DroneDelivery.Common/Models/ConfirmationType.cs (deflated 24%)
+  adding: DroneDelivery.Common/Models/UserAccount.cs (deflated 51%)
+  adding: DroneDelivery.Common/Models/PackageGen.cs (deflated 54%)
+  adding: DroneDelivery.Common/Models/ConfirmationRequired.cs (deflated 24%)
+  adding: DroneDelivery.Common/Models/PackageInfo.cs (deflated 55%)
+  adding: DroneDelivery.Common/Models/DeliveryStage.cs (deflated 36%)
+  adding: DroneDelivery.Common/DroneDelivery.Common.csproj (deflated 42%)
+  adding: DroneDelivery.sln (deflated 68%)
+rajani_net@Azure:~/mslearn-microservices-architecture/src/before$
+]
+
+4. Run this command to set a variable with the name of your app service.
+
+Bash
+APPSERVICENAME="$(az webapp list \
+                    --resource-group learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a \
+                    --query '[].name' \
+                    --output tsv)"
+
+$ APPSERVICENAME="$(az webapp list \
+                    --resource-group learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a \
+                    --query '[].name' \
+                    --output tsv)"
+[
+rajani_net@Azure:~/mslearn-microservices-architecture/src/before$ APPSERVICENAME="$(az webapp list \
+>                     --resource-group learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a\
+>                     --query '[].name' \
+>                     --output tsv)"
+rajani_net@Azure:~/mslearn-microservices-architecture/src/before$
+]
+
+5. Run this command to configure the app service to run a build as part of the deployment.
+
+Azure CLI
+az webapp config appsettings set \
+    --resource-group learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a \
+    --name $APPSERVICENAME \
+    --settings SCM_DO_BUILD_DURING_DEPLOYMENT=true
+
+$ az webapp config appsettings set \
+    --resource-group learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a \
+    --name $APPSERVICENAME \
+    --settings SCM_DO_BUILD_DURING_DEPLOYMENT=true
+[
+rajani_net@Azure:~/mslearn-microservices-architecture/src/before$ az webapp config appsettings set \
+>     --resource-group learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a \
+>     --name $APPSERVICENAME \
+>     --settings SCM_DO_BUILD_DURING_DEPLOYMENT=true
+[
+  {
+    "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+    "slotSetting": false,
+    "value": "22b5b1b2-b74c-4372-88b8-a3309fb1a09e"
+  },
+  {
+    "name": "ApplicationInsightsAgent_EXTENSION_VERSION",
+    "slotSetting": false,
+    "value": "~2"
+  },
+  {
+    "name": "XDT_MicrosoftApplicationInsights_Mode",
+    "slotSetting": false,
+    "value": "default"
+  },
+  {
+    "name": "DiagnosticServices_EXTENSION_VERSION",
+    "slotSetting": false,
+    "value": "disabled"
+  },
+  {
+    "name": "APPINSIGHTS_PROFILERFEATURE_VERSION",
+    "slotSetting": false,
+    "value": "disabled"
+  },
+  {
+    "name": "APPINSIGHTS_SNAPSHOTFEATURE_VERSION",
+    "slotSetting": false,
+    "value": "disabled"
+  },
+  {
+    "name": "InstrumentationEngine_EXTENSION_VERSION",
+    "slotSetting": false,
+    "value": "disabled"
+  },
+  {
+    "name": "SnapshotDebugger_EXTENSION_VERSION",
+    "slotSetting": false,
+    "value": "disabled"
+  },
+  {
+    "name": "XDT_MicrosoftApplicationInsights_BaseExtensions",
+    "slotSetting": false,
+    "value": "disabled"
+  },
+  {
+    "name": "PackageServiceUri",
+    "slotSetting": false,
+    "value": "https://packageservicefunction-5gf.azurewebsites.net/api/packages/"
+  },
+  {
+    "name": "PackageServiceFunctionCode",
+    "slotSetting": false,
+    "value": "Please put the code from accessing the PackageService Function here"
+  },
+  {
+    "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
+    "slotSetting": false,
+    "value": "true"
+  }
+]
+rajani_net@Azure:~/mslearn-microservices-architecture/src/before$
+]
+
+6. And now, run the following command to deploy the application to App Service. This deployment takes a few minutes to finish.
+
+Azure CLI
+az webapp deployment source config-zip \
+    --resource-group learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a \
+    --name $APPSERVICENAME \
+    --src DroneDelivery-before.zip
+
+$ az webapp deployment source config-zip \
+    --resource-group learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a \
+    --name $APPSERVICENAME \
+    --src DroneDelivery-before.zip
+[
+rajani_net@Azure:~/mslearn-microservices-architecture/src/before$ az webapp deployment source config-zip \
+>     --resource-group learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a \
+>     --name $APPSERVICENAME \
+>     --src DroneDelivery-before.zip
+Getting scm site credentials for zip deployment
+Starting zip deployment. This operation can take a while to complete ...
+Deployment endpoint responded with status code 202
+{
+  "active": true,
+  "author": "N/A",
+  "author_email": "N/A",
+  "complete": true,
+  "deployer": "ZipDeploy",
+  "end_time": "2020-08-14T13:06:04.3913257Z",
+  "id": "7ff8f6b673f842c3aaa703049d712a5e",
+  "is_readonly": true,
+  "is_temp": false,
+  "last_success_end_time": "2020-08-14T13:06:04.3913257Z",
+  "log_url": "https://microserviceslearnmodule-5gf.scm.azurewebsites.net/api/deployments/latest/log",
+  "message": "Created via a push deployment",
+  "progress": "",
+  "provisioningState": null,
+  "received_time": "2020-08-14T13:04:57.5427026Z",
+  "site_name": "microserviceslearnmodule-5gf",
+  "start_time": "2020-08-14T13:04:57.6519487Z",
+  "status": 4,
+  "status_text": "",
+  "url": "https://microserviceslearnmodule-5gf.scm.azurewebsites.net/api/deployments/latest"
+}
+rajani_net@Azure:~/mslearn-microservices-architecture/src/before$
+]
+
+7. After the deployment finishes, confirm that the deployment was successful by visiting the website of your app service. Run this command to get the URL, and select it to open the page.
+
+Bash
+echo https://$(az webapp config hostname list \
+                --resource-group learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a \
+                --webapp-name $APPSERVICENAME \
+                --query [].name \
+                --output tsv)
+
+$ echo https://$(az webapp config hostname list \
+                --resource-group learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a \
+                --webapp-name $APPSERVICENAME \
+                --query [].name \
+                --output tsv)
+[
+rajani_net@Azure:~/mslearn-microservices-architecture/src/before$ echo https://$(az webapp config hostname list \
+>                 --resource-group learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a \
+>                 --webapp-name $APPSERVICENAME \
+>                 --query [].name \
+>                 --output tsv)
+https://microserviceslearnmodule-5gf.azurewebsites.net
+rajani_net@Azure:~/mslearn-microservices-architecture/src/before$
+]

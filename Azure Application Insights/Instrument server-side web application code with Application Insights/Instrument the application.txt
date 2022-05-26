@@ -1,0 +1,408 @@
+# Add an action to the app
+In this exercise, we'll track an event based on a user action. We'll present a Like button to users of the video app. When they select it, the code that runs will track an occurrence of an event called Liked as part of its work.
+
+Let's add the button and action on the main page of the app.
+
+1. Open the Cloud Shell editor if it isn't open already.
+
+Bash
+cd videowebapp
+code .
+
+2. Use the file navigator of the Azure Cloud Shell editor to open Views/Home/Index.cshtml.
+
+3. At the bottom of the file, paste in the following code to add a button:
+
+HTML
+<div>
+    @using (Html.BeginForm("Like","Home"))
+    {
+        <input type="submit" value="Like" />
+        <div>@ViewBag.Message</div>
+    }  
+</div>
+
+4. Use the file navigator to open Controllers/HomeController.cs.
+
+5. To add an action that will run in response to the button click, add the following method inside the HomeController class:
+
+C#
+[HttpPost]
+public ActionResult Like(string button)
+{
+    ViewBag.Message = "Thank you for your response";
+    return View("Index");
+}
+
+
+$ cd videowebapp
+$ code .
+$ cat Views/Home/Index.cshtml
+$ cat Controllers/HomeController.cs
+[
+rajani_net@Azure:~/videowebapp$ cd videowebapp
+rajani_net@Azure:~/videowebapp$ code .
+rajani_net@Azure:~/videowebapp$ cat Views/Home/Index.cshtml
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+<div>
+    @using (Html.BeginForm("Like","Home"))
+    {
+        <input type="submit" value="Like" />
+        <div>@ViewBag.Message</div>
+    }
+</div>rajani_net@Azure:~/videowebapp$ cat Controllers/HomeController.cs
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using videowebapp.Models;
+
+namespace videowebapp.Controllers
+{
+    public class HomeController : Controller
+    {
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        [HttpPost]
+        public ActionResult Like(string button)
+        {
+            ViewBag.Message = "Thank you for your response";
+            return View("Index");
+        }
+    }
+}
+rajani_net@Azure:~/videowebapp$ dotnet run
+Program.cs(21,13): warning CS0618: 'ApplicationInsightsWebHostBuilderExtensions.UseApplicationInsights(IWebHostBuilder)' is obsolete: 'This method is deprecated infavor of AddApplicationInsightsTelemetry() extension method on IServiceCollection.' [/home/rajani_net/videowebapp/videowebapp.csproj]
+info: Microsoft.AspNetCore.DataProtection.KeyManagement.XmlKeyManager[0]
+      User profile is available. Using '/home/rajani_net/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+Hosting environment: Development
+Content root path: /home/rajani_net/videowebapp
+Now listening on: https://localhost:5001
+Now listening on: http://localhost:5000
+Application started. Press Ctrl+C to shut down.
+
+]
+
+
+# Instantiate the TelemetryClient object and track metrics
+Instantiate the TelemetryClient object and track metrics
+Now that we have a button in our app and some code that will run when a user selects it, we can add code that uses the Application Insights SDK to send telemetry.
+
+1. Still working in HomeController.cs, at the top of the code file, add the ApplicationInsights using statement:
+
+C#
+using Microsoft.ApplicationInsights;
+
+2. At the top of the HomeController class, create a TelemetryClient field named aiClient:
+
+C#
+private TelemetryClient aiClient;
+
+3. Add a constructor to the HomeController class that accepts a TelemetryClient object and assign it to your aiClient field:
+
+C#
+public HomeController(TelemetryClient aiClient)
+{
+    this.aiClient = aiClient;
+}
+
+4. Within the Like action, before the two existing lines of code, call TrackEvent on aiClient:
+
+C#
+this.aiClient.TrackEvent("LikeClicked");
+
+5. Save any open files and close the code editor.
+
+# HomeController.cs
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using videowebapp.Models;
+using Microsoft.ApplicationInsights;
+
+namespace videowebapp.Controllers
+{
+    public class HomeController : Controller
+    {
+        private TelemetryClient aiClient;
+
+        public HomeController(TelemetryClient aiClient)
+        {
+            this.aiClient = aiClient;
+        }
+
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        [HttpPost]
+        public ActionResult Like(string button)
+        {
+            this.aiClient.TrackEvent("LikeClicked");
+            ViewBag.Message = "Thank you for your response";
+            return View("Index");
+        }
+    }
+}
+[
+rajani_net@Azure:~/videowebapp$ cat Controllers/HomeController.cs
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using videowebapp.Models;
+using Microsoft.ApplicationInsights;
+
+namespace videowebapp.Controllers
+{
+    public class HomeController : Controller
+    {
+        private TelemetryClient aiClient;
+
+        public HomeController(TelemetryClient aiClient)
+        {
+            this.aiClient = aiClient;
+        }
+
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        [HttpPost]
+        public ActionResult Like(string button)
+        {
+            this.aiClient.TrackEvent("LikeClicked");
+            ViewBag.Message = "Thank you for your response";
+            return View("Index");
+        }
+    }
+}
+rajani_net@Azure:~/videowebapp$ dotnet build
+Microsoft (R) Build Engine version 16.2.32702+c4012a063 for .NET Core
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+  Restore completed in 58.34 ms for /home/rajani_net/videowebapp/videowebapp.csproj.
+Program.cs(21,13): warning CS0618: 'ApplicationInsightsWebHostBuilderExtensions.UseApplicationInsights(IWebHostBuilder)' is obsolete: 'This method is deprecated infavor of AddApplicationInsightsTelemetry() extension method on IServiceCollection.' [/home/rajani_net/videowebapp/videowebapp.csproj]
+  videowebapp -> /home/rajani_net/videowebapp/bin/Debug/netcoreapp2.2/videowebapp.dll
+  videowebapp -> /home/rajani_net/videowebapp/bin/Debug/netcoreapp2.2/videowebapp.Views.dll
+
+Build succeeded.
+
+Program.cs(21,13): warning CS0618: 'ApplicationInsightsWebHostBuilderExtensions.UseApplicationInsights(IWebHostBuilder)' is obsolete: 'This method is deprecated infavor of AddApplicationInsightsTelemetry() extension method on IServiceCollection.' [/home/rajani_net/videowebapp/videowebapp.csproj]
+    1 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:04.96
+rajani_net@Azure:~/videowebapp$
+]
+
+# Deploy the web app and generate data
+Run the following commands in the Cloud Shell from within the videowebapp folder to build the application and deploy it to App Service.
+
+Azure CLI
+dotnet publish -o pub
+cd pub
+zip -r site.zip *
+
+az webapp deployment source config-zip \
+    --src site.zip \
+    --resource-group learn-5313c38b-841c-406a-9fc0-1dcc595fbb96 \
+    --name <your-App-Service-name>
+
+$ dotnet publish -o pub
+$ cd pub
+$ zip -r site.zip *
+$ az webapp deployment source config-zip \
+    --src site.zip \
+    --resource-group learn-5313c38b-841c-406a-9fc0-1dcc595fbb96 \
+    --name rajaniapplicationinsights
+[
+rajani_net@Azure:~/videowebapp$ dotnet publish -o pub
+Microsoft (R) Build Engine version 16.2.32702+c4012a063 for .NET Core
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+  Restore completed in 53.05 ms for /home/rajani_net/videowebapp/videowebapp.csproj.
+  videowebapp -> /home/rajani_net/videowebapp/bin/Debug/netcoreapp2.2/videowebapp.dll
+  videowebapp -> /home/rajani_net/videowebapp/bin/Debug/netcoreapp2.2/videowebapp.Views.dll
+  videowebapp -> /home/rajani_net/videowebapp/pub/
+rajani_net@Azure:~/videowebapp$ cd pub
+rajani_net@Azure:~/videowebapp/pub$ zip -r site.zip *
+  adding: appsettings.Development.json (deflated 40%)
+  adding: appsettings.json (deflated 30%)
+  adding: Microsoft.AI.DependencyCollector.dll (deflated 65%)
+  adding: Microsoft.AI.EventCounterCollector.dll (deflated 53%)
+  adding: Microsoft.AI.PerfCounterCollector.dll (deflated 62%)
+  adding: Microsoft.AI.ServerTelemetryChannel.dll (deflated 59%)
+  adding: Microsoft.AI.WindowsServer.dll (deflated 57%)
+  adding: Microsoft.ApplicationInsights.AspNetCore.dll (deflated 58%)
+  adding: Microsoft.ApplicationInsights.dll (deflated 60%)
+  adding: Microsoft.Extensions.Logging.ApplicationInsights.dll (deflated 46%)
+  adding: Microsoft.Extensions.PlatformAbstractions.dll (deflated 45%)
+  adding: Microsoft.Win32.Registry.dll (deflated 53%)
+  adding: runtimes/ (stored 0%)
+  adding: runtimes/unix/ (stored 0%)
+  adding: runtimes/unix/lib/ (stored 0%)
+  adding: runtimes/unix/lib/netstandard2.0/ (stored 0%)
+  adding: runtimes/unix/lib/netstandard2.0/Microsoft.Win32.Registry.dll (deflated51%)
+  adding: runtimes/unix/lib/netcoreapp2.1/ (stored 0%)
+  adding: runtimes/unix/lib/netcoreapp2.1/System.Security.Principal.Windows.dll (deflated 53%)
+  adding: runtimes/win/ (stored 0%)
+  adding: runtimes/win/lib/ (stored 0%)
+  adding: runtimes/win/lib/netstandard2.0/ (stored 0%)
+  adding: runtimes/win/lib/netstandard2.0/Microsoft.Win32.Registry.dll (deflated 51%)
+  adding: runtimes/win/lib/netstandard2.0/System.IO.FileSystem.AccessControl.dll (deflated 52%)
+  adding: runtimes/win/lib/netstandard2.0/System.Security.Cryptography.ProtectedData.dll (deflated 46%)
+  adding: runtimes/win/lib/netcoreapp2.1/ (stored 0%)
+  adding: runtimes/win/lib/netcoreapp2.1/System.Security.Principal.Windows.dll (deflated 53%)
+  adding: runtimes/win/lib/netcoreapp2.0/ (stored 0%)
+  adding: runtimes/win/lib/netcoreapp2.0/System.Diagnostics.PerformanceCounter.dll (deflated 56%)
+  adding: runtimes/win/lib/netcoreapp2.0/System.Security.AccessControl.dll (deflated 57%)
+  adding: System.Configuration.ConfigurationManager.dll (deflated 60%)
+  adding: System.Diagnostics.DiagnosticSource.dll (deflated 52%)
+  adding: System.Diagnostics.PerformanceCounter.dll (deflated 60%)
+  adding: System.IO.FileSystem.AccessControl.dll (deflated 54%)
+  adding: System.Security.AccessControl.dll (deflated 60%)
+  adding: System.Security.Cryptography.ProtectedData.dll (deflated 46%)
+  adding: System.Security.Permissions.dll (deflated 58%)
+  adding: System.Security.Principal.Windows.dll (deflated 54%)
+  adding: videowebapp.deps.json (deflated 85%)
+  adding: videowebapp.dll (deflated 57%)
+  adding: videowebapp.pdb (deflated 38%)
+  adding: videowebapp.runtimeconfig.json (deflated 31%)
+  adding: videowebapp.Views.dll (deflated 71%)
+  adding: videowebapp.Views.pdb (deflated 60%)
+  adding: web.config (deflated 39%)
+  adding: wwwroot/ (stored 0%)
+  adding: wwwroot/js/ (stored 0%)
+  adding: wwwroot/js/site.js (deflated 26%)
+  adding: wwwroot/favicon.ico (deflated 71%)
+  adding: wwwroot/lib/ (stored 0%)
+  adding: wwwroot/lib/jquery/ (stored 0%)
+  adding: wwwroot/lib/jquery/dist/ (stored 0%)
+  adding: wwwroot/lib/jquery/dist/jquery.min.map (deflated 60%)
+  adding: wwwroot/lib/jquery/dist/jquery.min.js (deflated 65%)
+  adding: wwwroot/lib/jquery/dist/jquery.js (deflated 71%)
+  adding: wwwroot/lib/jquery/LICENSE.txt (deflated 44%)
+  adding: wwwroot/lib/bootstrap/ (stored 0%)
+  adding: wwwroot/lib/bootstrap/LICENSE (deflated 42%)
+  adding: wwwroot/lib/bootstrap/dist/ (stored 0%)
+  adding: wwwroot/lib/bootstrap/dist/js/ (stored 0%)
+  adding: wwwroot/lib/bootstrap/dist/js/bootstrap.bundle.js (deflated 79%)
+  adding: wwwroot/lib/bootstrap/dist/js/bootstrap.min.js.map (deflated 76%)
+  adding: wwwroot/lib/bootstrap/dist/js/bootstrap.bundle.js.map (deflated 77%)
+  adding: wwwroot/lib/bootstrap/dist/js/bootstrap.js (deflated 81%)
+  adding: wwwroot/lib/bootstrap/dist/js/bootstrap.bundle.min.js (deflated 72%)
+  adding: wwwroot/lib/bootstrap/dist/js/bootstrap.js.map (deflated 77%)
+  adding: wwwroot/lib/bootstrap/dist/js/bootstrap.min.js (deflated 74%)
+  adding: wwwroot/lib/bootstrap/dist/js/bootstrap.bundle.min.js.map (deflated 74%)
+  adding: wwwroot/lib/bootstrap/dist/css/ (stored 0%)
+  adding: wwwroot/lib/bootstrap/dist/css/bootstrap.css (deflated 87%)
+  adding: wwwroot/lib/bootstrap/dist/css/bootstrap-grid.min.css.map (deflated 87%)
+  adding: wwwroot/lib/bootstrap/dist/css/bootstrap-reboot.css (deflated 67%)
+  adding: wwwroot/lib/bootstrap/dist/css/bootstrap.min.css.map (deflated 84%)
+  adding: wwwroot/lib/bootstrap/dist/css/bootstrap.css.map (deflated 80%)
+  adding: wwwroot/lib/bootstrap/dist/css/bootstrap-reboot.min.css.map (deflated 75%)
+  adding: wwwroot/lib/bootstrap/dist/css/bootstrap-reboot.min.css (deflated 60%)
+  adding: wwwroot/lib/bootstrap/dist/css/bootstrap-grid.min.css (deflated 88%)
+  adding: wwwroot/lib/bootstrap/dist/css/bootstrap.min.css (deflated 85%)
+  adding: wwwroot/lib/bootstrap/dist/css/bootstrap-grid.css.map (deflated 82%)
+  adding: wwwroot/lib/bootstrap/dist/css/bootstrap-reboot.css.map (deflated 78%)
+  adding: wwwroot/lib/bootstrap/dist/css/bootstrap-grid.css (deflated 90%)
+  adding: wwwroot/lib/jquery-validation/ (stored 0%)
+  adding: wwwroot/lib/jquery-validation/dist/ (stored 0%)
+  adding: wwwroot/lib/jquery-validation/dist/additional-methods.js (deflated 73%)
+  adding: wwwroot/lib/jquery-validation/dist/jquery.validate.js (deflated 74%)
+  adding: wwwroot/lib/jquery-validation/dist/additional-methods.min.js (deflated 70%)
+  adding: wwwroot/lib/jquery-validation/dist/jquery.validate.min.js (deflated 68%)
+  adding: wwwroot/lib/jquery-validation/LICENSE.md (deflated 42%)
+  adding: wwwroot/lib/jquery-validation-unobtrusive/ (stored 0%)
+  adding: wwwroot/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js (deflated 62%)
+  adding: wwwroot/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js (deflated 76%)
+  adding: wwwroot/lib/jquery-validation-unobtrusive/LICENSE.txt (deflated 36%)
+  adding: wwwroot/css/ (stored 0%)
+  adding: wwwroot/css/site.css (deflated 54%)
+rajani_net@Azure:~/videowebapp/pub$ az webapp deployment source config-zip \
+>     --src site.zip \
+>     --resource-group learn-5313c38b-841c-406a-9fc0-1dcc595fbb96 \
+>     --name rajaniapplicationinsights
+Getting scm site credentials for zip deployment
+Starting zip deployment. This operation can take a while to complete ...
+Deployment endpoint responded with status code 202
+{
+  "active": true,
+  "author": "N/A",
+  "author_email": "N/A",
+  "complete": true,
+  "deployer": "Push-Deployer",
+  "end_time": "2020-06-08T16:42:56.4883397Z",
+  "id": "10d37a71083b4c7c8b427c7c9fef5ccb",
+  "is_readonly": true,
+  "is_temp": false,
+  "last_success_end_time": "2020-06-08T16:42:56.4883397Z",
+  "log_url": "https://rajaniapplicationinsights.scm.azurewebsites.net/api/deployments/latest/log",
+  "message": "Created via a push deployment",
+  "progress": "",
+  "provisioningState": null,
+  "received_time": "2020-06-08T16:42:52.3939425Z",
+  "site_name": "rajaniapplicationinsights",
+  "start_time": "2020-06-08T16:42:52.5345604Z",
+  "status": 4,
+  "status_text": "",
+  "url": "https://rajaniapplicationinsights.scm.azurewebsites.net/api/deployments/latest"
+}
+rajani_net@Azure:~/videowebapp/pub$
+]
+

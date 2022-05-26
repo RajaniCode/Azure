@@ -1,0 +1,598 @@
+# Configure a connection string to a Service Bus namespace
+Start by configuring connection strings both in the sending and receiving components. You'll use the same connection string as before. If you don't still have it, refer back to the previous exercise to learn how to retrieve it.
+
+1. In the editor, open performancemessagesender/Program.cs and locate the following line of code:
+
+C#
+const string ServiceBusConnectionString = "";
+
+Paste the connection string between the quotation marks and save the file either through the "..." menu, or the accelerator key (Ctrl+S on Windows and Linux, Cmd+S on macOS).
+
+2. Repeat the previous step in performancemessagereceiver/Program.cs, pasting in the same connection string value and save the file.
+
+# performancemessagesender/Program.cs
+# performancemessagereceiver/Program.cs
+const string ServiceBusConnectionString = "Endpoint=sb://salesteamapprs21may2020.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Bi/8LSH4W2+f/D2OSqvARQbo4b0mcPp3252R3L8hzh0=";
+
+$ code .
+$ cat performancemessagesender/Program.cs
+$ cat performancemessagereceiver/Program.cs
+[
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ code .
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ cat performancemessagesender/Program.cs
+using System;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Azure.ServiceBus;
+
+namespace performancemessagesender
+{
+    class Program
+    {
+        const string ServiceBusConnectionString = "Endpoint=sb://salesteamapprs21may2020.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Bi/8LSH4W2+f/D2OSqvARQbo4b0mcPp3252R3L8hzh0=";
+        const string TopicName = "salesperformancemessages";
+        static ITopicClient topicClient;
+
+        static void Main(string[] args)
+        {
+
+            Console.WriteLine("Sending a message to the Sales Performance topic...");
+
+            SendPerformanceMessageAsync().GetAwaiter().GetResult();
+
+            Console.WriteLine("Message was sent successfully.");
+
+        }
+
+        static async Task SendPerformanceMessageAsync()
+        {
+            // Create a Topic Client here
+
+            // Send messages.
+            try
+            {
+                // Create and send a message here
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"{DateTime.Now} :: Exception: {exception.Message}");
+            }
+
+            // Close the connection to the topic here
+        }
+    }
+}
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ cat performancemessagereceiver/Program.cs
+using System;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Azure.ServiceBus;
+
+namespace performancemessagereceiver
+{
+    class Program
+    {
+        const string ServiceBusConnectionString = "Endpoint=sb://salesteamapprs21may2020.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Bi/8LSH4W2+f/D2OSqvARQbo4b0mcPp3252R3L8hzh0=";
+        const string TopicName = "salesperformancemessages";
+        const string SubscriptionName = "Americas";
+        static ISubscriptionClient subscriptionClient;
+
+        static void Main(string[] args)
+        {
+            MainAsync().GetAwaiter().GetResult();
+        }
+
+        static async Task MainAsync()
+        {
+            // Create a Subscription Client here
+
+            Console.WriteLine("======================================================");
+            Console.WriteLine("Press ENTER key to exit after receiving all the messages.");
+            Console.WriteLine("======================================================");
+
+            // Register subscription message handler and receive messages in a loop
+            RegisterMessageHandler();
+
+            Console.Read();
+
+            // Close the subscription here
+        }
+
+        static void RegisterMessageHandler()
+        {
+            throw new NotImplementedException();
+        }
+
+        static async Task ProcessMessagesAsync(Message message, CancellationTokentoken)
+        {
+            throw new NotImplementedException();
+        }
+
+        static Task ExceptionReceivedHandler(ExceptionReceivedEventArgs exceptionReceivedEventArgs)
+        {
+            Console.WriteLine($"Message handler encountered an exception {exceptionReceivedEventArgs.Exception}.");
+            var context = exceptionReceivedEventArgs.ExceptionReceivedContext;
+            Console.WriteLine("Exception context for troubleshooting:");
+            Console.WriteLine($"- Endpoint: {context.Endpoint}");
+            Console.WriteLine($"- Entity Path: {context.EntityPath}");
+            Console.WriteLine($"- Executing Action: {context.Action}");
+            return Task.CompletedTask;
+        }
+    }
+}
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$
+]
+
+# Write code that sends a message to the topic
+To complete the component that sends messages about sales performance, follow these steps:
+
+1. Open performancemessagesender/Program.cs in the editor.
+
+2. Locate the SendPerformanceMessageAsync() method.
+
+3. Within that method, locate the following line of code:
+
+C#
+// Create a Topic Client here
+
+4. To create a topic client, replace that line of code with the following code:
+
+C#
+topicClient = new TopicClient(ServiceBusConnectionString, TopicName);
+
+5. Within the try...catch block, locate the following line of code:
+
+C#
+// Create and send a message here
+
+6. To create and format a message for the queue, replace that line of code with the following code:
+
+C#
+string messageBody = $"Total sales for Brazil in August: $13m.";
+var message = new Message(Encoding.UTF8.GetBytes(messageBody));
+
+7. To display the message in the console, on the next line, add the following code:
+
+C#
+Console.WriteLine($"Sending message: {messageBody}");
+
+8. To send the message to the queue, on the next line, add the following code:
+
+C#
+await topicClient.SendAsync(message);
+
+9. Locate the following line of code:
+
+C#
+// Close the connection to the topic here
+
+10. To close the connection to Service Bus, replace that line of code with the following code:
+
+C#
+await topicClient.CloseAsync();
+
+# performancemessagesender/Program.cs
+using System;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Azure.ServiceBus;
+
+namespace performancemessagesender
+{
+    class Program
+    {
+        const string ServiceBusConnectionString = "Endpoint=sb://salesteamapprs21may2020.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Bi/8LSH4W2+f/D2OSqvARQbo4b0mcPp3252R3L8hzh0=";
+        const string TopicName = "salesperformancemessages";
+        static ITopicClient topicClient;
+
+        static void Main(string[] args)
+        {
+
+            Console.WriteLine("Sending a message to the Sales Performance topic...");
+
+            SendPerformanceMessageAsync().GetAwaiter().GetResult();
+
+            Console.WriteLine("Message was sent successfully.");
+
+        }
+
+        static async Task SendPerformanceMessageAsync()
+        {
+            // Create Topic Client
+            topicClient = new TopicClient(ServiceBusConnectionString, TopicName);
+            // Send messages.
+            try
+            {
+                // Create and send message
+                string messageBody = $"Total sales for Brazil in August: $13m.";
+                var message = new Message(Encoding.UTF8.GetBytes(messageBody));
+                Console.WriteLine($"Sending message: {messageBody}");
+                await topicClient.SendAsync(message);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"{DateTime.Now} :: Exception: {exception.Message}");
+            }
+
+            // Close the connection to the topic here
+            await topicClient.CloseAsync();
+        }
+    }
+}
+[
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ code .
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ cat performancemessagesender/Program.cs
+﻿using System;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Azure.ServiceBus;
+
+namespace performancemessagesender
+{
+    class Program
+    {
+        const string ServiceBusConnectionString = "Endpoint=sb://salesteamapprs21may2020.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Bi/8LSH4W2+f/D2OSqvARQbo4b0mcPp3252R3L8hzh0=";
+        const string TopicName = "salesperformancemessages";
+        static ITopicClient topicClient;
+
+        static void Main(string[] args)
+        {
+
+            Console.WriteLine("Sending a message to the Sales Performance topic...");
+
+            SendPerformanceMessageAsync().GetAwaiter().GetResult();
+
+            Console.WriteLine("Message was sent successfully.");
+
+        }
+
+        static async Task SendPerformanceMessageAsync()
+        {
+            // Create Topic Client
+            topicClient = new TopicClient(ServiceBusConnectionString, TopicName);
+            // Send messages.
+            try
+            {
+                // Create and send message
+                string messageBody = $"Total sales for Brazil in August: $13m.";
+                var message = new Message(Encoding.UTF8.GetBytes(messageBody));
+                Console.WriteLine($"Sending message: {messageBody}");
+                await topicClient.SendAsync(message);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"{DateTime.Now} :: Exception: {exception.Message}");
+            }
+
+            // Close the connection to the topic here
+            await topicClient.CloseAsync();
+        }
+    }
+}
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$
+]
+
+11. Save the file.
+
+# Send a message to the topic
+To run the component that sends a message about a sale, run the following command in the Cloud Shell:
+
+Bash
+dotnet run -p performancemessagesender
+
+As the program executes, you'll see messages printed indicating that it's sending a message. Each time you run the app, one additional message will be added to the topic and each subscriber will receive a copy.
+
+$ dotnet run -p performancemessagesender
+[
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ dotnet run -p performancemessagesender
+Sending a message to the Sales Performance topic...
+Sending message: Total sales for Brazil in August: $13m.
+Message was sent successfully.
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$
+]
+
+Once it's finished, run the following command to see how many messages are in the Americas subscription:
+
+Azure CLI
+az servicebus topic subscription show \
+    --resource-group learn-d6156237-49fa-486e-b28a-133de5188629 \
+    --namespace-name <namespace-name> \
+    --topic-name salesperformancemessages \
+    --name Americas \
+    --query messageCount
+
+If you substitute EuropeAndAfrica for Americas, you should see that both subscriptions have the same number of messages.
+
+$ az servicebus topic subscription show \
+    --resource-group learn-d6156237-49fa-486e-b28a-133de5188629 \
+    --namespace-name salesteamapprs21may2020 \
+    --topic-name salesperformancemessages \
+    --name Americas \
+    --query messageCount
+
+$ az servicebus topic subscription show \
+    --resource-group learn-d6156237-49fa-486e-b28a-133de5188629 \
+    --namespace-name salesteamapprs21may2020 \
+    --topic-name salesperformancemessages \
+    --name EuropeAndAfrica \
+    --query messageCount
+[
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ az servicebus topic subscription show \
+>     --resource-group learn-d6156237-49fa-486e-b28a-133de5188629 \
+>     --namespace-name salesteamapprs21may2020 \
+>     --topic-name salesperformancemessages \
+>     --name Americas \
+>     --query messageCount
+1
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ az servicebus topic subscription show \
+>     --resource-group learn-d6156237-49fa-486e-b28a-133de5188629 \
+>     --namespace-name salesteamapprs21may2020 \
+>     --topic-name salesperformancemessages \
+>     --name EuropeAndAfrica \
+>     --query messageCount
+1
+]
+
+# Write code that receives a message from a topic subscription
+To complete the component that retrieves messages about sales performance, follow these steps:
+
+1. Open performancemessagereceiver/Program.cs in the editor.
+
+2. Locate the MainAsync() method.
+
+3. Within that method, locate the following line of code:
+
+C#
+// Create a subscription client here
+
+4. To create a subscription client, replace that line with the following code:
+
+C#
+subscriptionClient = new SubscriptionClient(ServiceBusConnectionString, TopicName, SubscriptionName);
+
+5. Locate the RegisterMessageHandler() method.
+
+6. To configure message handling options, replace all the code within that method with the following code:
+
+C#
+var messageHandlerOptions = new MessageHandlerOptions(ExceptionReceivedHandler)
+{
+    MaxConcurrentCalls = 1,
+    AutoComplete = false
+};
+
+7. To register the message handler, on the next line, add the following code:
+
+C#
+subscriptionClient.RegisterMessageHandler(ProcessMessagesAsync, messageHandlerOptions);
+
+8. Locate the ProcessMessagesAsync() method. You have registered this method as the one that handles incoming messages.
+
+9. To display incoming messages in the console, replace all the code within that method with the following code:
+
+C#
+Console.WriteLine($"Received sale performance message: SequenceNumber:{message.SystemProperties.SequenceNumber} Body:{Encoding.UTF8.GetString(message.Body)}");
+
+10. To remove the received message from the subscription, on the next line, add the following code:
+
+C#
+await subscriptionClient.CompleteAsync(message.SystemProperties.LockToken);
+
+11. Return to the MainAsync() method and locate the following line of code:
+
+C#
+// Close the subscription here
+
+12. To close the connection to Service Bus, replace that code with the following code:
+
+C#
+await subscriptionClient.CloseAsync();
+
+13. In Visual Studio Code, close all editor windows and save all changed files.
+
+# performancemessagereceiver/Program.cs
+using System;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Azure.ServiceBus;
+
+namespace performancemessagereceiver
+{
+    class Program
+    {
+        const string ServiceBusConnectionString = "Endpoint=sb://salesteamapprs21may2020.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Bi/8LSH4W2+f/D2OSqvARQbo4b0mcPp3252R3L8hzh0=";
+        const string TopicName = "salesperformancemessages";
+        const string SubscriptionName = "Americas";
+        static ISubscriptionClient subscriptionClient;
+
+        static void Main(string[] args)
+        {
+            MainAsync().GetAwaiter().GetResult();
+        }
+
+        static async Task MainAsync()
+        {
+            // Create Subscription Client
+            subscriptionClient = new SubscriptionClient(ServiceBusConnectionString, TopicName, SubscriptionName);
+            Console.WriteLine("======================================================");
+            Console.WriteLine("Press ENTER key to exit after receiving all the messages.");
+            Console.WriteLine("======================================================");
+
+            // Register subscription message handler and receive messages in a loop
+            RegisterMessageHandler();
+
+            Console.Read();
+
+            // Close subscription
+            await subscriptionClient.CloseAsync();
+        }
+
+        static void RegisterMessageHandler()
+        {
+            var messageHandlerOptions = new MessageHandlerOptions(ExceptionReceivedHandler)
+  	    {
+                MaxConcurrentCalls = 1,
+    		AutoComplete = false
+	    };
+            subscriptionClient.RegisterMessageHandler(ProcessMessagesAsync, messageHandlerOptions);
+        }
+
+        static async Task ProcessMessagesAsync(Message message, CancellationToken token)
+        {
+            Console.WriteLine($"Received sale performance message: SequenceNumber:{message.SystemProperties.SequenceNumber} Body:{Encoding.UTF8.GetString(message.Body)}");
+  	    await subscriptionClient.CompleteAsync(message.SystemProperties.LockToken);
+        }
+
+        static Task ExceptionReceivedHandler(ExceptionReceivedEventArgs exceptionReceivedEventArgs)
+        {
+            Console.WriteLine($"Message handler encountered an exception {exceptionReceivedEventArgs.Exception}.");
+            var context = exceptionReceivedEventArgs.ExceptionReceivedContext;
+            Console.WriteLine("Exception context for troubleshooting:");
+            Console.WriteLine($"- Endpoint: {context.Endpoint}");
+            Console.WriteLine($"- Entity Path: {context.EntityPath}");
+            Console.WriteLine($"- Executing Action: {context.Action}");
+            return Task.CompletedTask;
+        }
+    }
+}
+[
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ code .
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ cat performancemessagereceiver/Program.cs
+using System;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Azure.ServiceBus;
+
+namespace performancemessagereceiver
+{
+    class Program
+    {
+        const string ServiceBusConnectionString = "Endpoint=sb://salesteamapprs21may2020.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Bi/8LSH4W2+f/D2OSqvARQbo4b0mcPp3252R3L8hzh0=";
+        const string TopicName = "salesperformancemessages";
+        const string SubscriptionName = "Americas";
+        static ISubscriptionClient subscriptionClient;
+
+        static void Main(string[] args)
+        {
+            MainAsync().GetAwaiter().GetResult();
+        }
+
+        static async Task MainAsync()
+        {
+            // Create Subscription Client
+            subscriptionClient = new SubscriptionClient(ServiceBusConnectionString, TopicName, SubscriptionName);
+            Console.WriteLine("======================================================");
+            Console.WriteLine("Press ENTER key to exit after receiving all the messages.");
+            Console.WriteLine("======================================================");
+
+            // Register subscription message handler and receive messages in a loop
+            RegisterMessageHandler();
+
+            Console.Read();
+
+            // Close subscription
+            await subscriptionClient.CloseAsync();
+        }
+
+        static void RegisterMessageHandler()
+        {
+            var messageHandlerOptions = new MessageHandlerOptions(ExceptionReceivedHandler)
+  	    {
+                MaxConcurrentCalls = 1,
+    		AutoComplete = false
+	    };
+            subscriptionClient.RegisterMessageHandler(ProcessMessagesAsync, messageHandlerOptions);
+        }
+
+        static async Task ProcessMessagesAsync(Message message, CancellationToken token)
+        {
+            Console.WriteLine($"Received sale performance message: SequenceNumber:{message.SystemProperties.SequenceNumber} Body:{Encoding.UTF8.GetString(message.Body)}");
+  	    await subscriptionClient.CompleteAsync(message.SystemProperties.LockToken);
+        }
+
+        static Task ExceptionReceivedHandler(ExceptionReceivedEventArgs exceptionReceivedEventArgs)
+        {
+            Console.WriteLine($"Message handler encountered an exception {exceptionReceivedEventArgs.Exception}.");
+            var context = exceptionReceivedEventArgs.ExceptionReceivedContext;
+            Console.WriteLine("Exception context for troubleshooting:");
+            Console.WriteLine($"- Endpoint: {context.Endpoint}");
+            Console.WriteLine($"- Entity Path: {context.EntityPath}");
+            Console.WriteLine($"- Executing Action: {context.Action}");
+            return Task.CompletedTask;
+        }
+    }
+}
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$
+]
+
+# Retrieve a message from a topic subscription
+To run the component that retrieves a message about sales performance, follow these steps:
+
+Bash
+dotnet run -p performancemessagereceiver
+
+$ dotnet run -p performancemessagereceiver
+
+When the program stops printing notifications that it is receiving messages, press Enter to stop the app. Then, run the same command as before to confirm that there are zero remaining messages in the Americas subscription.
+
+[
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ dotnet run -p performancemessagereceiver
+======================================================
+Press ENTER key to exit after receiving all the messages.
+======================================================
+Received sale performance message: SequenceNumber:281474976710657 Body:Total sales for Brazil in August: $13m.
+
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ dotnet run -p performancemessagereceiver
+======================================================
+Press ENTER key to exit after receiving all the messages.
+======================================================
+
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$
+]
+
+Azure CLI
+az servicebus topic subscription show \
+    --resource-group learn-d6156237-49fa-486e-b28a-133de5188629 \
+    --namespace-name <namespace-name> \
+    --topic-name salesperformancemessages \
+    --name Americas \
+    --query messageCount
+
+If you substitute EuropeAndAfrica for Americas, you'll see that the message count has not changed. The application only received messages from the Americas subscription.
+
+$ az servicebus topic subscription show \
+    --resource-group learn-d6156237-49fa-486e-b28a-133de5188629 \
+    --namespace-name salesteamapprs21may2020 \
+    --topic-name salesperformancemessages \
+    --name Americas \
+    --query messageCount
+
+$ az servicebus topic subscription show \
+    --resource-group learn-d6156237-49fa-486e-b28a-133de5188629 \
+    --namespace-name salesteamapprs21may2020 \
+    --topic-name salesperformancemessages \
+    --name EuropeAndAfrica \
+    --query messageCount
+[
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ az servicebus topic subscription show \
+>     --resource-group learn-d6156237-49fa-486e-b28a-133de5188629 \
+>     --namespace-name salesteamapprs21may2020 \
+>     --topic-name salesperformancemessages \
+>     --name Americas \
+>     --query messageCount
+0
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ az servicebus topic subscription show \
+>     --resource-group learn-d6156237-49fa-486e-b28a-133de5188629 \
+>     --namespace-name salesteamapprs21may2020 \
+>     --topic-name salesperformancemessages \
+>     --name EuropeAndAfrica \
+>     --query messageCount
+1
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$
+]

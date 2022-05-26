@@ -1,0 +1,22 @@
+# Create a Service Bus namespace
+Name: salesteamapprs21may2020
+Pricing tier: Standard
+Resource group: learn-d6156237-49fa-486e-b28a-133de5188629
+Location: West US
+
+# Create a Service Bus queue
+Name: salesmessages
+Enable partitioning
+
+# Create a Service Bus topic and subscriptions
+Name: salesperformancemessages
+Enable partitioning
+
+Service Bus Namespace pane -> Entities -> Topics
+salesperformancemessages 
++ Subscription
+Name: Americas
+Max delivery count: 2000
++ Subscription
+Name: EuropeAndAfrica
+Max delivery count: 1000

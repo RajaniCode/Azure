@@ -1,0 +1,1912 @@
+# Azure # Azure Logic Apps # Azure Key Vault
+
+
+# Azure Logic Apps
+
+# Set up a Web API
+Host a Web API in the Azure sandbox
+The script to host Web API in Azure performs the following steps:
+
+• Create an Azure App Service plan in the free tier
+• Create a Web API in Azure App Service, configured for Git deployment from a local repo
+• Set account-level deployment credentials for our app
+• Configure Git locally
+• Deploy our Web API to our App Service instance
+
+1. Run the following git clone command in the Cloud Shell to clone the repo that contains the source for our app, as well as our setup script from GitHub.
+
+# Bash
+git clone https://github.com/MicrosoftDocs/mslearn-logic-apps-and-custom-connectors.git
+
+This command clones the repo to the local storage in the sandbox.
+
+$ git clone https://github.com/MicrosoftDocs/mslearn-logic-apps-and-custom-connectors.git
+[
+rajani_net@Azure:~$ git clone https://github.com/MicrosoftDocs/mslearn-logic-apps-and-custom-connectors.git
+Cloning into 'mslearn-logic-apps-and-custom-connectors'...
+remote: Enumerating objects: 23, done.
+remote: Total 23 (delta 0), reused 0 (delta 0), pack-reused 23
+Unpacking objects: 100% (23/23), done.
+Checking connectivity... done.
+rajani_net@Azure:~$
+]
+
+2. Navigate into the repo folder locally by running the following cd command.
+
+# Bash
+cd mslearn-logic-apps-and-custom-connectors
+
+If you list the contents of the ms-learn-print-framer-api folder with the ls command, you'll see that the folder contains a file called setup-exercise.sh and a folder called PrintFramerAPI.
+
+As its name suggests, setup-exercise.sh is the script we'll run to create our lab environment. PrintFramerAPI contains the app we want to deploy to Azure as a web app with a public API.
+
+$ cd mslearn-logic-apps-and-custom-connectors
+$ ls
+$ cat setup-exercise.sh#!/bin/bash
+$ ls PrintFramerAPI/
+[
+rajani_net@Azure:~$ cd mslearn-logic-apps-and-custom-connectors
+rajani_net@Azure:~/mslearn-logic-apps-and-custom-connectors$ ls
+LICENSE  LICENSE-CODE  PrintFramerAPI  README.md  setup-exercise.sh
+rajani_net@Azure:~/mslearn-logic-apps-and-custom-connectors$ cat setup-exercise.sh#!/bin/bash
+
+apiappname=PrintFramerAPI$(openssl rand -hex 5)
+
+printf "Setting username and password for Git ... (1/7)\n\n"
+
+
+GIT_USERNAME=gitName$Random
+GIT_EMAIL=a@b.c
+
+git config --global user.name "$GIT_USERNAME"
+git config --global user.email "$GIT_EMAIL"
+
+
+RESOURCE_GROUP=$(az group list --query "[0].name" -o tsv)
+
+# Create App Service plan
+PLAN_NAME=myPlan
+
+
+printf "\nCreating App Service plan in FREE tier ... (2/7)\n\n"
+
+
+az appservice plan create --name $apiappname --resource-group $RESOURCE_GROUP --sku FREE --verbose
+
+printf "\nCreating API App ... (3/7)\n\n"
+
+az webapp create --name $apiappname --resource-group $RESOURCE_GROUP --plan $apiappname --deployment-local-git --verbose
+
+
+printf "\nSetting the account-level deployment credentials ...(4/7)\n\n"
+
+
+DEPLOY_USER="myName1$(openssl rand -hex 5)"
+DEPLOY_PASSWORD="Pw1$(openssl rand -hex 10)"
+
+az webapp deployment user set --user-name $DEPLOY_USER --password $DEPLOY_PASSWORD --verbose
+
+
+GIT_URL="https://$DEPLOY_USER@$apiappname.scm.azurewebsites.net/$apiappname.git"
+
+# Create Web App with local-git deploy
+
+REMOTE_NAME=production
+
+
+# Set remote on src
+printf "\nSetting Git remote...(5/7)\n\n"
+
+
+git remote add $REMOTE_NAME $GIT_URL
+
+
+printf "\nGit add...(6/7)\n\n"
+
+git add .
+git commit -m "initial revision"
+
+
+printf "\nGit push... (7/7)\n\n"
+
+
+# printf "When prompted for a password enter this: $DEPLOY_PASSWORD\n"
+# git push --set-upstream $REMOTE_NAME master
+git push "https://$DEPLOY_USER:$DEPLOY_PASSWORD@$apiappname.scm.azurewebsites.net/$apiappname.git"
+
+
+printf "Setup complete!\n\n"
+
+printf "***********************    IMPORTANT INFO  *********************\n\n"
+
+printf "%s %s %s\n\n" "Password for " "$GIT_URL:" "$DEPLOY_PASSWORD"
+
+printf "Example URL: https://$apiappname.azurewebsites.net/api/values/6/7\n\n"
+
+printf "Swagger URL: https://$apiappname.azurewebsites.net/swagger\n"
+
+rajani_net@Azure:~/mslearn-logic-apps-and-custom-connectors$ ls PrintFramerAPI/
+appsettings.Development.json  Controllers            Program.cs
+appsettings.json              PrintFramerAPI.csproj  Startup.cs
+rajani_net@Azure:~/mslearn-logic-apps-and-custom-connectors$
+]
+
+3. Run the following command in the Cloud Shell to execute the setup script.
+
+# Bash
+bash setup-exercise.sh
+
+The script takes a couple of minutes to run. When the script finishes, it will display two URLS that you can use to test the app deployment. Observe that during deployment, all dependencies needed for our app to run are automatically installed on the remote App Service at this point.
+
+$ bash setup-exercise.sh
+$ ls PrintFramerAPI/
+$ cat PrintFramerAPI/Program.cs
+$ cat PrintFramerAPI/Startup.cs
+$ ls PrintFramerAPI/Controllers
+$ cat PrintFramerAPI/Controllers/ValuesController.cs
+[
+...
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.primitives/index.json 63ms
+remote:     GET https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.authentication.abstractions/index.json
+remote:     GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.hosting.abstractions/index.json
+remote:     GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.primitives/2.0.0/microsoft.extensions.primitives.2.0.0.nupkg
+remote:     GET https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.http.abstractions/index.json
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.primitives/2.0.0/microsoft.extensions.primitives.2.0.0.nupkg 5ms
+remote:     GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.abstractions/index.json
+remote:     GET https://api.nuget.org/v3-flatcontainer/microsoft.net.http.headers/index.json
+remote:     GET https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.webutilities/index.json
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.csharp/index.json126ms
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.staticfiles/2.0.0/microsoft.aspnetcore.staticfiles.2.0.0.nupkg 547ms
+remote:     GET https://api.nuget.org/v3-flatcontainer/system.buffers/index.json
+remote:     GET https://api.nuget.org/v3-flatcontainer/microsoft.csharp/4.4.0/microsoft.csharp.4.4.0.nupkg
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.csharp/4.4.0/microsoft.csharp.4.4.0.nupkg 5ms
+remote:     GET https://api.nuget.org/v3-flatcontainer/system.runtime.compilerservices.unsafe/index.json
+remote:     GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.webencoders/index.json
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.net.http.headers/index.json 131ms
+remote:     OK https://api.nuget.org/v3-flatcontainer/system.runtime.compilerservices.unsafe/index.json 59ms
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.authentication.abstractions/index.json 191ms
+remote:     GET https://api.nuget.org/v3-flatcontainer/system.runtime.compilerservices.unsafe/4.4.0/system.runtime.compilerservices.unsafe.4.4.0.nupkg
+remote:     GET https://api.nuget.org/v3-flatcontainer/microsoft.net.http.headers/2.0.0/microsoft.net.http.headers.2.0.0.nupkg
+remote:     GET https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.authentication.abstractions/2.0.0/microsoft.aspnetcore.authentication.abstractions.2.0.0.nupkg
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.net.http.headers/2.0.0/microsoft.net.http.headers.2.0.0.nupkg 3ms
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.authentication.abstractions/2.0.0/microsoft.aspnetcore.authentication.abstractions.2.0.0.nupkg 3ms
+remote:     OK https://api.nuget.org/v3-flatcontainer/system.runtime.compilerservices.unsafe/4.4.0/system.runtime.compilerservices.unsafe.4.4.0.nupkg 6ms
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.localization.abstractions/index.json 275ms
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.dependencyinjection.abstractions/index.json 257ms
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.authorization/index.json 265ms
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.hosting.abstractions/index.json 205ms
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.hosting.server.abstractions/index.json 390ms
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.routing.abstractions/index.json 836ms
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.logging.abstractions/index.json 836ms
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.objectpool/index.json 828ms
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.abstractions/index.json 332ms
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.dependencymodel/index.json 845ms
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.http.abstractions/index.json 343ms
+remote:     OK https://api.nuget.org/v3-flatcontainer/system.buffers/index.json 249ms
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.webutilities/index.json 305ms
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.webencoders/index.json 214ms
+remote:     GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.localization.abstractions/2.0.0/microsoft.extensions.localization.abstractions.2.0.0.nupkg
+remote:     GET https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.authorization/2.0.0/microsoft.aspnetcore.authorization.2.0.0.nupkg
+remote:     GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.hosting.abstractions/2.0.0/microsoft.extensions.hosting.abstractions.2.0.0.nupkg
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.localization.abstractions/2.0.0/microsoft.extensions.localization.abstractions.2.0.0.nupkg 6ms
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.hosting.abstractions/2.0.0/microsoft.extensions.hosting.abstractions.2.0.0.nupkg 13ms
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.authorization/2.0.0/microsoft.aspnetcore.authorization.2.0.0.nupkg 14ms
+remote:     GET https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.hosting.server.abstractions/2.0.0/microsoft.aspnetcore.hosting.server.abstractions.2.0.0.nupkg
+remote:     GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.dependencyinjection.abstractions/2.0.0/microsoft.extensions.dependencyinjection.abstractions.2.0.0.nupkg
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.hosting.server.abstractions/2.0.0/microsoft.aspnetcore.hosting.server.abstractions.2.0.0.nupkg 21ms
+remote:     GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.logging.abstractions/2.0.0/microsoft.extensions.logging.abstractions.2.0.0.nupkg
+remote:     GET https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.routing.abstractions/2.0.0/microsoft.aspnetcore.routing.abstractions.2.0.0.nupkg
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.dependencyinjection.abstractions/2.0.0/microsoft.extensions.dependencyinjection.abstractions.2.0.0.nupkg 24ms
+remote:     GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.objectpool/2.0.0/microsoft.extensions.objectpool.2.0.0.nupkg
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.logging.abstractions/2.0.0/microsoft.extensions.logging.abstractions.2.0.0.nupkg 3ms
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.objectpool/2.0.0/microsoft.extensions.objectpool.2.0.0.nupkg 2ms
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.routing.abstractions/2.0.0/microsoft.aspnetcore.routing.abstractions.2.0.0.nupkg 4ms
+remote:     GET https://api.nuget.org/v3-flatcontainer/system.buffers/4.4.0/system.buffers.4.4.0.nupkg
+remote:     GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.abstractions/2.0.0/microsoft.extensions.configuration.abstractions.2.0.0.nupkg
+remote:     GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.dependencymodel/2.0.0/microsoft.extensions.dependencymodel.2.0.0.nupkg
+remote:     GET https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.http.abstractions/2.0.0/microsoft.aspnetcore.http.abstractions.2.0.0.nupkg
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.abstractions/2.0.0/microsoft.extensions.configuration.abstractions.2.0.0.nupkg 5ms
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.dependencymodel/2.0.0/microsoft.extensions.dependencymodel.2.0.0.nupkg 5ms
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.http.abstractions/2.0.0/microsoft.aspnetcore.http.abstractions.2.0.0.nupkg 2ms
+remote:     GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.webencoders/2.0.0/microsoft.extensions.webencoders.2.0.0.nupkg
+remote:     OK https://api.nuget.org/v3-flatcontainer/system.buffers/4.4.0/system.buffers.4.4.0.nupkg 62ms
+remote:     GET https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.http.features/index.json
+remote:     GET https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.webutilities/2.0.0/microsoft.aspnetcore.webutilities.2.0.0.nupkg
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.webutilities/2.0.0/microsoft.aspnetcore.webutilities.2.0.0.nupkg 6ms
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.webencoders/2.0.0/microsoft.extensions.webencoders.2.0.0.nupkg 70ms
+remote:     GET https://api.nuget.org/v3-flatcontainer/microsoft.dotnet.platformabstractions/index.json
+remote:     GET https://api.nuget.org/v3-flatcontainer/system.text.encodings.web/index.json
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.http.features/index.json 241ms
+remote:     GET https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.http.features/2.0.0/microsoft.aspnetcore.http.features.2.0.0.nupkg
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.http.features/2.0.0/microsoft.aspnetcore.http.features.2.0.0.nupkg 5ms
+remote:     OK https://api.nuget.org/v3-flatcontainer/system.text.encodings.web/index.json 190ms
+remote:     GET https://api.nuget.org/v3-flatcontainer/system.text.encodings.web/4.4.0/system.text.encodings.web.4.4.0.nupkg
+remote:     OK https://api.nuget.org/v3-flatcontainer/system.text.encodings.web/4.4.0/system.text.encodings.web.4.4.0.nupkg 6ms
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.dotnet.platformabstractions/index.json 217ms
+remote:     GET https://api.nuget.org/v3-flatcontainer/microsoft.dotnet.platformabstractions/2.0.0/microsoft.dotnet.platformabstractions.2.0.0.nupkg
+remote:     OK https://api.nuget.org/v3-flatcontainer/microsoft.dotnet.platformabstractions/2.0.0/microsoft.dotnet.platformabstractions.2.0.0.nupkg 3ms
+remote:   Installing Microsoft.AspNetCore.Http.Features 2.0.0.
+remote:   Installing System.Runtime.CompilerServices.Unsafe 4.4.0.
+remote:   Installing Microsoft.Extensions.Localization.Abstractions 2.0.0.
+remote:   Installing Microsoft.DotNet.PlatformAbstractions 2.0.0.
+remote:   Installing Microsoft.AspNetCore.Authentication.Abstractions 2.0.0.
+remote:   Installing Microsoft.AspNetCore.Authorization 2.0.0.
+remote:   Installing Microsoft.AspNetCore.WebUtilities 2.0.0.
+remote:   Installing Microsoft.CSharp 4.4.0.
+remote:   Installing System.Buffers 4.4.0.
+remote:   Installing Microsoft.Net.Http.Headers 2.0.0.
+remote:   Installing Microsoft.AspNetCore.Http.Abstractions 2.0.0.
+remote:   Installing Microsoft.AspNetCore.Hosting.Server.Abstractions 2.0.0.
+remote:   Installing Microsoft.Extensions.Configuration.Abstractions 2.0.0.
+remote:   Installing Microsoft.Extensions.Hosting.Abstractions 2.0.0.
+remote:   Installing System.Text.Encodings.Web 4.4.0.
+remote:   Installing Microsoft.Extensions.DependencyInjection.Abstractions 2.0.0.
+remote:   Installing Swashbuckle.AspNetCore.SwaggerUI 4.0.1.
+remote:   Installing Swashbuckle.AspNetCore 4.0.1.
+remote:   Installing Swashbuckle.AspNetCore.Swagger 4.0.1.
+remote:   Installing Swashbuckle.AspNetCore.SwaggerGen 4.0.1.
+remote:   Installing Microsoft.Extensions.FileProviders.Embedded 2.0.0.
+remote:   Installing Microsoft.AspNetCore.StaticFiles 2.0.0.
+remote:   Installing Microsoft.AspNetCore.Routing 2.0.0.
+remote:   Installing Microsoft.AspNetCore.Mvc.Formatters.Json 2.0.0.
+remote:   Installing Microsoft.AspNetCore.Mvc.Core 2.0.0.
+remote:   Installing Microsoft.AspNetCore.Mvc.ApiExplorer 2.0.0.
+remote:   Installing Microsoft.AspNetCore.Mvc.DataAnnotations 2.0.0.
+remote:   Installing Microsoft.Extensions.FileProviders.Abstractions 2.0.0.
+remote:   Installing Microsoft.Extensions.Logging.Abstractions 2.0.0.
+remote:   Installing Microsoft.Extensions.WebEncoders 2.0.0.
+remote:   Installing Microsoft.AspNetCore.Hosting.Abstractions 2.0.0.
+remote:   Installing Microsoft.AspNetCore.Http.Extensions 2.0.0.
+remote:   Installing Microsoft.Extensions.Primitives 2.0.0.
+remote:   Installing Microsoft.Extensions.ObjectPool 2.0.0.
+remote:   Installing Microsoft.Extensions.Options 2.0.0.
+remote:   Installing Microsoft.AspNetCore.Routing.Abstractions 2.0.0.
+remote:   Installing Microsoft.AspNetCore.JsonPatch 2.0.0.
+remote:   Installing System.Diagnostics.DiagnosticSource 4.4.1.
+remote:   Installing Microsoft.AspNetCore.ResponseCaching.Abstractions 2.0.0.
+remote:   Installing Microsoft.AspNetCore.Http 2.0.0.
+remote:   Installing Microsoft.AspNetCore.Authorization.Policy 2.0.0.
+remote:   Installing Microsoft.AspNetCore.Authentication.Core 2.0.0.
+remote:   Installing Microsoft.AspNetCore.Mvc.Abstractions 2.0.0.
+remote:   Installing Microsoft.Extensions.DependencyModel 2.0.0.
+remote:   Installing System.ComponentModel.Annotations 4.4.0.
+remote:   Installing Microsoft.Extensions.Localization 2.0.0.
+remote: ...
+remote:   Committing restore...
+remote:   Generating MSBuild file D:\home\site\repository\PrintFramerAPI\obj\PrintFramerAPI.csproj.nuget.g.props.
+remote:   Generating MSBuild file D:\home\site\repository\PrintFramerAPI\obj\PrintFramerAPI.csproj.nuget.g.targets.
+remote:   Writing assets file to disk. Path: D:\home\site\repository\PrintFramerAPI\obj\project.assets.json
+remote:   Restore completed in 19.65 sec for D:\home\site\repository\PrintFramerAPI\PrintFramerAPI.csproj.
+remote:
+remote:   NuGet Config files used:
+remote:       C:\DWASFiles\Sites\#1PrintFramerAPIa011381b1e\AppData\NuGet\NuGet.Config
+remote:
+remote:   Feeds used:
+remote:       https://api.nuget.org/v3/index.json
+remote:
+remote:   Installed:
+remote:       46 package(s) to D:\home\site\repository\PrintFramerAPI\PrintFramerAPI.csproj
+remote: Done Building Project "D:\home\site\repository\PrintFramerAPI\PrintFramerAPI.csproj" (Restore target(s)).
+remote: Project "D:\home\site\repository\PrintFramerAPI\PrintFramerAPI.csproj" onnode 1 (default targets).
+remote: PrepareForBuild:
+remote:   Creating directory "bin\Release\netcoreapp2.2\".
+remote:   Creating directory "obj\Release\netcoreapp2.2\".
+remote: CoreCompile:
+remote:   D:\Program Files (x86)\MSBuild-16.4\MSBuild\Current\Bin\Roslyn\csc.exe /noconfig /unsafe- /checked- /nowarn:1701,1702,1701,1702 /nostdlib+ /errorreport:prompt /warn:4 /define:TRACE;RELEASE;NETCOREAPP;NETCOREAPP2_2 /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.antiforgery\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Antiforgery.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.authentication.abstractions\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Authentication.Abstractions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.authentication.cookies\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Authentication.Cookies.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.authentication.core\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Authentication.Core.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.authentication\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Authentication.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.authentication.facebook\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Authentication.Facebook.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.authentication.google\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Authentication.Google.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.authentication.jwtbearer\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.authentication.microsoftaccount\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Authentication.MicrosoftAccount.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.authentication.oauth\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Authentication.OAuth.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.authentication.openidconnect\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Authentication.OpenIdConnect.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.authentication.twitter\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Authentication.Twitter.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.authentication.wsfederation\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Authentication.WsFederation.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.authorization\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Authorization.dll"/reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.authorization.policy\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Authorization.Policy.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.connections.abstractions\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Connections.Abstractions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.cookiepolicy\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.CookiePolicy.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.cors\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Cors.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.cryptography.internal\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Cryptography.Internal.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.cryptography.keyderivation\2.2.0\lib\netcoreapp2.0\Microsoft.AspNetCore.Cryptography.KeyDerivation.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.dataprotection.abstractions\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.DataProtection.Abstractions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.dataprotection\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.DataProtection.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.dataprotection.extensions\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.DataProtection.Extensions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.diagnostics.abstractions\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Diagnostics.Abstractions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.diagnostics\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Diagnostics.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.diagnostics.entityframeworkcore\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.diagnostics.healthchecks\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Diagnostics.HealthChecks.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.hostfiltering\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.HostFiltering.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.hosting.abstractions\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Hosting.Abstractions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.hosting\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Hosting.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.hosting.server.abstractions\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Hosting.Server.Abstractions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.html.abstractions\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Html.Abstractions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.http.abstractions\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Http.Abstractions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.http.connections.common\1.1.0\lib\netstandard2.0\Microsoft.AspNetCore.Http.Connections.Common.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.http.connections\1.1.0\lib\netcoreapp2.2\Microsoft.AspNetCore.Http.Connections.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.http\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Http.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.http.extensions\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Http.Extensions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.http.features\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Http.Features.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.httpoverrides\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.HttpOverrides.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.httpspolicy\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.HttpsPolicy.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.identity\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Identity.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.identity.entityframeworkcore\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.identity.ui\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Identity.UI.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.identity.ui\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Identity.UI.Views.V3.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.identity.ui\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Identity.UI.Views.V4.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.jsonpatch\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.JsonPatch.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.localization\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Localization.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.localization.routing\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Localization.Routing.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.middlewareanalysis\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.MiddlewareAnalysis.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.mvc.abstractions\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Mvc.Abstractions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.mvc.apiexplorer\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Mvc.ApiExplorer.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.mvc.core\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Mvc.Core.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.mvc.cors\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Mvc.Cors.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.mvc.dataannotations\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Mvc.DataAnnotations.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.mvc\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Mvc.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.mvc.formatters.json\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Mvc.Formatters.Json.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.mvc.formatters.xml\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Mvc.Formatters.Xml.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.mvc.localization\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Mvc.Localization.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.mvc.razor\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Mvc.Razor.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.mvc.razor.extensions\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Mvc.Razor.Extensions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.mvc.razorpages\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Mvc.RazorPages.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.mvc.taghelpers\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Mvc.TagHelpers.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.mvc.viewfeatures\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Mvc.ViewFeatures.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.nodeservices\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.NodeServices.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.owin\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Owin.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.razor\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Razor.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.razor.language\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Razor.Language.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.razor.runtime\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Razor.Runtime.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.responsecaching.abstractions\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.ResponseCaching.Abstractions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.responsecaching\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.ResponseCaching.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.responsecompression\2.2.0\lib\netcoreapp2.1\Microsoft.AspNetCore.ResponseCompression.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.rewrite\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Rewrite.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.routing.abstractions\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Routing.Abstractions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.routing\2.2.0\lib\netcoreapp2.2\Microsoft.AspNetCore.Routing.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.server.httpsys\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Server.HttpSys.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.server.iis\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Server.IIS.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.server.iisintegration\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Server.IISIntegration.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.server.kestrel.core\2.2.0\lib\netcoreapp2.1\Microsoft.AspNetCore.Server.Kestrel.Core.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.server.kestrel\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Server.Kestrel.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.server.kestrel.https\2.2.0\lib\netcoreapp2.1\Microsoft.AspNetCore.Server.Kestrel.Https.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.server.kestrel.transport.abstractions\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Server.Kestrel.Transport.Abstractions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.server.kestrel.transport.sockets\2.2.0\lib\netcoreapp2.1\Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.session\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Session.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.signalr.common\1.1.0\lib\netcoreapp2.2\Microsoft.AspNetCore.SignalR.Common.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.signalr.core\1.1.0\lib\netstandard2.0\Microsoft.AspNetCore.SignalR.Core.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.signalr\1.1.0\lib\netstandard2.0\Microsoft.AspNetCore.SignalR.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.signalr.protocols.json\1.1.0\lib\netstandard2.0\Microsoft.AspNetCore.SignalR.Protocols.Json.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.spaservices\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.SpaServices.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.spaservices.extensions\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.SpaServices.Extensions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.staticfiles\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.StaticFiles.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.websockets\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.WebSockets.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.webutilities\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.WebUtilities.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.codeanalysis.csharp\2.8.0\lib\netstandard1.3\Microsoft.CodeAnalysis.CSharp.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.codeanalysis.common\2.8.0\lib\netstandard1.3\Microsoft.CodeAnalysis.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.codeanalysis.razor\2.2.0\lib\netstandard2.0\Microsoft.CodeAnalysis.Razor.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\Microsoft.CSharp.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.dotnet.platformabstractions\2.1.0\lib\netstandard1.3\Microsoft.DotNet.PlatformAbstractions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.entityframeworkcore.abstractions\2.2.0\lib\netstandard2.0\Microsoft.EntityFrameworkCore.Abstractions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.entityframeworkcore.design\2.2.0\lib\netstandard2.0\Microsoft.EntityFrameworkCore.Design.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.entityframeworkcore\2.2.0\lib\netstandard2.0\Microsoft.EntityFrameworkCore.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.entityframeworkcore.inmemory\2.2.0\lib\netstandard2.0\Microsoft.EntityFrameworkCore.InMemory.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.entityframeworkcore.relational\2.2.0\lib\netstandard2.0\Microsoft.EntityFrameworkCore.Relational.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.entityframeworkcore.sqlserver\2.2.0\lib\netstandard2.0\Microsoft.EntityFrameworkCore.SqlServer.dll" /reference:"D:\ProgramFiles (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.caching.abstractions\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Caching.Abstractions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.caching.memory\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Caching.Memory.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.caching.sqlserver\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Caching.SqlServer.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.configuration.abstractions\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Configuration.Abstractions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.configuration.binder\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Configuration.Binder.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.configuration.commandline\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Configuration.CommandLine.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.configuration\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Configuration.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.configuration.environmentvariables\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Configuration.EnvironmentVariables.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.configuration.fileextensions\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Configuration.FileExtensions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.configuration.ini\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Configuration.Ini.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.configuration.json\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Configuration.Json.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.configuration.keyperfile\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Configuration.KeyPerFile.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.configuration.usersecrets\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Configuration.UserSecrets.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.configuration.xml\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Configuration.Xml.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.dependencyinjection.abstractions\2.2.0\lib\netstandard2.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.dependencyinjection\2.2.0\lib\netcoreapp2.0\Microsoft.Extensions.DependencyInjection.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.dependencymodel\2.1.0\lib\netstandard1.6\Microsoft.Extensions.DependencyModel.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.diagnosticadapter\2.2.0\lib\netcoreapp2.0\Microsoft.Extensions.DiagnosticAdapter.dll" /reference:"D:\ProgramFiles (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.diagnostics.healthchecks.abstractions\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.diagnostics.healthchecks\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Diagnostics.HealthChecks.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.fileproviders.abstractions\2.2.0\lib\netstandard2.0\Microsoft.Extensions.FileProviders.Abstractions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.fileproviders.composite\2.2.0\lib\netstandard2.0\Microsoft.Extensions.FileProviders.Composite.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.fileproviders.embedded\2.2.0\lib\netstandard2.0\Microsoft.Extensions.FileProviders.Embedded.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.fileproviders.physical\2.2.0\lib\netstandard2.0\Microsoft.Extensions.FileProviders.Physical.dll" /reference:"D:\ProgramFiles (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.filesystemglobbing\2.2.0\lib\netstandard2.0\Microsoft.Extensions.FileSystemGlobbing.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.hosting.abstractions\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Hosting.Abstractions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.hosting\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Hosting.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.http\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Http.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.identity.core\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Identity.Core.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.identity.stores\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Identity.Stores.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.localization.abstractions\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Localization.Abstractions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.localization\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Localization.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.logging.abstractions\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Logging.Abstractions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.logging.configuration\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Logging.Configuration.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.logging.console\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Logging.Console.dll" /reference:"D:\Program Files(x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.logging.debug\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Logging.Debug.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.logging\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Logging.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.logging.eventsource\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Logging.EventSource.dll" /reference:"D:\ProgramFiles (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.logging.tracesource\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Logging.TraceSource.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.objectpool\2.2.0\lib\netstandard2.0\Microsoft.Extensions.ObjectPool.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.options.configurationextensions\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Options.ConfigurationExtensions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.options.dataannotations\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Options.DataAnnotations.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.options\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Options.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.primitives\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Primitives.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.webencoders\2.2.0\lib\netstandard2.0\Microsoft.Extensions.WebEncoders.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.identitymodel.jsonwebtokens\5.3.0\lib\netstandard2.0\Microsoft.IdentityModel.JsonWebTokens.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.identitymodel.logging\5.3.0\lib\netstandard2.0\Microsoft.IdentityModel.Logging.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.identitymodel.protocols\5.3.0\lib\netstandard2.0\Microsoft.IdentityModel.Protocols.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.identitymodel.protocols.openidconnect\5.3.0\lib\netstandard2.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.identitymodel.protocols.wsfederation\5.3.0\lib\netstandard2.0\Microsoft.IdentityModel.Protocols.WsFederation.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.identitymodel.tokens\5.3.0\lib\netstandard2.0\Microsoft.IdentityModel.Tokens.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.identitymodel.tokens.saml\5.3.0\lib\netstandard2.0\Microsoft.IdentityModel.Tokens.Saml.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.identitymodel.xml\5.3.0\lib\netstandard2.0\Microsoft.IdentityModel.Xml.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.net.http.headers\2.2.0\lib\netstandard2.0\Microsoft.Net.Http.Headers.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\Microsoft.VisualBasic.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\Microsoft.Win32.Primitives.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.win32.registry\4.5.0\ref\netstandard2.0\Microsoft.Win32.Registry.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\mscorlib.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\netstandard.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\newtonsoft.json.bson\1.0.1\lib\netstandard1.3\Newtonsoft.Json.Bson.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\newtonsoft.json\11.0.2\lib\netstandard2.0\Newtonsoft.Json.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\remotion.linq\2.2.0\lib\netstandard1.0\Remotion.Linq.dll" /reference:D:\home\.nuget\swashbuckle.aspnetcore\4.0.1\lib\netstandard2.0\Swashbuckle.AspNetCore.dll /reference:D:\home\.nuget\swashbuckle.aspnetcore.swagger\4.0.1\lib\netstandard2.0\Swashbuckle.AspNetCore.Swagger.dll /reference:D:\home\.nuget\swashbuckle.aspnetcore.swaggergen\4.0.1\lib\netstandard2.0\Swashbuckle.AspNetCore.SwaggerGen.dll /reference:D:\home\.nuget\swashbuckle.aspnetcore.swaggerui\4.0.1\lib\netstandard2.0\Swashbuckle.AspNetCore.SwaggerUI.dll /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.AppContext.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Buffers.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Collections.Concurrent.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Collections.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Collections.Immutable.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Collections.NonGeneric.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Collections.Specialized.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.ComponentModel.Annotations.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.ComponentModel.DataAnnotations.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.ComponentModel.dll"/reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.ComponentModel.EventBasedAsync.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.ComponentModel.Primitives.dll" /reference:"D:\ProgramFiles (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.ComponentModel.TypeConverter.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Configuration.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Console.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Core.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Data.Common.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Data.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\system.data.sqlclient\4.6.0\ref\netcoreapp2.1\System.Data.SqlClient.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Diagnostics.Contracts.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Diagnostics.Debug.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Diagnostics.DiagnosticSource.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Diagnostics.FileVersionInfo.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Diagnostics.Process.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Diagnostics.StackTrace.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Diagnostics.TextWriterTraceListener.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Diagnostics.Tools.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Diagnostics.TraceSource.dll" /reference:"D:\Program Files(x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Diagnostics.Tracing.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Drawing.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Drawing.Primitives.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Dynamic.Runtime.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Globalization.Calendars.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Globalization.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Globalization.Extensions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\system.identitymodel.tokens.jwt\5.3.0\lib\netstandard2.0\System.IdentityModel.Tokens.Jwt.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\system.interactive.async\3.2.0\lib\netstandard2.0\System.Interactive.Async.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.IO.Compression.Brotli.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.IO.Compression.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.IO.Compression.FileSystem.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.IO.Compression.ZipFile.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.IO.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.IO.FileSystem.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.IO.FileSystem.DriveInfo.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.IO.FileSystem.Primitives.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.IO.FileSystem.Watcher.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.IO.IsolatedStorage.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.IO.MemoryMappedFiles.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\system.io.pipelines\4.5.2\ref\netstandard1.3\System.IO.Pipelines.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.IO.Pipes.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.IO.UnmanagedMemoryStream.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Linq.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Linq.Expressions.dll" /reference:"D:\Program Files(x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Linq.Parallel.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Linq.Queryable.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Memory.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Net.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Net.Http.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnet.webapi.client\5.2.6\lib\netstandard2.0\System.Net.Http.Formatting.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Net.HttpListener.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Net.Mail.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Net.NameResolution.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Net.NetworkInformation.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Net.Ping.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Net.Primitives.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Net.Requests.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Net.Security.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Net.ServicePoint.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Net.Sockets.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Net.WebClient.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Net.WebHeaderCollection.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Net.WebProxy.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Net.WebSockets.Client.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Net.WebSockets.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\system.net.websockets.websocketprotocol\4.5.1\ref\netstandard2.0\System.Net.WebSockets.WebSocketProtocol.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Numerics.dll"/reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Numerics.Vectors.dll" /reference:"D:\ProgramFiles (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.ObjectModel.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Reflection.DispatchProxy.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Reflection.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Reflection.Emit.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Reflection.Emit.ILGeneration.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Reflection.Emit.Lightweight.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Reflection.Extensions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Reflection.Metadata.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Reflection.Primitives.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Reflection.TypeExtensions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Resources.Reader.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Resources.ResourceManager.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Resources.Writer.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\system.runtime.compilerservices.unsafe\4.5.1\ref\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Runtime.CompilerServices.VisualC.dll" /reference:"D:\ProgramFiles (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Runtime.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Runtime.Extensions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Runtime.Handles.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Runtime.InteropServices.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Runtime.InteropServices.RuntimeInformation.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Runtime.InteropServices.WindowsRuntime.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Runtime.Loader.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Runtime.Numerics.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Runtime.Serialization.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Runtime.Serialization.Formatters.dll" /reference:"D:\ProgramFiles (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Runtime.Serialization.Json.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Runtime.Serialization.Primitives.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Runtime.Serialization.Xml.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\system.security.accesscontrol\4.5.0\ref\netstandard2.0\System.Security.AccessControl.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Security.Claims.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Security.Cryptography.Algorithms.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\system.security.cryptography.cng\4.5.0\ref\netcoreapp2.1\System.Security.Cryptography.Cng.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Security.Cryptography.Csp.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Security.Cryptography.Encoding.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Security.Cryptography.Primitives.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Security.Cryptography.X509Certificates.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\system.security.cryptography.xml\4.5.0\ref\netstandard2.0\System.Security.Cryptography.Xml.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Security.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\system.security.permissions\4.5.0\ref\netstandard2.0\System.Security.Permissions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Security.Principal.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\system.security.principal.windows\4.5.0\ref\netstandard2.0\System.Security.Principal.Windows.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Security.SecureString.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.ServiceModel.Web.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.ServiceProcess.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Text.Encoding.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Text.Encoding.Extensions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\system.text.encodings.web\4.5.0\lib\netstandard2.0\System.Text.Encodings.Web.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Text.RegularExpressions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\system.threading.channels\4.5.0\lib\netcoreapp2.1\System.Threading.Channels.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Threading.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Threading.Overlapped.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Threading.Tasks.Dataflow.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Threading.Tasks.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Threading.Tasks.Extensions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Threading.Tasks.Parallel.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Threading.Thread.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Threading.ThreadPool.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Threading.Timer.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Transactions.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Transactions.Local.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.ValueTuple.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Web.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Web.HttpUtility.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Windows.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Xml.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Xml.Linq.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Xml.ReaderWriter.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Xml.Serialization.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Xml.XDocument.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Xml.XmlDocument.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Xml.XmlSerializer.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Xml.XPath.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Xml.XPath.XDocument.dll" /reference:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\WindowsBase.dll" /debug+ /debug:portable /filealign:512 /optimize+ /out:obj\Release\netcoreapp2.2\PrintFramerAPI.dll /ruleset:"D:\Program Files (x86)\MSBuild-16.4\Team Tools\Static Analysis Tools\\Rule Sets\MinimumRecommendedRules.ruleset" /target:exe /warnaserror- /utf8output /deterministic+ /langversion:7.3 /analyzer:"D:\ProgramFiles (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.mvc.analyzers\2.2.0\analyzers\dotnet\cs\Microsoft.AspNetCore.Mvc.Analyzers.dll" /analyzer:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.codeanalysis.analyzers\1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" /analyzer:"D:\ProgramFiles (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.codeanalysis.analyzers\1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" /analyzer:"D:\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.entityframeworkcore.analyzers\2.2.0\analyzers\dotnet\cs\Microsoft.EntityFrameworkCore.Analyzers.dll" Controllers\ValuesController.cs Program.cs Startup.cs "D:\local\Temp\.NETCoreApp,Version=v2.2.AssemblyAttributes.cs" obj\Release\netcoreapp2.2\PrintFramerAPI.RazorAssemblyInfo.cs obj\Release\netcoreapp2.2\PrintFramerAPI.AssemblyInfo.cs /warnaserror+:NU1605
+remote:   Using shared compilation with compiler from directory: D:\Program Files(x86)\MSBuild-16.4\MSBuild\Current\Bin\Roslyn
+remote: ........
+remote: GetTypeScriptCopyToOutputDirectoryItems:
+remote:   Adding items with BuildAction=TypeScriptCompile to the same collectionsthat will be populated (with items of other BuildActions) by the GetCopyToOutputDirectoryItems target
+remote: _CopyOutOfDateSourceItemsToOutputDirectory:
+remote:   Copying file from "D:\home\site\repository\PrintFramerAPI\appsettings.Development.json" to "D:\home\site\repository\PrintFramerAPI\bin\Release\netcoreapp2.2\appsettings.Development.json".
+remote:   Copying file from "D:\home\site\repository\PrintFramerAPI\appsettings.json" to "D:\home\site\repository\PrintFramerAPI\bin\Release\netcoreapp2.2\appsettings.json".
+remote: CopyFilesToOutputDirectory:
+remote:   Copying file from "D:\home\site\repository\PrintFramerAPI\obj\Release\netcoreapp2.2\PrintFramerAPI.dll" to "D:\home\site\repository\PrintFramerAPI\bin\Release\netcoreapp2.2\PrintFramerAPI.dll".
+remote:   PrintFramerAPI -> D:\home\site\repository\PrintFramerAPI\bin\Release\netcoreapp2.2\PrintFramerAPI.dll
+remote:   Copying file from "D:\home\site\repository\PrintFramerAPI\obj\Release\netcoreapp2.2\PrintFramerAPI.pdb" to "D:\home\site\repository\PrintFramerAPI\bin\Release\netcoreapp2.2\PrintFramerAPI.pdb".
+remote: CleanupEmptyRefsFolder:
+remote:   Directory "D:\home\site\repository\PrintFramerAPI\bin\Release\netcoreapp2.2\refs" doesn't exist. Skipping.
+remote: _DeletePublishIntermediateOutputPath:
+remote:   Creating directory "D:\home\site\repository\PrintFramerAPI\obj\Release\netcoreapp2.2\PubTmp\Out\".
+remote: _CopyResolvedFilesToPublishPreserveNewest:
+remote:   Copying file from "D:\home\site\repository\PrintFramerAPI\appsettings.json" to "D:\home\site\repository\PrintFramerAPI\obj\Release\netcoreapp2.2\PubTmp\Out\appsettings.json".
+remote:   Copying file from "D:\home\site\repository\PrintFramerAPI\obj\Release\netcoreapp2.2\PrintFramerAPI.dll" to "D:\home\site\repository\PrintFramerAPI\obj\Release\netcoreapp2.2\PubTmp\Out\PrintFramerAPI.dll".
+remote:   Copying file from "D:\home\site\repository\PrintFramerAPI\obj\Release\netcoreapp2.2\PrintFramerAPI.pdb" to "D:\home\site\repository\PrintFramerAPI\obj\Release\netcoreapp2.2\PubTmp\Out\PrintFramerAPI.pdb".
+remote:   Copying file from "D:\home\site\repository\PrintFramerAPI\appsettings.Development.json" to "D:\home\site\repository\PrintFramerAPI\obj\Release\netcoreapp2.2\PubTmp\Out\appsettings.Development.json".
+remote:   Copying file from "D:\home\.nuget\swashbuckle.aspnetcore\4.0.1\lib\netstandard2.0\Swashbuckle.AspNetCore.dll" to "D:\home\site\repository\PrintFramerAPI\obj\Release\netcoreapp2.2\PubTmp\Out\Swashbuckle.AspNetCore.dll".
+remote:   Copying file from "D:\home\.nuget\swashbuckle.aspnetcore.swagger\4.0.1\lib\netstandard2.0\Swashbuckle.AspNetCore.Swagger.dll" to "D:\home\site\repository\PrintFramerAPI\obj\Release\netcoreapp2.2\PubTmp\Out\Swashbuckle.AspNetCore.Swagger.dll".
+remote:   Copying file from "D:\home\.nuget\swashbuckle.aspnetcore.swaggergen\4.0.1\lib\netstandard2.0\Swashbuckle.AspNetCore.SwaggerGen.dll" to "D:\home\site\repository\PrintFramerAPI\obj\Release\netcoreapp2.2\PubTmp\Out\Swashbuckle.AspNetCore.SwaggerGen.dll".
+remote:   Copying file from "D:\home\site\repository\PrintFramerAPI\bin\Release\netcoreapp2.2\PrintFramerAPI.runtimeconfig.json" to "D:\home\site\repository\PrintFramerAPI\obj\Release\netcoreapp2.2\PubTmp\Out\PrintFramerAPI.runtimeconfig.json".
+remote:   Copying file from "D:\home\.nuget\swashbuckle.aspnetcore.swaggerui\4.0.1\lib\netstandard2.0\Swashbuckle.AspNetCore.SwaggerUI.dll" to "D:\home\site\repository\PrintFramerAPI\obj\Release\netcoreapp2.2\PubTmp\Out\Swashbuckle.AspNetCore.SwaggerUI.dll".
+remote: Publish:
+remote:   PrintFramerAPI -> D:\home\site\repository\PrintFramerAPI\obj\Release\netcoreapp2.2\PubTmp\Out\
+remote: _TransformWebConfig:
+remote:   No web.config found. Creating 'D:\home\site\repository\PrintFramerAPI\obj\Release\netcoreapp2.2\PubTmp\Out\web.config'
+remote:   Configuring web.config for deployment to Azure
+remote: FileSystemPublish:
+remote:   Copying file from "D:\home\site\repository\PrintFramerAPI\obj\Release\netcoreapp2.2\PubTmp\Out\appsettings.Development.json" to "D:\local\Temp\8d7fbf885e69218\appsettings.Development.json".
+remote:   Copying file from "D:\home\site\repository\PrintFramerAPI\obj\Release\netcoreapp2.2\PubTmp\Out\PrintFramerAPI.dll" to "D:\local\Temp\8d7fbf885e69218\PrintFramerAPI.dll".
+remote:   Copying file from "D:\home\site\repository\PrintFramerAPI\obj\Release\netcoreapp2.2\PubTmp\Out\appsettings.json" to "D:\local\Temp\8d7fbf885e69218\appsettings.json".
+remote:   Copying file from "D:\home\site\repository\PrintFramerAPI\obj\Release\netcoreapp2.2\PubTmp\Out\PrintFramerAPI.deps.json" to "D:\local\Temp\8d7fbf885e69218\PrintFramerAPI.deps.json".
+remote:   Copying file from "D:\home\site\repository\PrintFramerAPI\obj\Release\netcoreapp2.2\PubTmp\Out\PrintFramerAPI.pdb" to "D:\local\Temp\8d7fbf885e69218\PrintFramerAPI.pdb".
+remote:   Copying file from "D:\home\site\repository\PrintFramerAPI\obj\Release\netcoreapp2.2\PubTmp\Out\Swashbuckle.AspNetCore.dll" to "D:\local\Temp\8d7fbf885e69218\Swashbuckle.AspNetCore.dll".
+remote:   Copying file from "D:\home\site\repository\PrintFramerAPI\obj\Release\netcoreapp2.2\PubTmp\Out\PrintFramerAPI.runtimeconfig.json" to "D:\local\Temp\8d7fbf885e69218\PrintFramerAPI.runtimeconfig.json".
+remote:   Copying file from "D:\home\site\repository\PrintFramerAPI\obj\Release\netcoreapp2.2\PubTmp\Out\Swashbuckle.AspNetCore.Swagger.dll" to "D:\local\Temp\8d7fbf885e69218\Swashbuckle.AspNetCore.Swagger.dll".
+remote:   Copying file from "D:\home\site\repository\PrintFramerAPI\obj\Release\netcoreapp2.2\PubTmp\Out\Swashbuckle.AspNetCore.SwaggerGen.dll" to "D:\local\Temp\8d7fbf885e69218\Swashbuckle.AspNetCore.SwaggerGen.dll".
+remote:   Copying file from "D:\home\site\repository\PrintFramerAPI\obj\Release\netcoreapp2.2\PubTmp\Out\Swashbuckle.AspNetCore.SwaggerUI.dll" to "D:\local\Temp\8d7fbf885e69218\Swashbuckle.AspNetCore.SwaggerUI.dll".
+remote:   Copying file from "D:\home\site\repository\PrintFramerAPI\obj\Release\netcoreapp2.2\PubTmp\Out\web.config" to "D:\local\Temp\8d7fbf885e69218\web.config".
+remote: Done Building Project "D:\home\site\repository\PrintFramerAPI\PrintFramerAPI.csproj" (default targets).
+remote:
+remote: Build succeeded.
+remote:     0 Warning(s)
+remote:     0 Error(s)
+remote:
+remote: Time Elapsed 00:00:40.90
+remote: Creating app_offline.htm
+remote: KuduSync.NET from: 'D:\local\Temp\8d7fbf885e69218' to: 'D:\home\site\wwwroot'
+remote: Deleting file: 'hostingstart.html'
+remote: Copying file: 'appsettings.Development.json'
+remote: Copying file: 'appsettings.json'
+remote: Copying file: 'PrintFramerAPI.deps.json'
+remote: Copying file: 'PrintFramerAPI.dll'
+remote: Copying file: 'PrintFramerAPI.pdb'
+remote: Copying file: 'PrintFramerAPI.runtimeconfig.json'
+remote: Copying file: 'Swashbuckle.AspNetCore.dll'
+remote: Copying file: 'Swashbuckle.AspNetCore.Swagger.dll'
+remote: Copying file: 'Swashbuckle.AspNetCore.SwaggerGen.dll'
+remote: Copying file: 'Swashbuckle.AspNetCore.SwaggerUI.dll'
+remote: Copying file: 'web.config'
+remote: Deleting app_offline.htm
+remote: Finished successfully.
+remote: Running post deployment command(s)...
+remote: Triggering recycle (preview mode disabled).
+remote: Deployment successful.
+To https://myName1428503554f:Pw1efd95821a5e88a3cb38c@PrintFramerAPIa011381b1e.scm.azurewebsites.net/PrintFramerAPIa011381b1e.git
+ * [new branch]      master -> master
+Setup complete!
+
+***********************    IMPORTANT INFO  *********************
+
+Password for  https://myName1428503554f@PrintFramerAPIa011381b1e.scm.azurewebsites.net/PrintFramerAPIa011381b1e.git: Pw1efd95821a5e88a3cb38c
+
+Example URL: https://PrintFramerAPIa011381b1e.azurewebsites.net/api/values/6/7
+
+Swagger URL: https://PrintFramerAPIa011381b1e.azurewebsites.net/swagger
+rajani_net@Azure:~/mslearn-logic-apps-and-custom-connectors$ ls PrintFramerAPI/appsettings.Development.json  Controllers            Program.cs
+appsettings.json              PrintFramerAPI.csproj  Startup.cs
+rajani_net@Azure:~/mslearn-logic-apps-and-custom-connectors$ cat PrintFramerAPI/Program.cs
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+
+namespace PrintFramerAPI
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            CreateWebHostBuilder(args).Build().Run();
+        }
+
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+            WebHost.CreateDefaultBuilder(args)
+                .UseStartup<Startup>();
+    }
+}
+rajani_net@Azure:~/mslearn-logic-apps-and-custom-connectors$ cat PrintFramerAPI/Startup.cs
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.Swagger;
+using Newtonsoft.Json;
+
+namespace PrintFramerAPI
+{
+    public class Startup
+    {
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+        public IConfiguration Configuration { get; }
+
+        // This method gets called by the runtime. Use this method to add services to the container.
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddMvc()
+            .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+            .AddJsonOptions(options =>
+            {
+                options.SerializerSettings.Formatting = Formatting.Indented;
+            });
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info { Title = "Print Framer API", Version= "v1" });
+            });
+        }
+
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Print Framer API V1");
+            });
+
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                // The default HSTS value is 30 days. You may want to change thisfor production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseHsts();
+            }
+
+            app.UseHttpsRedirection();
+            app.UseMvc();
+        }
+    }
+}
+rajani_net@Azure:~/mslearn-logic-apps-and-custom-connectors$ ls PrintFramerAPI/Controllers
+ValuesController.cs
+rajani_net@Azure:~/mslearn-logic-apps-and-custom-connectors$ cat PrintFramerAPI/Controllers/ValuesController.cs
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+
+namespace PrintFramerAPI.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class ValuesController : ControllerBase
+    {
+        [HttpGet("{Height}/{Width}")]
+        public string GetQuery(string Height, string Width)
+        {
+        string result;
+        result = CalculatePrice(Double.Parse(Height), Double.Parse(Width));
+        return result;
+        }
+
+        private string CalculatePrice(double ht,double wd)
+        {
+        double area;
+        area = ht * wd;
+
+        if ((area > 20.00 ) &&  (area < 200.00))
+        {
+            return "20.00";
+        }
+        if ((area > 200.00) && (area < 1000.00))
+        {
+            return "50.00";
+        }
+        if ((area > 1000.00) && (area < 5000.00))
+        {
+            return "100.00";
+        }
+        return "not valid";
+        }
+    }
+}
+rajani_net@Azure:~/mslearn-logic-apps-and-custom-connectors$
+]
+
+4. To test that our app deployed successfully, copy and paste the value for Example URL from the Cloud Shell output into your favorite browser. The browser displays the value 20.0, which is the dollar value the API calculated for a frame with dimensions 6x7 inches. You can try other values by replacing 6 and 7 in the URL.
+
+https://PrintFramerAPIa011381b1e.azurewebsites.net/api/values/6/7
+
+https://PrintFramerAPIa011381b1e.azurewebsites.net/api/values/60/70
+
+5. Keep note of this URL, because you'll need it in the next exercise.
+
+6. To see what the API looks like, navigate in your browser to the URL that is displayed in the Swagger URL output shown in the Cloud Shell. The URL should look something like https://PrintFramerAPIabcde.azurewebsites.net/swagger.The browser displays the Swagger UI for our app, as shown in the following screenshot.
+
+1. In the Swagger UI in your browser, select Get and then select Try it out. Enter a height and width, and then select Execute. Examine the response.
+2. In the Address bar of your browser, replace /swagger/index.html with /swagger/v1/swagger.json. The browser displays the OpenAPI definition for the API.
+3. Save the OpenAPI JSON content to a local file for reference.
+
+https://PrintFramerAPIa011381b1e.azurewebsites.net/swagger
+
+
+
+
+# OpenAPI.json
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "v1",
+    "title": "Print Framer API"
+  },
+  "paths": {
+    "/api/Values/{Height}/{Width}": {
+      "get": {
+        "tags": [
+          "Values"
+        ],
+        "operationId": "GetQuery",
+        "consumes": [],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "Height",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Width",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {}
+}
+
+
+
+
+# Azure Key Vault # CS
+# Create the vault
+$ az keyvault create \
+    --resource-group learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c \
+    --location centralus \
+    --name sandbox-unique-vault-cs
+[
+rajani_net@Azure:~$ az keyvault create \
+>     --resource-group learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c \
+>     --location centralus \
+>     --name sandbox-unique-vault-cs
+{
+  "id": "/subscriptions/888c12a1-ec85-45a1-84de-2ba117b7d511/resourceGroups/learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c/providers/Microsoft.KeyVault/vaults/sandbox-unique-vault-cs",
+  "location": "centralus",
+  "name": "sandbox-unique-vault-cs",
+  "properties": {
+    "accessPolicies": [
+      {
+        "applicationId": null,
+        "objectId": "5a10ab73-4942-4b34-8611-81288ba96af5",
+        "permissions": {
+          "certificates": [
+            "get",
+            "list",
+            "delete",
+            "create",
+            "import",
+            "update",
+            "managecontacts",
+            "getissuers",
+            "listissuers",
+            "setissuers",
+            "deleteissuers",
+            "manageissuers",
+            "recover"
+          ],
+          "keys": [
+            "get",
+            "create",
+            "delete",
+            "list",
+            "update",
+            "import",
+            "backup",
+            "restore",
+            "recover"
+          ],
+          "secrets": [
+            "get",
+            "list",
+            "set",
+            "delete",
+            "backup",
+            "restore",
+            "recover"
+          ],
+          "storage": [
+            "get",
+            "list",
+            "delete",
+            "set",
+            "update",
+            "regeneratekey",
+            "setsas",
+            "listsas",
+            "getsas",
+            "deletesas"
+          ]
+        },
+        "tenantId": "604c1504-c6a3-4080-81aa-b33091104187"
+      }
+    ],
+    "createMode": null,
+    "enablePurgeProtection": null,
+    "enableSoftDelete": true,
+    "enabledForDeployment": false,
+    "enabledForDiskEncryption": null,
+    "enabledForTemplateDeployment": null,
+    "networkAcls": null,
+    "privateEndpointConnections": null,
+    "provisioningState": "Succeeded",
+    "sku": {
+      "name": "standard"
+    },
+    "tenantId": "604c1504-c6a3-4080-81aa-b33091104187",
+    "vaultUri": "https://sandbox-unique-vault-cs.vault.azure.net/"
+  },
+  "resourceGroup": "learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c",
+  "tags": {},
+  "type": "Microsoft.KeyVault/vaults"
+}
+rajani_net@Azure:~$
+]
+
+# Add the secret
+$ az keyvault secret set \
+    --name SecretPassword \
+    --value reindeer_flotilla \
+    --vault-name sandbox-unique-vault-cs
+[
+rajani_net@Azure:~$ az keyvault secret set \
+>     --name SecretPassword \
+>     --value reindeer_flotilla \
+>     --vault-name sandbox-unique-vault-cs
+{
+  "attributes": {
+    "created": "2020-04-02T04:51:49+00:00",
+    "enabled": true,
+    "expires": null,
+    "notBefore": null,
+    "recoveryLevel": "Recoverable+Purgeable",
+    "updated": "2020-04-02T04:51:49+00:00"
+  },
+  "contentType": null,
+  "id": "https://sandbox-unique-vault-cs.vault.azure.net/secrets/SecretPassword/460cfd85c75140359b11a1373c237453",
+  "kid": null,
+  "managed": null,
+  "tags": {
+    "file-encoding": "utf-8"
+  },
+  "value": "reindeer_flotilla"
+}
+rajani_net@Azure:~$
+]
+
+# Create the app
+$ dotnet new webapi -o KeyVaultDemoApp
+[
+rajani_net@Azure:~$ dotnet new webapi -o KeyVaultDemoApp
+
+Welcome to .NET Core!
+---------------------
+Learn more about .NET Core: https://aka.ms/dotnet-docs
+Use 'dotnet --help' to see available commands or visit: https://aka.ms/dotnet-cli-docs
+
+Telemetry
+---------
+The .NET Core tools collect usage data in order to help us improve your experience. The data is anonymous and doesn't include command-line arguments. The data is collected by Microsoft and shared with the community. You can opt-out of telemetry by setting the DOTNET_CLI_TELEMETRY_OPTOUT environment variable to '1' or 'true' using your favorite shell.
+
+Read more about .NET Core CLI Tools telemetry: https://aka.ms/dotnet-cli-telemetry
+
+ASP.NET Core
+------------
+Successfully installed the ASP.NET Core HTTPS Development Certificate.
+To trust the certificate run 'dotnet dev-certs https --trust' (Windows and macOS only). For establishing trust on other platforms refer to the platform specific documentation.
+For more information on configuring HTTPS see https://go.microsoft.com/fwlink/?linkid=848054.
+Getting ready...
+The template "ASP.NET Core Web API" was created successfully.
+
+Processing post-creation actions...
+Running 'dotnet restore' on KeyVaultDemoApp/KeyVaultDemoApp.csproj...
+  Restore completed in 12.52 sec for /home/rajani_net/KeyVaultDemoApp/KeyVaultDemoApp.csproj.
+
+Restore succeeded.
+
+rajani_net@Azure:~$
+]
+$ cd KeyVaultDemoApp
+[
+rajani_net@Azure:~$ cd KeyVaultDemoApp
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+$ code .
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ code .
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+
+After the editor loads, run the following commands in the shell to add the NuGet package containing AddAzureKeyVault and restore all of the app's dependencies.
+$ dotnet add package Microsoft.Extensions.Configuration.AzureKeyVault -v 2.1.1
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ dotnet add package Microsoft.Extensions.Configuration.AzureKeyVault -v 2.1.1
+  Writing /tmp/tmp9Mm51z.tmp
+info : Adding PackageReference for package 'Microsoft.Extensions.Configuration.AzureKeyVault' into project '/home/rajani_net/KeyVaultDemoApp/KeyVaultDemoApp.csproj'.
+info : Restoring packages for /home/rajani_net/KeyVaultDemoApp/KeyVaultDemoApp.csproj...
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.azurekeyvault/index.json
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.azurekeyvault/index.json 212ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.azurekeyvault/2.1.1/microsoft.extensions.configuration.azurekeyvault.2.1.1.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.azurekeyvault/2.1.1/microsoft.extensions.configuration.azurekeyvault.2.1.1.nupkg 3ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.fileextensions/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration/index.json
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration/index.json 518ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration/2.1.1/microsoft.extensions.configuration.2.1.1.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration/2.1.1/microsoft.extensions.configuration.2.1.1.nupkg 2ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.abstractions/index.json
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.abstractions/index.json 210ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.abstractions/2.1.1/microsoft.extensions.configuration.abstractions.2.1.1.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.abstractions/2.1.1/microsoft.extensions.configuration.abstractions.2.1.1.nupkg 2ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.primitives/index.json
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.fileextensions/index.json 819ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.fileextensions/2.1.1/microsoft.extensions.configuration.fileextensions.2.1.1.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.fileextensions/2.1.1/microsoft.extensions.configuration.fileextensions.2.1.1.nupkg 5ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.fileproviders.physical/index.json
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.fileproviders.physical/index.json 213ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.fileproviders.physical/2.1.1/microsoft.extensions.fileproviders.physical.2.1.1.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.fileproviders.physical/2.1.1/microsoft.extensions.fileproviders.physical.2.1.1.nupkg 2ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.fileproviders.abstractions/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.filesystemglobbing/index.json
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.fileproviders.abstractions/index.json 219ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.fileproviders.abstractions/2.1.1/microsoft.extensions.fileproviders.abstractions.2.1.1.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.fileproviders.abstractions/2.1.1/microsoft.extensions.fileproviders.abstractions.2.1.1.nupkg 3ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.filesystemglobbing/index.json 289ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.filesystemglobbing/2.1.1/microsoft.extensions.filesystemglobbing.2.1.1.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.filesystemglobbing/2.1.1/microsoft.extensions.filesystemglobbing.2.1.1.nupkg 2ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.primitives/index.json 876ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.primitives/2.1.1/microsoft.extensions.primitives.2.1.1.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.primitives/2.1.1/microsoft.extensions.primitives.2.1.1.nupkg 3ms
+info : Installing Microsoft.Extensions.FileProviders.Abstractions 2.1.1.
+info : Installing Microsoft.Extensions.FileSystemGlobbing 2.1.1.
+info : Installing Microsoft.Extensions.Primitives 2.1.1.
+info : Installing Microsoft.Extensions.FileProviders.Physical 2.1.1.
+info : Installing Microsoft.Extensions.Configuration.Abstractions 2.1.1.
+info : Installing Microsoft.Extensions.Configuration.FileExtensions 2.1.1.
+info : Installing Microsoft.Extensions.Configuration 2.1.1.
+info : Installing Microsoft.Extensions.Configuration.AzureKeyVault 2.1.1.
+info : Package 'Microsoft.Extensions.Configuration.AzureKeyVault' is compatible with all the specified frameworks in project '/home/rajani_net/KeyVaultDemoApp/KeyVaultDemoApp.csproj'.
+info : PackageReference for package 'Microsoft.Extensions.Configuration.AzureKeyVault' version '2.1.1' added to file '/home/rajani_net/KeyVaultDemoApp/KeyVaultDemoApp.csproj'.
+info : Committing restore...
+info : Writing assets file to disk. Path: /home/rajani_net/KeyVaultDemoApp/obj/project.assets.json
+log  : Restore completed in 3.16 sec for /home/rajani_net/KeyVaultDemoApp/KeyVaultDemoApp.csproj.
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+$ dotnet restore
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ dotnet restore
+  Restore completed in 48.8 ms for /home/rajani_net/KeyVaultDemoApp/KeyVaultDemoApp.csproj.
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+
+# Add code to load and use secrets
+Program.cs
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+
+namespace KeyVaultDemoApp
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            CreateWebHostBuilder(args).Build().Run();
+        }
+
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+            WebHost.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration((context, config) =>
+                {
+                    // Build the current set of configuration to load values from
+                    // JSON files and environment variables, including VaultName.
+                    var builtConfig = config.Build();
+
+                    // Use VaultName from the configuration to create the full vault URL.
+                    var vaultUrl = $"https://{builtConfig["VaultName"]}.vault.azure.net/";
+
+                    // Load all secrets from the vault into configuration. This will automatically
+                    // authenticate to the vault using a managed identity. If a managed identity
+                    // is not available, it will check if Visual Studio and/or the Azure CLI are
+                    // installed locally and see if they are configured with credentials that can
+                    // access the vault.
+                    config.AddAzureKeyVault(vaultUrl);
+                })
+                .UseStartup<Startup>();
+    }
+}
+
+Next, the controller: Create a new file in the Controllers folder called SecretTestController.cs and paste the following code into it.
+Tip
+To create a new file, use the touch command in the shell. In this case, use touch Controllers/SecretTestController.cs. You'll need to click the refresh button in the Files pane of the editor to see it there.
+$ touch Controllers/SecretTestController.cs
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ touch Controllers/SecretTestController.cs
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+Controllers/SecretTestController.cs
+using System;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+
+namespace KeyVaultDemoApp.Controllers
+{
+    [Route("api/[controller]")]
+    public class SecretTestController : ControllerBase
+    {
+        private readonly IConfiguration _configuration;
+
+        public SecretTestController(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
+        [HttpGet]
+        public IActionResult Get()
+        {
+            // Get the secret value from configuration. This can be done anywhere
+            // we have access to IConfiguration. This does not call the Key Vault
+            // API, because the secrets were loaded at startup.
+            var secretName = "SecretPassword";
+            var secretValue = _configuration[secretName];
+
+            if (secretValue == null)
+            {
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    $"Error: No secret named {secretName} was found...");
+            }
+            else {
+                return Content($"Secret value: {secretValue}" +
+                    Environment.NewLine + Environment.NewLine +
+                    "This is for testing only! Never output a secret " +
+                    "to a response or anywhere else in a real app!");
+            }
+        }
+    }
+}
+
+Run dotnet build in the shell to make sure everything compiles. The app is ready to run — now let's get it into Azure!
+$ dotnet build
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ dotnet build
+Microsoft (R) Build Engine version 16.2.32702+c4012a063 for .NET Core
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+  Restore completed in 49.9 ms for /home/rajani_net/KeyVaultDemoApp/KeyVaultDemoApp.csproj.
+  KeyVaultDemoApp -> /home/rajani_net/KeyVaultDemoApp/bin/Debug/netcoreapp2.2/KeyVaultDemoApp.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:01.25
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+
+# Create the App Service plan and app
+In Azure Cloud Shell, run the following to create an App Service plan:
+$ az appservice plan create \
+    --name keyvault-exercise-plan \
+    --sku FREE \
+    --location centralus \
+    --resource-group learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ az appservice plan create \
+>     --name keyvault-exercise-plan \
+>     --sku FREE \
+>     --location centralus \
+>     --resource-group learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c
+{
+  "freeOfferExpirationTime": null,
+  "geoRegion": "Central US",
+  "hostingEnvironmentProfile": null,
+  "hyperV": false,
+  "id": "/subscriptions/888c12a1-ec85-45a1-84de-2ba117b7d511/resourceGroups/learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c/providers/Microsoft.Web/serverfarms/keyvault-exercise-plan",
+  "isSpot": false,
+  "isXenon": false,
+  "kind": "app",
+  "location": "Central US",
+  "maximumElasticWorkerCount": 1,
+  "maximumNumberOfWorkers": 1,
+  "name": "keyvault-exercise-plan",
+  "numberOfSites": 0,
+  "perSiteScaling": false,
+  "provisioningState": "Succeeded",
+  "reserved": false,
+  "resourceGroup": "learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c",
+  "sku": {
+    "capabilities": null,
+    "capacity": 0,
+    "family": "F",
+    "locations": null,
+    "name": "F1",
+    "size": "F1",
+    "skuCapacity": null,
+    "tier": "Free"
+  },
+  "spotExpirationTime": null,
+  "status": "Ready",
+  "subscription": "888c12a1-ec85-45a1-84de-2ba117b7d511",
+  "tags": null,
+  "targetWorkerCount": 0,
+  "targetWorkerSizeId": 0,
+  "type": "Microsoft.Web/serverfarms",
+  "workerTierName": null
+}
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+
+Next, run the following command to create the Web App that uses the App Service plan you just created:
+$ az webapp create \
+    --plan keyvault-exercise-plan \
+    --resource-group learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c \
+    --name sandbox-unique-app-cs
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ az webapp create \
+>     --plan keyvault-exercise-plan \
+>     --resource-group learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c \
+>     --name sandbox-unique-app-cs
+{
+  "availabilityState": "Normal",
+  "clientAffinityEnabled": true,
+  "clientCertEnabled": false,
+  "clientCertExclusionPaths": null,
+  "cloningInfo": null,
+  "containerSize": 0,
+  "dailyMemoryTimeQuota": 0,
+  "defaultHostName": "sandbox-unique-app-cs.azurewebsites.net",
+  "enabled": true,
+  "enabledHostNames": [
+    "sandbox-unique-app-cs.azurewebsites.net",
+    "sandbox-unique-app-cs.scm.azurewebsites.net"
+  ],
+  "ftpPublishingUrl": "ftp://waws-prod-dm1-151.ftp.azurewebsites.windows.net/site/wwwroot",
+  "hostNameSslStates": [
+    {
+      "hostType": "Standard",
+      "ipBasedSslResult": null,
+      "ipBasedSslState": "NotConfigured",
+      "name": "sandbox-unique-app-cs.azurewebsites.net",
+      "sslState": "Disabled",
+      "thumbprint": null,
+      "toUpdate": null,
+      "toUpdateIpBasedSsl": null,
+      "virtualIp": null
+    },
+    {
+      "hostType": "Repository",
+      "ipBasedSslResult": null,
+      "ipBasedSslState": "NotConfigured",
+      "name": "sandbox-unique-app-cs.scm.azurewebsites.net",
+      "sslState": "Disabled",
+      "thumbprint": null,
+      "toUpdate": null,
+      "toUpdateIpBasedSsl": null,
+      "virtualIp": null
+    }
+  ],
+  "hostNames": [
+    "sandbox-unique-app-cs.azurewebsites.net"
+  ],
+  "hostNamesDisabled": false,
+  "hostingEnvironmentProfile": null,
+  "httpsOnly": false,
+  "hyperV": false,
+  "id": "/subscriptions/888c12a1-ec85-45a1-84de-2ba117b7d511/resourceGroups/learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c/providers/Microsoft.Web/sites/sandbox-unique-app-cs",
+  "identity": null,
+  "inProgressOperationId": null,
+  "isDefaultContainer": null,
+  "isXenon": false,
+  "kind": "app",
+  "lastModifiedTimeUtc": "2020-04-02T05:04:08.053333",
+  "location": "Central US",
+  "maxNumberOfWorkers": null,
+  "name": "sandbox-unique-app-cs",
+  "outboundIpAddresses": "13.89.172.2,23.99.133.160,23.101.117.42,23.101.112.78,23.99.229.34",
+  "possibleOutboundIpAddresses": "13.89.172.2,23.99.133.160,23.101.117.42,23.101.112.78,23.99.229.34,168.61.189.180,168.61.214.234,23.99.231.53",
+  "redundancyMode": "None",
+  "repositorySiteName": "sandbox-unique-app-cs",
+  "reserved": false,
+  "resourceGroup": "learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c",
+  "scmSiteAlsoStopped": false,
+  "serverFarmId": "/subscriptions/888c12a1-ec85-45a1-84de-2ba117b7d511/resourceGroups/learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c/providers/Microsoft.Web/serverfarms/keyvault-exercise-plan",
+  "siteConfig": null,
+  "slotSwapStatus": null,
+  "state": "Running",
+  "suspendedTill": null,
+  "tags": null,
+  "targetSwapSlot": null,
+  "trafficManagerHostNames": null,
+  "type": "Microsoft.Web/sites",
+  "usageState": "Normal"
+}
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+
+# Add configuration to the app
+$ az webapp config appsettings set \
+    --resource-group learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c \
+    --name sandbox-unique-app-cs \
+    --settings 'VaultName=sandbox-unique-vault-cs'
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ az webapp config appsettings set \
+>     --resource-group learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c \
+>     --name sandbox-unique-app-cs \
+>     --settings 'VaultName=sandbox-unique-vault-cs'
+[
+  {
+    "name": "WEBSITE_NODE_DEFAULT_VERSION",
+    "slotSetting": false,
+    "value": "10.14"
+  },
+  {
+    "name": "VaultName",
+    "slotSetting": false,
+    "value": "sandbox-unique-vault-cs"
+  }
+]
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+
+# Enable managed identity
+$ az webapp identity assign \
+    --resource-group learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c \
+    --name sandbox-unique-app-cs
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ az webapp identity assign \
+>     --resource-group learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c \
+>     --name sandbox-unique-app-cs
+{
+  "principalId": "525c092c-6ee4-4ef9-8bbb-4bc4b6e84965",
+  "tenantId": "604c1504-c6a3-4080-81aa-b33091104187",
+  "type": "SystemAssigned",
+  "userAssignedIdentities": null
+}
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+
+From the JSON output that results, copy the principalId value. PrincipalId is the unique ID of
+the app's new identity in Azure Active Directory, and we're going to use it in the next step.
+[
+525c092c-6ee4-4ef9-8bbb-4bc4b6e84965
+]
+
+# Grant access to the vault
+The last step before deploying is to assign Key Vault permissions to your app's managed
+identity. Use the principalId value you copied from the previous step as the value for objectid
+in the command below. Running this command will grant Get and List access:
+$ az keyvault set-policy \
+    --secret-permissions get list \
+    --name sandbox-unique-vault-cs \
+    --object-id 525c092c-6ee4-4ef9-8bbb-4bc4b6e84965
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ az keyvault set-policy \
+>     --secret-permissions get list \
+>     --name sandbox-unique-vault-cs \
+>     --object-id 525c092c-6ee4-4ef9-8bbb-4bc4b6e84965
+{
+  "id": "/subscriptions/888c12a1-ec85-45a1-84de-2ba117b7d511/resourceGroups/learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c/providers/Microsoft.KeyVault/vaults/sandbox-unique-vault-cs",
+  "location": "centralus",
+  "name": "sandbox-unique-vault-cs",
+  "properties": {
+    "accessPolicies": [
+      {
+        "applicationId": null,
+        "objectId": "5a10ab73-4942-4b34-8611-81288ba96af5",
+        "permissions": {
+          "certificates": [
+            "get",
+            "list",
+            "delete",
+            "create",
+            "import",
+            "update",
+            "managecontacts",
+            "getissuers",
+            "listissuers",
+            "setissuers",
+            "deleteissuers",
+            "manageissuers",
+            "recover"
+          ],
+          "keys": [
+            "get",
+            "create",
+            "delete",
+            "list",
+            "update",
+            "import",
+            "backup",
+            "restore",
+            "recover"
+          ],
+          "secrets": [
+            "get",
+            "list",
+            "set",
+            "delete",
+            "backup",
+            "restore",
+            "recover"
+          ],
+          "storage": [
+            "get",
+            "list",
+            "delete",
+            "set",
+            "update",
+            "regeneratekey",
+            "setsas",
+            "listsas",
+            "getsas",
+            "deletesas"
+          ]
+        },
+        "tenantId": "604c1504-c6a3-4080-81aa-b33091104187"
+      },
+      {
+        "applicationId": null,
+        "objectId": "525c092c-6ee4-4ef9-8bbb-4bc4b6e84965",
+        "permissions": {
+          "certificates": null,
+          "keys": null,
+          "secrets": [
+            "get",
+            "list"
+          ],
+          "storage": null
+        },
+        "tenantId": "604c1504-c6a3-4080-81aa-b33091104187"
+      }
+    ],
+    "createMode": null,
+    "enablePurgeProtection": null,
+    "enableSoftDelete": true,
+    "enabledForDeployment": false,
+    "enabledForDiskEncryption": null,
+    "enabledForTemplateDeployment": null,
+    "networkAcls": null,
+    "privateEndpointConnections": null,
+    "provisioningState": "Succeeded",
+    "sku": {
+      "name": "standard"
+    },
+    "tenantId": "604c1504-c6a3-4080-81aa-b33091104187",
+    "vaultUri": "https://sandbox-unique-vault-cs.vault.azure.net/"
+  },
+  "resourceGroup": "learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c",
+  "tags": {},
+  "type": "Microsoft.KeyVault/vaults"
+}
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+
+# Deploy the app and try it out
+$ dotnet publish -o pub
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ dotnet publish -o pub
+Microsoft (R) Build Engine version 16.2.32702+c4012a063 for .NET Core
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+  Restore completed in 48.29 ms for /home/rajani_net/KeyVaultDemoApp/KeyVaultDemoApp.csproj.
+  KeyVaultDemoApp -> /home/rajani_net/KeyVaultDemoApp/bin/Debug/netcoreapp2.2/KeyVaultDemoApp.dll
+  KeyVaultDemoApp -> /home/rajani_net/KeyVaultDemoApp/pub/
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+$ zip -j site.zip pub/*
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ zip -j site.zip pub/*
+  adding: appsettings.Development.json (deflated 40%)
+  adding: appsettings.json (deflated 30%)
+  adding: KeyVaultDemoApp.deps.json (deflated 85%)
+  adding: KeyVaultDemoApp.dll (deflated 58%)
+  adding: KeyVaultDemoApp.pdb (deflated 38%)
+  adding: KeyVaultDemoApp.runtimeconfig.json (deflated 31%)
+  adding: Microsoft.Azure.KeyVault.dll (deflated 73%)
+  adding: Microsoft.Azure.KeyVault.WebKey.dll (deflated 56%)
+  adding: Microsoft.Azure.Services.AppAuthentication.dll (deflated 55%)
+  adding: Microsoft.Extensions.Configuration.AzureKeyVault.dll (deflated 46%)
+  adding: Microsoft.IdentityModel.Clients.ActiveDirectory.dll (deflated 62%)
+  adding: Microsoft.IdentityModel.Clients.ActiveDirectory.Platform.dll (deflated 47%)
+  adding: Microsoft.Rest.ClientRuntime.Azure.dll (deflated 56%)
+  adding: Microsoft.Rest.ClientRuntime.dll (deflated 53%)
+  adding: web.config (deflated 39%)
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+$ az webapp deployment source config-zip \
+    --src site.zip \
+    --resource-group learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c \
+    --name sandbox-unique-app-cs
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ az webapp deployment source config-zip \
+>     --src site.zip \
+>     --resource-group learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c \
+>     --name sandbox-unique-app-cs
+
+Getting scm site credentials for zip deployment
+Starting zip deployment. This operation can take a while to complete ...
+Deployment endpoint responded with status code 202
+{
+  "active": true,
+  "author": "N/A",
+  "author_email": "N/A",
+  "complete": true,
+  "deployer": "Push-Deployer",
+  "end_time": "2020-04-02T05:10:26.0877811Z",
+  "id": "4ec90caba37f45dea22c678eb0b2b923",
+  "is_readonly": true,
+  "is_temp": false,
+  "last_success_end_time": "2020-04-02T05:10:26.0877811Z",
+  "log_url": "https://sandbox-unique-app-cs.scm.azurewebsites.net/api/deployments/latest/log",
+  "message": "Created via a push deployment",
+  "progress": "",
+  "provisioningState": null,
+  "received_time": "2020-04-02T05:10:22.6941138Z",
+  "site_name": "sandbox-unique-app-cs",
+  "start_time": "2020-04-02T05:10:22.8347539Z",
+  "status": 4,
+  "status_text": "",
+  "url": "https://sandbox-unique-app-cs.scm.azurewebsites.net/api/deployments/latest"
+}
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+
+The deployment may take a minute or two to complete. Once you get a result that indicates
+the site has deployed, open https://<your-unique-appname>.
+azurewebsites.net/api/SecretTest in a browser. The app will take a moment to start up
+for the first time on the server, but once it does, you should see the secret value,
+reindeer_flotilla.
+
+https://sandbox-unique-app-cs.azurewebsites.net/api/SecretTest
+Secret value: reindeer_flotilla
+
+This is for testing only! Never output a secret to a response or anywhere else in a real app!
+Your app is finished and deployed!
+
+
+# Azure Key Vault # JS
+# Create the vault
+$ az keyvault create \
+    --resource-group learn-8202b72b-4737-4424-a7ed-c78e807b7457 \
+    --location centralus \
+    --name js-unique-vault-name
+[
+rajani_net@Azure:~$ az keyvault create \
+>     --resource-group learn-8202b72b-4737-4424-a7ed-c78e807b7457 \
+>     --location centralus \
+>     --name js-unique-vault-name
+{
+  "id": "/subscriptions/4c041d79-7efb-4645-ac96-ed17a5b918bb/resourceGroups/learn-8202b72b-4737-4424-a7ed-c78e807b7457/providers/Microsoft.KeyVault/vaults/js-unique-vault-name",
+  "location": "centralus",
+  "name": "js-unique-vault-name",
+  "properties": {
+    "accessPolicies": [
+      {
+        "applicationId": null,
+        "objectId": "5a10ab73-4942-4b34-8611-81288ba96af5",
+        "permissions": {
+          "certificates": [
+            "get",
+            "list",
+            "delete",
+            "create",
+            "import",
+            "update",
+            "managecontacts",
+            "getissuers",
+            "listissuers",
+            "setissuers",
+            "deleteissuers",
+            "manageissuers",
+            "recover"
+          ],
+          "keys": [
+            "get",
+            "create",
+            "delete",
+            "list",
+            "update",
+            "import",
+            "backup",
+            "restore",
+            "recover"
+          ],
+          "secrets": [
+            "get",
+            "list",
+            "set",
+            "delete",
+            "backup",
+            "restore",
+            "recover"
+          ],
+          "storage": [
+            "get",
+            "list",
+            "delete",
+            "set",
+            "update",
+            "regeneratekey",
+            "setsas",
+            "listsas",
+            "getsas",
+            "deletesas"
+          ]
+        },
+        "tenantId": "604c1504-c6a3-4080-81aa-b33091104187"
+      }
+    ],
+    "createMode": null,
+    "enablePurgeProtection": null,
+    "enableSoftDelete": true,
+    "enabledForDeployment": false,
+    "enabledForDiskEncryption": null,
+    "enabledForTemplateDeployment": null,
+    "networkAcls": null,
+    "privateEndpointConnections": null,
+    "provisioningState": "Succeeded",
+    "sku": {
+      "name": "standard"
+    },
+    "tenantId": "604c1504-c6a3-4080-81aa-b33091104187",
+    "vaultUri": "https://js-unique-vault-name.vault.azure.net/"
+  },
+  "resourceGroup": "learn-8202b72b-4737-4424-a7ed-c78e807b7457",
+  "tags": {},
+  "type": "Microsoft.KeyVault/vaults"
+}
+rajani_net@Azure:~$
+]
+
+# Add the secret
+$ az keyvault secret set \
+    --name SecretPassword \
+    --value reindeer_flotilla \
+    --vault-name js-unique-vault-name
+[
+rajani_net@Azure:~$ az keyvault secret set \
+>     --name SecretPassword \
+>     --value reindeer_flotilla \
+>     --vault-name js-unique-vault-name
+{
+  "attributes": {
+    "created": "2020-04-02T10:34:48+00:00",
+    "enabled": true,
+    "expires": null,
+    "notBefore": null,
+    "recoveryLevel": "Recoverable+Purgeable",
+    "updated": "2020-04-02T10:34:48+00:00"
+  },
+  "contentType": null,
+  "id": "https://js-unique-vault-name.vault.azure.net/secrets/SecretPassword/8db346b53688424d894f90f787885cd6",
+  "kid": null,
+  "managed": null,
+  "tags": {
+    "file-encoding": "utf-8"
+  },
+  "value": "reindeer_flotilla"
+}
+rajani_net@Azure:~$
+]
+
+# Create the app
+$ mkdir KeyVaultDemoApp
+[
+rajani_net@Azure:~$ mkdir KeyVaultDemoApp
+rajani_net@Azure:~$
+]
+$ cd KeyVaultDemoApp
+[
+rajani_net@Azure:~$ cd KeyVaultDemoApp
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+$ npm init -y
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ npm init -y
+Wrote to /home/rajani_net/KeyVaultDemoApp/package.json:
+
+{
+  "name": "KeyVaultDemoApp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
+
+
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+$ npm install ms-rest-azure azure-keyvault express
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ npm install ms-rest-azure azure-keyvault express
+npm WARN deprecated azure-keyvault@3.0.5: This package has been deprecated. Please use @azure/keyvault-keys, @azure/keyvault-secrets or @azure/keyvault-certificates instead
+npm WARN deprecated request@2.88.2: request has been deprecated, see https://github.com/request/request/issues/3142
+npm notice created a lockfile as package-lock.json. You should commit this file.
+npm WARN KeyVaultDemoApp@1.0.0 No description
+npm WARN KeyVaultDemoApp@1.0.0 No repository field.
+
++ azure-keyvault@3.0.5
++ express@4.17.1
++ ms-rest-azure@3.0.0
+added 118 packages from 140 contributors and audited 634 packages in 4.635s
+found 0 vulnerabilities
+
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+$ touch app.js
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ touch app.js
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+$ code app.js
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ code app.js
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+
+# Add code to load and use secrets
+app.js
+// Importing dependencies
+const msRestAzure = require('ms-rest-azure');
+const keyVault = require('azure-keyvault');
+const app = require('express')();
+
+// Initialize port
+const port = process.env.PORT || 3000;
+
+// Create Vault URL from App Settings
+const vaultUrl = `https://${process.env.VaultName}.vault.azure.net/`;
+
+// Map of key vault secret names to values
+let vaultSecretsMap = {};
+
+Next, we'll add the code to authenticate to the vault and load the secrets. We'll add this as two separate functions. Insert a couple of blank lines after the code you previously added and then paste in the following code:
+const authenticateToKeyVault = async () => {
+  try {
+    let credentials;
+    if (process.env.NODE_ENV === 'production') {
+      credentials = await msRestAzure.loginWithAppServiceMSI({ resource: 'https://vault.azure.net' });
+    } else {
+      // For non-App Service environments. Set the APP_ID, APP_SECRET and TENANT_ID environment
+      // variables to use.
+      const appId = process.env.APP_ID;
+      const appSecret = process.env.APP_SECRET;
+      const tenantId = process.env.TENANT_ID;
+      credentials = await msRestAzure.loginWithServicePrincipalSecret(appId, appSecret, tenantId);
+    }
+    return credentials;
+  } catch(err) {
+    throw err.message;
+  }
+}
+
+const getKeyVaultSecrets = async credentials => {
+  // Create a key vault client
+  let keyVaultClient = new keyVault.KeyVaultClient(credentials);
+  try {
+    let secrets = await keyVaultClient.getSecrets(vaultUrl);
+    // For each secret name, get the secret value from the vault
+    for (const secret of secrets) {
+      // Only load enabled secrets - getSecret will return an error for disabled secrets
+      if (secret.attributes.enabled) {
+        let secretId = secret.id;
+        let secretName = secretId.substring(secretId.lastIndexOf('/') + 1);
+        let secretValue = await keyVaultClient.getSecret(vaultUrl, secretName, '');
+        vaultSecretsMap[secretName] = secretValue.value;
+      }
+    }
+  } catch(err) {
+    console.log(err.message)
+  }
+}
+
+Now create the Express endpoint we'll use to test whether our secret was loaded. Paste in this code next:
+app.get('/api/SecretTest', (req, res) => {
+  let secretName = 'SecretPassword';
+  let response;
+  if (secretName in vaultSecretsMap) {
+    response = `Secret value: ${vaultSecretsMap[secretName]}\n\nThis is for testing only! Never output a secret to a response or anywhere else in a real app!`;
+  } else {
+    response = `Error: No secret named ${secretName} was found...`
+  }
+  res.type('text');
+  res.send(response);
+});
+
+Finally, we'll call our functions to load the secrets from our vault, then start the app. Paste in this last snippet to complete the application:
+(async () =>  {
+  let credentials = await authenticateToKeyVault();
+  await getKeyVaultSecrets(credentials);
+  app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
+  });
+})().catch(err => console.log(err));
+
+
+# Create the App Service plan and app
+In Azure Cloud Shell, run the following to create an App Service plan:
+$ az appservice plan create \
+    --name keyvault-exercise-plan \
+    --sku FREE \
+    --location centralus \
+    --resource-group learn-8202b72b-4737-4424-a7ed-c78e807b7457
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ az appservice plan create \
+>     --name keyvault-exercise-plan \
+>     --sku FREE \
+>     --location centralus \
+>     --resource-group learn-8202b72b-4737-4424-a7ed-c78e807b7457
+{
+  "freeOfferExpirationTime": null,
+  "geoRegion": "Central US",
+  "hostingEnvironmentProfile": null,
+  "hyperV": false,
+  "id": "/subscriptions/4c041d79-7efb-4645-ac96-ed17a5b918bb/resourceGroups/learn-8202b72b-4737-4424-a7ed-c78e807b7457/providers/Microsoft.Web/serverfarms/keyvault-exercise-plan",
+  "isSpot": false,
+  "isXenon": false,
+  "kind": "app",
+  "location": "Central US",
+  "maximumElasticWorkerCount": 1,
+  "maximumNumberOfWorkers": 1,
+  "name": "keyvault-exercise-plan",
+  "numberOfSites": 0,
+  "perSiteScaling": false,
+  "provisioningState": "Succeeded",
+  "reserved": false,
+  "resourceGroup": "learn-8202b72b-4737-4424-a7ed-c78e807b7457",
+  "sku": {
+    "capabilities": null,
+    "capacity": 0,
+    "family": "F",
+    "locations": null,
+    "name": "F1",
+    "size": "F1",
+    "skuCapacity": null,
+    "tier": "Free"
+  },
+  "spotExpirationTime": null,
+  "status": "Ready",
+  "subscription": "4c041d79-7efb-4645-ac96-ed17a5b918bb",
+  "tags": null,
+  "targetWorkerCount": 0,
+  "targetWorkerSizeId": 0,
+  "type": "Microsoft.Web/serverfarms",
+  "workerTierName": null
+}
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+
+Next, run the following command to create the Web App that uses the App Service plan you just created:
+$ az webapp create \
+    --plan keyvault-exercise-plan \
+    --runtime "node|10.6" \
+    --resource-group learn-8202b72b-4737-4424-a7ed-c78e807b7457 \
+    --name js-unique-app-name
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ az webapp create \
+>     --plan keyvault-exercise-plan \
+>     --runtime "node|10.6" \
+>     --resource-group learn-8202b72b-4737-4424-a7ed-c78e807b7457 \
+>     --name js-unique-app-name
+{
+  "availabilityState": "Normal",
+  "clientAffinityEnabled": true,
+  "clientCertEnabled": false,
+  "clientCertExclusionPaths": null,
+  "cloningInfo": null,
+  "containerSize": 0,
+  "dailyMemoryTimeQuota": 0,
+  "defaultHostName": "js-unique-app-name.azurewebsites.net",
+  "enabled": true,
+  "enabledHostNames": [
+    "js-unique-app-name.azurewebsites.net",
+    "js-unique-app-name.scm.azurewebsites.net"
+  ],
+  "ftpPublishingUrl": "ftp://waws-prod-dm1-089.ftp.azurewebsites.windows.net/site/wwwroot",
+  "hostNameSslStates": [
+    {
+      "hostType": "Standard",
+      "ipBasedSslResult": null,
+      "ipBasedSslState": "NotConfigured",
+      "name": "js-unique-app-name.azurewebsites.net",
+      "sslState": "Disabled",
+      "thumbprint": null,
+      "toUpdate": null,
+      "toUpdateIpBasedSsl": null,
+      "virtualIp": null
+    },
+    {
+      "hostType": "Repository",
+      "ipBasedSslResult": null,
+      "ipBasedSslState": "NotConfigured",
+      "name": "js-unique-app-name.scm.azurewebsites.net",
+      "sslState": "Disabled",
+      "thumbprint": null,
+      "toUpdate": null,
+      "toUpdateIpBasedSsl": null,
+      "virtualIp": null
+    }
+  ],
+  "hostNames": [
+    "js-unique-app-name.azurewebsites.net"
+  ],
+  "hostNamesDisabled": false,
+  "hostingEnvironmentProfile": null,
+  "httpsOnly": false,
+  "hyperV": false,
+  "id": "/subscriptions/4c041d79-7efb-4645-ac96-ed17a5b918bb/resourceGroups/learn-8202b72b-4737-4424-a7ed-c78e807b7457/providers/Microsoft.Web/sites/js-unique-app-name",
+  "identity": null,
+  "inProgressOperationId": null,
+  "isDefaultContainer": null,
+  "isXenon": false,
+  "kind": "app",
+  "lastModifiedTimeUtc": "2020-04-02T10:45:39.080000",
+  "location": "Central US",
+  "maxNumberOfWorkers": null,
+  "name": "js-unique-app-name",
+  "outboundIpAddresses": "52.165.168.40,52.165.227.9,52.165.224.93,13.89.185.131,13.89.186.120",
+  "possibleOutboundIpAddresses": "52.165.168.40,52.165.227.9,52.165.224.93,13.89.185.131,13.89.186.120,13.89.191.30,13.89.185.138,52.173.147.98",
+  "redundancyMode": "None",
+  "repositorySiteName": "js-unique-app-name",
+  "reserved": false,
+  "resourceGroup": "learn-8202b72b-4737-4424-a7ed-c78e807b7457",
+  "scmSiteAlsoStopped": false,
+  "serverFarmId": "/subscriptions/4c041d79-7efb-4645-ac96-ed17a5b918bb/resourceGroups/learn-8202b72b-4737-4424-a7ed-c78e807b7457/providers/Microsoft.Web/serverfarms/keyvault-exercise-plan",
+  "siteConfig": null,
+  "slotSwapStatus": null,
+  "state": "Running",
+  "suspendedTill": null,
+  "tags": null,
+  "targetSwapSlot": null,
+  "trafficManagerHostNames": null,
+  "type": "Microsoft.Web/sites",
+  "usageState": "Normal"
+}
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+
+# Add configuration to the app
+$ az webapp config appsettings set \
+    --resource-group learn-8202b72b-4737-4424-a7ed-c78e807b7457 \
+    --name js-unique-app-name \
+    --settings 'VaultName=js-unique-vault-name' 'SCM_DO_BUILD_DURING_DEPLOYMENT=true'
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ az webapp config appsettings set \
+>     --resource-group learn-8202b72b-4737-4424-a7ed-c78e807b7457 \
+>     --name js-unique-app-name \
+>     --settings 'VaultName=js-unique-vault-name' 'SCM_DO_BUILD_DURING_DEPLOYMENT=true'
+[
+  {
+    "name": "WEBSITE_NODE_DEFAULT_VERSION",
+    "slotSetting": false,
+    "value": "10.6"
+  },
+  {
+    "name": "VaultName",
+    "slotSetting": false,
+    "value": "js-unique-vault-name"
+  },
+  {
+    "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
+    "slotSetting": false,
+    "value": "true"
+  }
+]
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+
+# Enable managed identity
+$ az webapp identity assign \
+    --resource-group learn-8202b72b-4737-4424-a7ed-c78e807b7457 \
+    --name js-unique-app-name
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ az webapp identity assign \
+>     --resource-group learn-8202b72b-4737-4424-a7ed-c78e807b7457 \
+>     --name js-unique-app-name
+{
+  "principalId": "f76096bc-48a6-483c-99aa-8312ee48537d",
+  "tenantId": "604c1504-c6a3-4080-81aa-b33091104187",
+  "type": "SystemAssigned",
+  "userAssignedIdentities": null
+}
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+
+From the JSON output that results, copy the principalId value. PrincipalId is the unique ID of the app's new identity in Azure Active Directory, and we're going to use it in the next step.
+[
+f76096bc-48a6-483c-99aa-8312ee48537d
+]
+
+# Grant access to the vault
+The last step before deploying is to assign Key Vault permissions to your app's managed identity. Use the principalId value you copied from the previous step as the value for object-id in the command below. Running this command will grant Get and List access:
+$ az keyvault set-policy \
+    --secret-permissions get list \
+    --name js-unique-vault-name \
+    --object-id f76096bc-48a6-483c-99aa-8312ee48537d
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ az keyvault set-policy \
+>     --secret-permissions get list \
+>     --name js-unique-vault-name \
+>     --object-id f76096bc-48a6-483c-99aa-8312ee48537d
+{
+  "id": "/subscriptions/4c041d79-7efb-4645-ac96-ed17a5b918bb/resourceGroups/learn-8202b72b-4737-4424-a7ed-c78e807b7457/providers/Microsoft.KeyVault/vaults/js-unique-vault-name",
+  "location": "centralus",
+  "name": "js-unique-vault-name",
+  "properties": {
+    "accessPolicies": [
+      {
+        "applicationId": null,
+        "objectId": "5a10ab73-4942-4b34-8611-81288ba96af5",
+        "permissions": {
+          "certificates": [
+            "get",
+            "list",
+            "delete",
+            "create",
+            "import",
+            "update",
+            "managecontacts",
+            "getissuers",
+            "listissuers",
+            "setissuers",
+            "deleteissuers",
+            "manageissuers",
+            "recover"
+          ],
+          "keys": [
+            "get",
+            "create",
+            "delete",
+            "list",
+            "update",
+            "import",
+            "backup",
+            "restore",
+            "recover"
+          ],
+          "secrets": [
+            "get",
+            "list",
+            "set",
+            "delete",
+            "backup",
+            "restore",
+            "recover"
+          ],
+          "storage": [
+            "get",
+            "list",
+            "delete",
+            "set",
+            "update",
+            "regeneratekey",
+            "setsas",
+            "listsas",
+            "getsas",
+            "deletesas"
+          ]
+        },
+        "tenantId": "604c1504-c6a3-4080-81aa-b33091104187"
+      },
+      {
+        "applicationId": null,
+        "objectId": "f76096bc-48a6-483c-99aa-8312ee48537d",
+        "permissions": {
+          "certificates": null,
+          "keys": null,
+          "secrets": [
+            "get",
+            "list"
+          ],
+          "storage": null
+        },
+        "tenantId": "604c1504-c6a3-4080-81aa-b33091104187"
+      }
+    ],
+    "createMode": null,
+    "enablePurgeProtection": null,
+    "enableSoftDelete": true,
+    "enabledForDeployment": false,
+    "enabledForDiskEncryption": null,
+    "enabledForTemplateDeployment": null,
+    "networkAcls": null,
+    "privateEndpointConnections": null,
+    "provisioningState": "Succeeded",
+    "sku": {
+      "name": "standard"
+    },
+    "tenantId": "604c1504-c6a3-4080-81aa-b33091104187",
+    "vaultUri": "https://js-unique-vault-name.vault.azure.net/"
+  },
+  "resourceGroup": "learn-8202b72b-4737-4424-a7ed-c78e807b7457",
+  "tags": {},
+  "type": "Microsoft.KeyVault/vaults"
+}
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+
+# Deploy the app and try it out
+$ zip site.zip * -x node_modules/
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ zip site.zip * -x node_modules/
+  adding: app.js (deflated 59%)
+  adding: package.json (deflated 36%)
+  adding: package-lock.json (deflated 70%)
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+$ az webapp deployment source config-zip \
+    --src site.zip \
+    --resource-group learn-8202b72b-4737-4424-a7ed-c78e807b7457 \
+    --name js-unique-app-name
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ az webapp deployment source config-zip \
+>     --src site.zip \
+>     --resource-group learn-8202b72b-4737-4424-a7ed-c78e807b7457 \
+>     --name js-unique-app-name
+Getting scm site credentials for zip deployment
+Starting zip deployment. This operation can take a while to complete ...
+Deployment endpoint responded with status code 202
+Configuring default logging for the app, if not already enabled
+Zip deployment failed. {'id': 'b46c0e2bfe4e42a2a839243ff0dc56db', 'status': 3, 'status_text': '', 'author_email': 'N/A', 'author': 'N/A', 'deployer': 'Push-Deployer', 'message': 'Created via a push deployment', 'progress': '', 'received_time': '2020-04-02T10:53:11.4387195Z', 'start_time': '2020-04-02T10:53:11.5490996Z', 'end_time': '2020-04-02T10:54:31.9851455Z', 'last_success_end_time': None, 'complete': True, 'active': False, 'is_temp': False, 'is_readonly': True, 'url': 'https://js-unique-app-name.scm.azurewebsites.net/api/deployments/latest', 'log_url': 'https://js-unique-app-name.scm.azurewebsites.net/api/deployments/latest/log', 'site_name':'js-unique-app-name', 'provisioningState': None}. Please run the command az webapp log tail
+                           -n js-unique-app-name -g learn-8202b72b-4737-4424-a7ed-c78e807b7457
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+
+The deployment may take a minute or two to complete. Once you get a result that indicates the site has deployed, open https://<your-unique-app-name>.azurewebsites.net/api/SecretTest in a browser. The app will take a moment to start up for the first time on the server, but once it does, you should see the secret value, reindeer_flotilla.
+[
+https://js-unique-app-name.azurewebsites.net/api/SecretTest
+]
+Your app is finished and deployed!
+
+
+
+
+/*
+Courtesy:
+https://docs.microsoft.com
+*/

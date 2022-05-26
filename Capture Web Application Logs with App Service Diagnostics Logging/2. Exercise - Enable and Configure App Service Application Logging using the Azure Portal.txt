@@ -1,0 +1,357 @@
+# Use Azure CLI to deploy a web app
+
+1. Run the following commands in the Cloud Shell to set some variables, replacing <your-local-Azure-region>, with the closest region to you from the following list.
+
+The free sandbox allows you to create resources in a subset of the Azure global regions. Select a region from this list when you create resources:
+• westus2
+• southcentralus
+• centralus
+• eastus
+• westeurope
+• southeastasia
+• japaneast
+• brazilsouth
+• australiasoutheast
+• centralindia
+
+Bash
+gitRepo=https://github.com/MicrosoftDocs/mslearn-capture-application-logs-app-service
+appName="contosofashions$RANDOM"
+appPlan="contosofashionsAppPlan"
+appLocation=<your-local-Azure-region>
+resourceGroup=learn-647064ed-c8e8-4fc5-9b1a-f49726a826ca
+storageAccount=sa$appName
+
+$ gitRepo=https://github.com/MicrosoftDocs/mslearn-capture-application-logs-app-service
+$ appName="contosofashions$RANDOM"
+$ appPlan="contosofashionsAppPlan"
+$ appLocation=westus2
+$ resourceGroup=learn-647064ed-c8e8-4fc5-9b1a-f49726a826ca
+$ storageAccount=sa$appName
+[
+Requesting a Cloud Shell.Succeeded.
+Connecting terminal...
+
+Welcome to Azure Cloud Shell
+
+Type "az" to use Azure CLI
+Type "help" to learn about Cloud Shell
+
+rajani_net@Azure:~$ dotnet --version
+2.2.402
+rajani_net@Azure:~$ gitRepo=https://github.com/MicrosoftDocs/mslearn-capture-application-logs-app-service
+rajani_net@Azure:~$ appName="contosofashions$RANDOM"
+rajani_net@Azure:~$ appPlan="contosofashionsAppPlan"
+rajani_net@Azure:~$ appLocation=westus2
+rajani_net@Azure:~$ resourceGroup=learn-647064ed-c8e8-4fc5-9b1a-f49726a826ca
+rajani_net@Azure:~$ storageAccount=sa$appName
+rajani_net@Azure:~$
+]
+
+2. Run the following commands in the Cloud Shell to deploy the web app.
+
+Azure CLI
+az appservice plan create --name $appPlan --resource-group $resourceGroup --location $appLocation --sku FREE
+az webapp create --name $appName --resource-group $resourceGroup --plan $appPlan --deployment-source-url $gitRepo
+
+$ az appservice plan create --name $appPlan --resource-group $resourceGroup --location $appLocation --sku FREE
+$ az webapp create --name $appName --resource-group $resourceGroup --plan $appPlan --deployment-source-url $gitRepo
+[
+rajani_net@Azure:~$ az appservice plan create --name $appPlan --resource-group $resourceGroup --location $appLocation --sku FREE
+{- Finished ..
+  "freeOfferExpirationTime": null,
+  "geoRegion": "West US 2",
+  "hostingEnvironmentProfile": null,
+  "hyperV": false,
+  "id": "/subscriptions/0e825941-c8c7-4d09-9374-5dbedf5bdad3/resourceGroups/learn-647064ed-c8e8-4fc5-9b1a-f49726a826ca/providers/Microsoft.Web/serverfarms/contosofashionsAppPlan",
+  "isSpot": false,
+  "isXenon": false,
+  "kind": "app",
+  "location": "West US 2",
+  "maximumElasticWorkerCount": 1,
+  "maximumNumberOfWorkers": 1,
+  "name": "contosofashionsAppPlan",
+  "numberOfSites": 0,
+  "perSiteScaling": false,
+  "provisioningState": "Succeeded",
+  "reserved": false,
+  "resourceGroup": "learn-647064ed-c8e8-4fc5-9b1a-f49726a826ca",
+  "sku": {
+    "capabilities": null,
+    "capacity": 0,
+    "family": "F",
+    "locations": null,
+    "name": "F1",
+    "size": "F1",
+    "skuCapacity": null,
+    "tier": "Free"
+  },
+  "spotExpirationTime": null,
+  "status": "Ready",
+  "subscription": "0e825941-c8c7-4d09-9374-5dbedf5bdad3",
+  "tags": null,
+  "targetWorkerCount": 0,
+  "targetWorkerSizeId": 0,
+  "type": "Microsoft.Web/serverfarms",
+  "workerTierName": null
+}
+rajani_net@Azure:~$ az webapp create --name $appName --resource-group $resourceGroup --plan $appPlan --deployment-source-url $gitRepo
+Linking to git repository 'https://github.com/MicrosoftDocs/mslearn-capture-application-logs-app-service'
+{- Finished ..
+  "availabilityState": "Normal",
+  "clientAffinityEnabled": true,
+  "clientCertEnabled": false,
+  "clientCertExclusionPaths": null,
+  "cloningInfo": null,
+  "containerSize": 0,
+  "dailyMemoryTimeQuota": 0,
+  "defaultHostName": "contosofashions635.azurewebsites.net",
+  "enabled": true,
+  "enabledHostNames": [
+    "contosofashions635.azurewebsites.net",
+    "contosofashions635.scm.azurewebsites.net"
+  ],
+  "ftpPublishingUrl": "ftp://waws-prod-mwh-045.ftp.azurewebsites.windows.net/site/wwwroot",
+  "hostNameSslStates": [
+    {
+      "hostType": "Standard",
+      "ipBasedSslResult": null,
+      "ipBasedSslState": "NotConfigured",
+      "name": "contosofashions635.azurewebsites.net",
+      "sslState": "Disabled",
+      "thumbprint": null,
+      "toUpdate": null,
+      "toUpdateIpBasedSsl": null,
+      "virtualIp": null
+    },
+    {
+      "hostType": "Repository",
+      "ipBasedSslResult": null,
+      "ipBasedSslState": "NotConfigured",
+      "name": "contosofashions635.scm.azurewebsites.net",
+      "sslState": "Disabled",
+      "thumbprint": null,
+      "toUpdate": null,
+      "toUpdateIpBasedSsl": null,
+      "virtualIp": null
+    }
+  ],
+  "hostNames": [
+    "contosofashions635.azurewebsites.net"
+  ],
+  "hostNamesDisabled": false,
+  "hostingEnvironmentProfile": null,
+  "httpsOnly": false,
+  "hyperV": false,
+  "id": "/subscriptions/0e825941-c8c7-4d09-9374-5dbedf5bdad3/resourceGroups/learn-647064ed-c8e8-4fc5-9b1a-f49726a826ca/providers/Microsoft.Web/sites/contosofashions635",
+  "identity": null,
+  "inProgressOperationId": null,
+  "isDefaultContainer": null,
+  "isXenon": false,
+  "kind": "app",
+  "lastModifiedTimeUtc": "2020-07-27T16:34:03.020000",
+  "location": "West US 2",
+  "maxNumberOfWorkers": null,
+  "name": "contosofashions635",
+  "outboundIpAddresses": "13.66.138.106,52.183.22.185,52.183.44.102,13.66.166.131,13.66.160.40",
+  "possibleOutboundIpAddresses": "13.66.138.106,52.183.22.185,52.183.44.102,13.66.166.131,13.66.160.40,13.77.151.8,52.183.43.161,13.77.160.193,13.77.155.56,52.175.223.195",
+  "redundancyMode": "None",
+  "repositorySiteName": "contosofashions635",
+  "reserved": false,
+  "resourceGroup": "learn-647064ed-c8e8-4fc5-9b1a-f49726a826ca",
+  "scmSiteAlsoStopped": false,
+  "serverFarmId": "/subscriptions/0e825941-c8c7-4d09-9374-5dbedf5bdad3/resourceGroups/learn-647064ed-c8e8-4fc5-9b1a-f49726a826ca/providers/Microsoft.Web/serverfarms/contosofashionsAppPlan",
+  "siteConfig": {
+    "acrUseManagedIdentityCreds": false,
+    "acrUserManagedIdentityID": null,
+    "alwaysOn": null,
+    "apiDefinition": null,
+    "apiManagementConfig": null,
+    "appCommandLine": null,
+    "appSettings": null,
+    "autoHealEnabled": null,
+    "autoHealRules": null,
+    "autoSwapSlotName": null,
+    "azureMonitorLogCategories": null,
+    "connectionStrings": null,
+    "cors": null,
+    "customAppPoolIdentityAdminState": null,
+    "customAppPoolIdentityTenantState": null,
+    "defaultDocuments": null,
+    "detailedErrorLoggingEnabled": null,
+    "documentRoot": null,
+    "experiments": null,
+    "fileChangeAuditEnabled": null,
+    "ftpsState": null,
+    "functionsRuntimeScaleMonitoringEnabled": null,
+    "handlerMappings": null,
+    "healthCheckPath": null,
+    "http20Enabled": null,
+    "httpLoggingEnabled": null,
+    "ipSecurityRestrictions": [
+      {
+        "action": "Allow",
+        "description": "Allow all access",
+        "ipAddress": "Any",
+        "name": "Allow all",
+        "priority": 1,
+        "subnetMask": null,
+        "subnetTrafficTag": null,
+        "tag": null,
+        "vnetSubnetResourceId": null,
+        "vnetTrafficTag": null
+      }
+    ],
+    "javaContainer": null,
+    "javaContainerVersion": null,
+    "javaVersion": null,
+    "limits": null,
+    "linuxFxVersion": null,
+    "loadBalancing": null,
+    "localMySqlEnabled": null,
+    "logsDirectorySizeLimit": null,
+    "machineKey": null,
+    "managedPipelineMode": null,
+    "managedServiceIdentityId": null,
+    "metadata": null,
+    "minTlsVersion": null,
+    "minimumElasticInstanceCount": 0,
+    "netFrameworkVersion": null,
+    "nodeVersion": null,
+    "numberOfWorkers": null,
+    "phpVersion": null,
+    "powerShellVersion": null,
+    "preWarmedInstanceCount": null,
+    "publishingPassword": null,
+    "publishingUsername": null,
+    "push": null,
+    "pythonVersion": null,
+    "remoteDebuggingEnabled": null,
+    "remoteDebuggingVersion": null,
+    "requestTracingEnabled": null,
+    "requestTracingExpirationTime": null,
+    "routingRules": null,
+    "runtimeADUser": null,
+    "runtimeADUserPassword": null,
+    "scmIpSecurityRestrictions": [
+      {
+        "action": "Allow",
+        "description": "Allow all access",
+        "ipAddress": "Any",
+        "name": "Allow all",
+        "priority": 1,
+        "subnetMask": null,
+        "subnetTrafficTag": null,
+        "tag": null,
+        "vnetSubnetResourceId": null,
+        "vnetTrafficTag": null
+      }
+    ],
+    "scmIpSecurityRestrictionsUseMain": null,
+    "scmType": null,
+    "tracingOptions": null,
+    "use32BitWorkerProcess": null,
+    "virtualApplications": null,
+    "vnetName": null,
+    "webSocketsEnabled": null,
+    "websiteTimeZone": null,
+    "winAuthAdminState": null,
+    "winAuthTenantState": null,
+    "windowsFxVersion": null,
+    "xManagedServiceIdentityId": null
+  },
+  "slotSwapStatus": null,
+  "state": "Running",
+  "suspendedTill": null,
+  "tags": null,
+  "targetSwapSlot": null,
+  "trafficManagerHostNames": null,
+  "type": "Microsoft.Web/sites",
+  "usageState": "Normal"
+}
+rajani_net@Azure:~$
+]
+
+3. Make a note of the random number suffix in your app name; this was generated to uniquely identify your app. The app may take several minutes to deploy.
+
+4. Run the following command in the Cloud Shell to create a storage account.
+Azure CLI
+az storage account create -n $storageAccount -g $resourceGroup -l $appLocation --sku Standard_LRS
+
+$ az storage account create -n $storageAccount -g $resourceGroup -l $appLocation --sku Standard_LRS
+[
+rajani_net@Azure:~$ az storage account create -n $storageAccount -g $resourceGroup -l $appLocation --sku Standard_LRS
+{- Finished ..
+  "accessTier": "Hot",
+  "allowBlobPublicAccess": null,
+  "azureFilesIdentityBasedAuthentication": null,
+  "blobRestoreStatus": null,
+  "creationTime": "2020-07-27T16:41:09.719280+00:00",
+  "customDomain": null,
+  "enableHttpsTrafficOnly": true,
+  "encryption": {
+    "keySource": "Microsoft.Storage",
+    "keyVaultProperties": null,
+    "requireInfrastructureEncryption": null,
+    "services": {
+      "blob": {
+        "enabled": true,
+        "keyType": "Account",
+        "lastEnabledTime": "2020-07-27T16:41:09.797345+00:00"
+      },
+      "file": {
+        "enabled": true,
+        "keyType": "Account",
+        "lastEnabledTime": "2020-07-27T16:41:09.797345+00:00"
+      },
+      "queue": null,
+      "table": null
+    }
+  },
+  "failoverInProgress": null,
+  "geoReplicationStats": null,
+  "id": "/subscriptions/0e825941-c8c7-4d09-9374-5dbedf5bdad3/resourceGroups/learn-647064ed-c8e8-4fc5-9b1a-f49726a826ca/providers/Microsoft.Storage/storageAccounts/sacontosofashions635",
+  "identity": null,
+  "isHnsEnabled": null,
+  "kind": "StorageV2",
+  "largeFileSharesState": null,
+  "lastGeoFailoverTime": null,
+  "location": "westus2",
+  "minimumTlsVersion": null,
+  "name": "sacontosofashions635",
+  "networkRuleSet": {
+    "bypass": "AzureServices",
+    "defaultAction": "Allow",
+    "ipRules": [],
+    "virtualNetworkRules": []
+  },
+  "primaryEndpoints": {
+    "blob": "https://sacontosofashions635.blob.core.windows.net/",
+    "dfs": "https://sacontosofashions635.dfs.core.windows.net/",
+    "file": "https://sacontosofashions635.file.core.windows.net/",
+    "internetEndpoints": null,
+    "microsoftEndpoints": null,
+    "queue": "https://sacontosofashions635.queue.core.windows.net/",
+    "table": "https://sacontosofashions635.table.core.windows.net/",
+    "web": "https://sacontosofashions635.z5.web.core.windows.net/"
+  },
+  "primaryLocation": "westus2",
+  "privateEndpointConnections": [],
+  "provisioningState": "Succeeded",
+  "resourceGroup": "learn-647064ed-c8e8-4fc5-9b1a-f49726a826ca",
+  "routingPreference": null,
+  "secondaryEndpoints": null,
+  "secondaryLocation": null,
+  "sku": {
+    "name": "Standard_LRS",
+    "tier": "Standard"
+  },
+  "statusOfPrimary": "available",
+  "statusOfSecondary": null,
+  "tags": {},
+  "type": "Microsoft.Storage/storageAccounts"
+}
+rajani_net@Azure:~$
+]
+
+5. Wait until the commands have completed before continuing with the exercise.

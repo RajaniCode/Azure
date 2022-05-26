@@ -1,0 +1,597 @@
+# Create the vault
+$ az keyvault create \
+    --resource-group learn-8202b72b-4737-4424-a7ed-c78e807b7457 \
+    --location centralus \
+    --name js-unique-vault-name
+[
+rajani_net@Azure:~$ az keyvault create \
+>     --resource-group learn-8202b72b-4737-4424-a7ed-c78e807b7457 \
+>     --location centralus \
+>     --name js-unique-vault-name
+{
+  "id": "/subscriptions/4c041d79-7efb-4645-ac96-ed17a5b918bb/resourceGroups/learn-8202b72b-4737-4424-a7ed-c78e807b7457/providers/Microsoft.KeyVault/vaults/js-unique-vault-name",
+  "location": "centralus",
+  "name": "js-unique-vault-name",
+  "properties": {
+    "accessPolicies": [
+      {
+        "applicationId": null,
+        "objectId": "5a10ab73-4942-4b34-8611-81288ba96af5",
+        "permissions": {
+          "certificates": [
+            "get",
+            "list",
+            "delete",
+            "create",
+            "import",
+            "update",
+            "managecontacts",
+            "getissuers",
+            "listissuers",
+            "setissuers",
+            "deleteissuers",
+            "manageissuers",
+            "recover"
+          ],
+          "keys": [
+            "get",
+            "create",
+            "delete",
+            "list",
+            "update",
+            "import",
+            "backup",
+            "restore",
+            "recover"
+          ],
+          "secrets": [
+            "get",
+            "list",
+            "set",
+            "delete",
+            "backup",
+            "restore",
+            "recover"
+          ],
+          "storage": [
+            "get",
+            "list",
+            "delete",
+            "set",
+            "update",
+            "regeneratekey",
+            "setsas",
+            "listsas",
+            "getsas",
+            "deletesas"
+          ]
+        },
+        "tenantId": "604c1504-c6a3-4080-81aa-b33091104187"
+      }
+    ],
+    "createMode": null,
+    "enablePurgeProtection": null,
+    "enableSoftDelete": true,
+    "enabledForDeployment": false,
+    "enabledForDiskEncryption": null,
+    "enabledForTemplateDeployment": null,
+    "networkAcls": null,
+    "privateEndpointConnections": null,
+    "provisioningState": "Succeeded",
+    "sku": {
+      "name": "standard"
+    },
+    "tenantId": "604c1504-c6a3-4080-81aa-b33091104187",
+    "vaultUri": "https://js-unique-vault-name.vault.azure.net/"
+  },
+  "resourceGroup": "learn-8202b72b-4737-4424-a7ed-c78e807b7457",
+  "tags": {},
+  "type": "Microsoft.KeyVault/vaults"
+}
+rajani_net@Azure:~$
+]
+
+# Add the secret
+$ az keyvault secret set \
+    --name SecretPassword \
+    --value reindeer_flotilla \
+    --vault-name js-unique-vault-name
+[
+rajani_net@Azure:~$ az keyvault secret set \
+>     --name SecretPassword \
+>     --value reindeer_flotilla \
+>     --vault-name js-unique-vault-name
+{
+  "attributes": {
+    "created": "2020-04-02T10:34:48+00:00",
+    "enabled": true,
+    "expires": null,
+    "notBefore": null,
+    "recoveryLevel": "Recoverable+Purgeable",
+    "updated": "2020-04-02T10:34:48+00:00"
+  },
+  "contentType": null,
+  "id": "https://js-unique-vault-name.vault.azure.net/secrets/SecretPassword/8db346b53688424d894f90f787885cd6",
+  "kid": null,
+  "managed": null,
+  "tags": {
+    "file-encoding": "utf-8"
+  },
+  "value": "reindeer_flotilla"
+}
+rajani_net@Azure:~$
+]
+
+# Create the app
+$ mkdir KeyVaultDemoApp
+[
+rajani_net@Azure:~$ mkdir KeyVaultDemoApp
+rajani_net@Azure:~$
+]
+$ cd KeyVaultDemoApp
+[
+rajani_net@Azure:~$ cd KeyVaultDemoApp
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+$ npm init -y
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ npm init -y
+Wrote to /home/rajani_net/KeyVaultDemoApp/package.json:
+
+{
+  "name": "KeyVaultDemoApp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
+
+
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+$ npm install ms-rest-azure azure-keyvault express
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ npm install ms-rest-azure azure-keyvault express
+npm WARN deprecated azure-keyvault@3.0.5: This package has been deprecated. Please use @azure/keyvault-keys, @azure/keyvault-secrets or @azure/keyvault-certificates instead
+npm WARN deprecated request@2.88.2: request has been deprecated, see https://github.com/request/request/issues/3142
+npm notice created a lockfile as package-lock.json. You should commit this file.
+npm WARN KeyVaultDemoApp@1.0.0 No description
+npm WARN KeyVaultDemoApp@1.0.0 No repository field.
+
++ azure-keyvault@3.0.5
++ express@4.17.1
++ ms-rest-azure@3.0.0
+added 118 packages from 140 contributors and audited 634 packages in 4.635s
+found 0 vulnerabilities
+
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+$ touch app.js
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ touch app.js
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+$ code app.js
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ code app.js
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+
+# Add code to load and use secrets
+app.js
+// Importing dependencies
+const msRestAzure = require('ms-rest-azure');
+const keyVault = require('azure-keyvault');
+const app = require('express')();
+
+// Initialize port
+const port = process.env.PORT || 3000;
+
+// Create Vault URL from App Settings
+const vaultUrl = `https://${process.env.VaultName}.vault.azure.net/`;
+
+// Map of key vault secret names to values
+let vaultSecretsMap = {};
+
+Next, we'll add the code to authenticate to the vault and load the secrets. We'll add this as two separate functions. Insert a couple of blank lines after the code you previously added and then paste in the following code:
+const authenticateToKeyVault = async () => {
+  try {
+    let credentials;
+    if (process.env.NODE_ENV === 'production') {
+      credentials = await msRestAzure.loginWithAppServiceMSI({ resource: 'https://vault.azure.net' });
+    } else {
+      // For non-App Service environments. Set the APP_ID, APP_SECRET and TENANT_ID environment
+      // variables to use.
+      const appId = process.env.APP_ID;
+      const appSecret = process.env.APP_SECRET;
+      const tenantId = process.env.TENANT_ID;
+      credentials = await msRestAzure.loginWithServicePrincipalSecret(appId, appSecret, tenantId);
+    }
+    return credentials;
+  } catch(err) {
+    throw err.message;
+  }
+}
+
+const getKeyVaultSecrets = async credentials => {
+  // Create a key vault client
+  let keyVaultClient = new keyVault.KeyVaultClient(credentials);
+  try {
+    let secrets = await keyVaultClient.getSecrets(vaultUrl);
+    // For each secret name, get the secret value from the vault
+    for (const secret of secrets) {
+      // Only load enabled secrets - getSecret will return an error for disabled secrets
+      if (secret.attributes.enabled) {
+        let secretId = secret.id;
+        let secretName = secretId.substring(secretId.lastIndexOf('/') + 1);
+        let secretValue = await keyVaultClient.getSecret(vaultUrl, secretName, '');
+        vaultSecretsMap[secretName] = secretValue.value;
+      }
+    }
+  } catch(err) {
+    console.log(err.message)
+  }
+}
+
+Now create the Express endpoint we'll use to test whether our secret was loaded. Paste in this code next:
+app.get('/api/SecretTest', (req, res) => {
+  let secretName = 'SecretPassword';
+  let response;
+  if (secretName in vaultSecretsMap) {
+    response = `Secret value: ${vaultSecretsMap[secretName]}\n\nThis is for testing only! Never output a secret to a response or anywhere else in a real app!`;
+  } else {
+    response = `Error: No secret named ${secretName} was found...`
+  }
+  res.type('text');
+  res.send(response);
+});
+
+Finally, we'll call our functions to load the secrets from our vault, then start the app. Paste in this last snippet to complete the application:
+(async () =>  {
+  let credentials = await authenticateToKeyVault();
+  await getKeyVaultSecrets(credentials);
+  app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
+  });
+})().catch(err => console.log(err));
+
+
+# Create the App Service plan and app
+In Azure Cloud Shell, run the following to create an App Service plan:
+$ az appservice plan create \
+    --name keyvault-exercise-plan \
+    --sku FREE \
+    --location centralus \
+    --resource-group learn-8202b72b-4737-4424-a7ed-c78e807b7457
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ az appservice plan create \
+>     --name keyvault-exercise-plan \
+>     --sku FREE \
+>     --location centralus \
+>     --resource-group learn-8202b72b-4737-4424-a7ed-c78e807b7457
+{
+  "freeOfferExpirationTime": null,
+  "geoRegion": "Central US",
+  "hostingEnvironmentProfile": null,
+  "hyperV": false,
+  "id": "/subscriptions/4c041d79-7efb-4645-ac96-ed17a5b918bb/resourceGroups/learn-8202b72b-4737-4424-a7ed-c78e807b7457/providers/Microsoft.Web/serverfarms/keyvault-exercise-plan",
+  "isSpot": false,
+  "isXenon": false,
+  "kind": "app",
+  "location": "Central US",
+  "maximumElasticWorkerCount": 1,
+  "maximumNumberOfWorkers": 1,
+  "name": "keyvault-exercise-plan",
+  "numberOfSites": 0,
+  "perSiteScaling": false,
+  "provisioningState": "Succeeded",
+  "reserved": false,
+  "resourceGroup": "learn-8202b72b-4737-4424-a7ed-c78e807b7457",
+  "sku": {
+    "capabilities": null,
+    "capacity": 0,
+    "family": "F",
+    "locations": null,
+    "name": "F1",
+    "size": "F1",
+    "skuCapacity": null,
+    "tier": "Free"
+  },
+  "spotExpirationTime": null,
+  "status": "Ready",
+  "subscription": "4c041d79-7efb-4645-ac96-ed17a5b918bb",
+  "tags": null,
+  "targetWorkerCount": 0,
+  "targetWorkerSizeId": 0,
+  "type": "Microsoft.Web/serverfarms",
+  "workerTierName": null
+}
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+
+Next, run the following command to create the Web App that uses the App Service plan you just created:
+$ az webapp create \
+    --plan keyvault-exercise-plan \
+    --runtime "node|10.6" \
+    --resource-group learn-8202b72b-4737-4424-a7ed-c78e807b7457 \
+    --name js-unique-app-name
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ az webapp create \
+>     --plan keyvault-exercise-plan \
+>     --runtime "node|10.6" \
+>     --resource-group learn-8202b72b-4737-4424-a7ed-c78e807b7457 \
+>     --name js-unique-app-name
+{
+  "availabilityState": "Normal",
+  "clientAffinityEnabled": true,
+  "clientCertEnabled": false,
+  "clientCertExclusionPaths": null,
+  "cloningInfo": null,
+  "containerSize": 0,
+  "dailyMemoryTimeQuota": 0,
+  "defaultHostName": "js-unique-app-name.azurewebsites.net",
+  "enabled": true,
+  "enabledHostNames": [
+    "js-unique-app-name.azurewebsites.net",
+    "js-unique-app-name.scm.azurewebsites.net"
+  ],
+  "ftpPublishingUrl": "ftp://waws-prod-dm1-089.ftp.azurewebsites.windows.net/site/wwwroot",
+  "hostNameSslStates": [
+    {
+      "hostType": "Standard",
+      "ipBasedSslResult": null,
+      "ipBasedSslState": "NotConfigured",
+      "name": "js-unique-app-name.azurewebsites.net",
+      "sslState": "Disabled",
+      "thumbprint": null,
+      "toUpdate": null,
+      "toUpdateIpBasedSsl": null,
+      "virtualIp": null
+    },
+    {
+      "hostType": "Repository",
+      "ipBasedSslResult": null,
+      "ipBasedSslState": "NotConfigured",
+      "name": "js-unique-app-name.scm.azurewebsites.net",
+      "sslState": "Disabled",
+      "thumbprint": null,
+      "toUpdate": null,
+      "toUpdateIpBasedSsl": null,
+      "virtualIp": null
+    }
+  ],
+  "hostNames": [
+    "js-unique-app-name.azurewebsites.net"
+  ],
+  "hostNamesDisabled": false,
+  "hostingEnvironmentProfile": null,
+  "httpsOnly": false,
+  "hyperV": false,
+  "id": "/subscriptions/4c041d79-7efb-4645-ac96-ed17a5b918bb/resourceGroups/learn-8202b72b-4737-4424-a7ed-c78e807b7457/providers/Microsoft.Web/sites/js-unique-app-name",
+  "identity": null,
+  "inProgressOperationId": null,
+  "isDefaultContainer": null,
+  "isXenon": false,
+  "kind": "app",
+  "lastModifiedTimeUtc": "2020-04-02T10:45:39.080000",
+  "location": "Central US",
+  "maxNumberOfWorkers": null,
+  "name": "js-unique-app-name",
+  "outboundIpAddresses": "52.165.168.40,52.165.227.9,52.165.224.93,13.89.185.131,13.89.186.120",
+  "possibleOutboundIpAddresses": "52.165.168.40,52.165.227.9,52.165.224.93,13.89.185.131,13.89.186.120,13.89.191.30,13.89.185.138,52.173.147.98",
+  "redundancyMode": "None",
+  "repositorySiteName": "js-unique-app-name",
+  "reserved": false,
+  "resourceGroup": "learn-8202b72b-4737-4424-a7ed-c78e807b7457",
+  "scmSiteAlsoStopped": false,
+  "serverFarmId": "/subscriptions/4c041d79-7efb-4645-ac96-ed17a5b918bb/resourceGroups/learn-8202b72b-4737-4424-a7ed-c78e807b7457/providers/Microsoft.Web/serverfarms/keyvault-exercise-plan",
+  "siteConfig": null,
+  "slotSwapStatus": null,
+  "state": "Running",
+  "suspendedTill": null,
+  "tags": null,
+  "targetSwapSlot": null,
+  "trafficManagerHostNames": null,
+  "type": "Microsoft.Web/sites",
+  "usageState": "Normal"
+}
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+
+# Add configuration to the app
+$ az webapp config appsettings set \
+    --resource-group learn-8202b72b-4737-4424-a7ed-c78e807b7457 \
+    --name js-unique-app-name \
+    --settings 'VaultName=js-unique-vault-name' 'SCM_DO_BUILD_DURING_DEPLOYMENT=true'
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ az webapp config appsettings set \
+>     --resource-group learn-8202b72b-4737-4424-a7ed-c78e807b7457 \
+>     --name js-unique-app-name \
+>     --settings 'VaultName=js-unique-vault-name' 'SCM_DO_BUILD_DURING_DEPLOYMENT=true'
+[
+  {
+    "name": "WEBSITE_NODE_DEFAULT_VERSION",
+    "slotSetting": false,
+    "value": "10.6"
+  },
+  {
+    "name": "VaultName",
+    "slotSetting": false,
+    "value": "js-unique-vault-name"
+  },
+  {
+    "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
+    "slotSetting": false,
+    "value": "true"
+  }
+]
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+
+# Enable managed identity
+$ az webapp identity assign \
+    --resource-group learn-8202b72b-4737-4424-a7ed-c78e807b7457 \
+    --name js-unique-app-name
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ az webapp identity assign \
+>     --resource-group learn-8202b72b-4737-4424-a7ed-c78e807b7457 \
+>     --name js-unique-app-name
+{
+  "principalId": "f76096bc-48a6-483c-99aa-8312ee48537d",
+  "tenantId": "604c1504-c6a3-4080-81aa-b33091104187",
+  "type": "SystemAssigned",
+  "userAssignedIdentities": null
+}
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+
+From the JSON output that results, copy the principalId value. PrincipalId is the unique ID of the app's new identity in Azure Active Directory, and we're going to use it in the next step.
+[
+f76096bc-48a6-483c-99aa-8312ee48537d
+]
+
+# Grant access to the vault
+The last step before deploying is to assign Key Vault permissions to your app's managed identity. Use the principalId value you copied from the previous step as the value for object-id in the command below. Running this command will grant Get and List access:
+$ az keyvault set-policy \
+    --secret-permissions get list \
+    --name js-unique-vault-name \
+    --object-id f76096bc-48a6-483c-99aa-8312ee48537d
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ az keyvault set-policy \
+>     --secret-permissions get list \
+>     --name js-unique-vault-name \
+>     --object-id f76096bc-48a6-483c-99aa-8312ee48537d
+{
+  "id": "/subscriptions/4c041d79-7efb-4645-ac96-ed17a5b918bb/resourceGroups/learn-8202b72b-4737-4424-a7ed-c78e807b7457/providers/Microsoft.KeyVault/vaults/js-unique-vault-name",
+  "location": "centralus",
+  "name": "js-unique-vault-name",
+  "properties": {
+    "accessPolicies": [
+      {
+        "applicationId": null,
+        "objectId": "5a10ab73-4942-4b34-8611-81288ba96af5",
+        "permissions": {
+          "certificates": [
+            "get",
+            "list",
+            "delete",
+            "create",
+            "import",
+            "update",
+            "managecontacts",
+            "getissuers",
+            "listissuers",
+            "setissuers",
+            "deleteissuers",
+            "manageissuers",
+            "recover"
+          ],
+          "keys": [
+            "get",
+            "create",
+            "delete",
+            "list",
+            "update",
+            "import",
+            "backup",
+            "restore",
+            "recover"
+          ],
+          "secrets": [
+            "get",
+            "list",
+            "set",
+            "delete",
+            "backup",
+            "restore",
+            "recover"
+          ],
+          "storage": [
+            "get",
+            "list",
+            "delete",
+            "set",
+            "update",
+            "regeneratekey",
+            "setsas",
+            "listsas",
+            "getsas",
+            "deletesas"
+          ]
+        },
+        "tenantId": "604c1504-c6a3-4080-81aa-b33091104187"
+      },
+      {
+        "applicationId": null,
+        "objectId": "f76096bc-48a6-483c-99aa-8312ee48537d",
+        "permissions": {
+          "certificates": null,
+          "keys": null,
+          "secrets": [
+            "get",
+            "list"
+          ],
+          "storage": null
+        },
+        "tenantId": "604c1504-c6a3-4080-81aa-b33091104187"
+      }
+    ],
+    "createMode": null,
+    "enablePurgeProtection": null,
+    "enableSoftDelete": true,
+    "enabledForDeployment": false,
+    "enabledForDiskEncryption": null,
+    "enabledForTemplateDeployment": null,
+    "networkAcls": null,
+    "privateEndpointConnections": null,
+    "provisioningState": "Succeeded",
+    "sku": {
+      "name": "standard"
+    },
+    "tenantId": "604c1504-c6a3-4080-81aa-b33091104187",
+    "vaultUri": "https://js-unique-vault-name.vault.azure.net/"
+  },
+  "resourceGroup": "learn-8202b72b-4737-4424-a7ed-c78e807b7457",
+  "tags": {},
+  "type": "Microsoft.KeyVault/vaults"
+}
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+
+# Deploy the app and try it out
+$ zip site.zip * -x node_modules/
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ zip site.zip * -x node_modules/
+  adding: app.js (deflated 59%)
+  adding: package.json (deflated 36%)
+  adding: package-lock.json (deflated 70%)
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+$ az webapp deployment source config-zip \
+    --src site.zip \
+    --resource-group learn-8202b72b-4737-4424-a7ed-c78e807b7457 \
+    --name js-unique-app-name
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ az webapp deployment source config-zip \
+>     --src site.zip \
+>     --resource-group learn-8202b72b-4737-4424-a7ed-c78e807b7457 \
+>     --name js-unique-app-name
+Getting scm site credentials for zip deployment
+Starting zip deployment. This operation can take a while to complete ...
+Deployment endpoint responded with status code 202
+Configuring default logging for the app, if not already enabled
+Zip deployment failed. {'id': 'b46c0e2bfe4e42a2a839243ff0dc56db', 'status': 3, 'status_text': '', 'author_email': 'N/A', 'author': 'N/A', 'deployer': 'Push-Deployer', 'message': 'Created via a push deployment', 'progress': '', 'received_time': '2020-04-02T10:53:11.4387195Z', 'start_time': '2020-04-02T10:53:11.5490996Z', 'end_time': '2020-04-02T10:54:31.9851455Z', 'last_success_end_time': None, 'complete': True, 'active': False, 'is_temp': False, 'is_readonly': True, 'url': 'https://js-unique-app-name.scm.azurewebsites.net/api/deployments/latest', 'log_url': 'https://js-unique-app-name.scm.azurewebsites.net/api/deployments/latest/log', 'site_name':'js-unique-app-name', 'provisioningState': None}. Please run the command az webapp log tail
+                           -n js-unique-app-name -g learn-8202b72b-4737-4424-a7ed-c78e807b7457
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+
+The deployment may take a minute or two to complete. Once you get a result that indicates the site has deployed, open https://<your-unique-app-name>.azurewebsites.net/api/SecretTest in a browser. The app will take a moment to start up for the first time on the server, but once it does, you should see the secret value, reindeer_flotilla.
+[
+https://js-unique-app-name.azurewebsites.net/api/SecretTest
+]
+Your app is finished and deployed!

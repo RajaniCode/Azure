@@ -1,0 +1,417 @@
+# Deploy the function app
+Run this command to set up environment variables pointed to our services.
+
+Azure CLI
+APPSERVICENAME="$(az webapp list \
+                    --resource-group learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a \
+                    --query '[].name' \
+                    --output tsv)"
+FUNCTIONAPPNAME="$(az functionapp list \
+                    --resource-group learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a \
+                    --query '[].name' \
+                    --output tsv)"
+
+$ APPSERVICENAME="$(az webapp list \
+                    --resource-group learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a \
+                    --query '[].name' \
+                    --output tsv)"
+$ FUNCTIONAPPNAME="$(az functionapp list \
+                    --resource-group learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a \
+                    --query '[].name' \
+                    --output tsv)"
+[
+rajani_net@Azure:~/mslearn-microservices-architecture/src/before$ APPSERVICENAME="$(az webapp list \
+>                     --resource-group learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a\
+>                     --query '[].name' \
+>                     --output tsv)"
+rajani_net@Azure:~/mslearn-microservices-architecture/src/before$ FUNCTIONAPPNAME="$(az functionapp list \
+>                     --resource-group learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a\
+>                     --query '[].name' \
+>                     --output tsv)"
+rajani_net@Azure:~/mslearn-microservices-architecture/src/before$
+]
+
+2. Let's build and zip up the application code for the function app.
+
+Bash
+cd ~/mslearn-microservices-architecture/src/after
+dotnet build ./PackageService/PackageService.csproj -c Release
+cd PackageService/bin/Release/netcoreapp2.2
+zip -r PackageService.zip .
+
+$ cd ~/mslearn-microservices-architecture/src/after
+$ dotnet build ./PackageService/PackageService.csproj -c Release
+$ cd PackageService/bin/Release/netcoreapp2.2
+$ zip -r PackageService.zip .
+[
+rajani_net@Azure:~/mslearn-microservices-architecture/src/before$ cd ~/mslearn-microservices-architecture/src/after
+rajani_net@Azure:~/mslearn-microservices-architecture/src/after$ dotnet build ./PackageService/PackageService.csproj -c Release
+
+Welcome to .NET Core!
+---------------------
+Learn more about .NET Core: https://aka.ms/dotnet-docs
+Use 'dotnet --help' to see available commands or visit: https://aka.ms/dotnet-cli-docs
+
+Telemetry
+---------
+The .NET Core tools collect usage data in order to help us improve your experience. The data is anonymous and doesn't include command-line arguments. The data is collected by Microsoft and shared with the community. You can opt-out of telemetry by setting the DOTNET_CLI_TELEMETRY_OPTOUT environment variable to '1' or 'true' using your favorite shell.
+
+Read more about .NET Core CLI Tools telemetry: https://aka.ms/dotnet-cli-telemetry
+
+ASP.NET Core
+------------
+Successfully installed the ASP.NET Core HTTPS Development Certificate.
+To trust the certificate run 'dotnet dev-certs https --trust' (Windows and macOS only). For establishing trust on other platforms refer to the platform specific documentation.
+For more information on configuring HTTPS see https://go.microsoft.com/fwlink/?linkid=848054.
+Microsoft (R) Build Engine version 16.2.32702+c4012a063 for .NET Core
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+  Restore completed in 7.55 sec for /home/rajani_net/mslearn-microservices-architecture/src/after/DroneDelivery.Common/DroneDelivery.Common.csproj.
+/home/rajani_net/mslearn-microservices-architecture/src/after/PackageService/PackageService.csproj : warning NU1608: Detected package version outside of dependencyconstraint: Microsoft.NET.Sdk.Functions 1.0.24 requires Newtonsoft.Json (= 11.0.2) but version Newtonsoft.Json 12.0.2 was resolved.
+  Restore completed in 54.13 sec for /home/rajani_net/mslearn-microservices-architecture/src/after/PackageService/PackageService.csproj.
+/home/rajani_net/mslearn-microservices-architecture/src/after/PackageService/PackageService.csproj : warning NU1608: Detected package version outside of dependencyconstraint: Microsoft.NET.Sdk.Functions 1.0.24 requires Newtonsoft.Json (= 11.0.2) but version Newtonsoft.Json 12.0.2 was resolved.
+  DroneDelivery.Common -> /home/rajani_net/mslearn-microservices-architecture/src/after/DroneDelivery.Common/bin/Release/netcoreapp2.1/DroneDelivery.Common.dll
+  PackageService -> /home/rajani_net/mslearn-microservices-architecture/src/after/PackageService/bin/Release/netcoreapp2.2/bin/PackageService.dll
+
+Build succeeded.
+
+/home/rajani_net/mslearn-microservices-architecture/src/after/PackageService/PackageService.csproj : warning NU1608: Detected package version outside of dependencyconstraint: Microsoft.NET.Sdk.Functions 1.0.24 requires Newtonsoft.Json (= 11.0.2) but version Newtonsoft.Json 12.0.2 was resolved.
+/home/rajani_net/mslearn-microservices-architecture/src/after/PackageService/PackageService.csproj : warning NU1608: Detected package version outside of dependencyconstraint: Microsoft.NET.Sdk.Functions 1.0.24 requires Newtonsoft.Json (= 11.0.2) but version Newtonsoft.Json 12.0.2 was resolved.
+    2 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:01:16.31
+rajani_net@Azure:~/mslearn-microservices-architecture/src/after$ cd PackageService/bin/Release/netcoreapp2.2
+rajani_net@Azure:~/mslearn-microservices-architecture/src/after/PackageService/bin/Release/netcoreapp2.2$ zip -r PackageService.zip .
+  adding: PackageServiceFunction/ (stored 0%)
+  adding: PackageServiceFunction/function.json (deflated 41%)
+  adding: PackageService.deps.json (deflated 83%)
+  adding: host.json (stored 0%)
+  adding: bin/ (stored 0%)
+  adding: bin/Microsoft.Extensions.Hosting.Abstractions.dll (deflated 47%)
+  adding: bin/Microsoft.Extensions.FileSystemGlobbing.dll (deflated 49%)
+  adding: bin/Microsoft.Azure.WebJobs.dll (deflated 43%)
+  adding: bin/extensions.json (stored 0%)
+  adding: bin/Microsoft.Extensions.Hosting.dll (deflated 49%)
+  adding: bin/Microsoft.Azure.WebJobs.Extensions.Http.dll (deflated 43%)
+  adding: bin/Microsoft.AspNetCore.Hosting.Abstractions.dll (deflated 49%)
+  adding: bin/Microsoft.Extensions.Configuration.EnvironmentVariables.dll (deflated 45%)
+  adding: bin/Microsoft.Extensions.Configuration.Json.dll (deflated 46%)
+  adding: bin/Microsoft.Extensions.FileProviders.Abstractions.dll (deflated 47%)
+  adding: bin/runtimes/ (stored 0%)
+  adding: bin/runtimes/win/ (stored 0%)
+  adding: bin/runtimes/win/lib/ (stored 0%)
+  adding: bin/runtimes/win/lib/netstandard1.3/ (stored 0%)
+  adding: bin/runtimes/win/lib/netstandard1.3/System.Text.Encoding.CodePages.dll (deflated 30%)
+  adding: bin/runtimes/unix/ (stored 0%)
+  adding: bin/runtimes/unix/lib/ (stored 0%)
+  adding: bin/runtimes/unix/lib/netstandard1.3/ (stored 0%)
+  adding: bin/runtimes/unix/lib/netstandard1.3/System.Text.Encoding.CodePages.dll(deflated 30%)
+  adding: bin/Microsoft.AspNetCore.Mvc.Core.dll (deflated 62%)
+  adding: bin/Microsoft.AspNetCore.Http.Abstractions.dll (deflated 54%)
+  adding: bin/Microsoft.AspNetCore.Mvc.Abstractions.dll (deflated 57%)
+  adding: bin/Microsoft.Extensions.Logging.Configuration.dll (deflated 45%)
+  adding: bin/DroneDelivery.Common.dll (deflated 58%)
+  adding: bin/Microsoft.Extensions.ObjectPool.dll (deflated 45%)
+  adding: bin/NCrontab.Signed.dll (deflated 54%)
+  adding: bin/Microsoft.Net.Http.Headers.dll (deflated 53%)
+  adding: bin/Microsoft.AspNetCore.JsonPatch.dll (deflated 56%)
+  adding: bin/Microsoft.Extensions.Primitives.dll (deflated 50%)
+  adding: bin/Microsoft.Extensions.Logging.dll (deflated 48%)
+  adding: bin/Microsoft.Azure.WebJobs.Host.Storage.dll (deflated 48%)
+  adding: bin/Microsoft.AspNetCore.Routing.dll (deflated 56%)
+  adding: bin/Microsoft.Extensions.Configuration.FileExtensions.dll (deflated 45%)
+  adding: bin/Microsoft.AspNetCore.Routing.Abstractions.dll (deflated 51%)
+  adding: bin/Microsoft.AspNetCore.ResponseCaching.Abstractions.dll (deflated 44%)
+  adding: bin/Microsoft.Extensions.FileProviders.Physical.dll (deflated 46%)
+  adding: bin/Microsoft.AspNetCore.Mvc.WebApiCompatShim.dll (deflated 53%)
+  adding: bin/Microsoft.AspNetCore.Authentication.Abstractions.dll (deflated 49%)
+  adding: bin/Microsoft.Extensions.Configuration.Abstractions.dll (deflated 48%)
+  adding: bin/Microsoft.AspNetCore.Authorization.Policy.dll (deflated 45%)
+  adding: bin/Microsoft.WindowsAzure.Storage.dll (deflated 67%)
+  adding: bin/Microsoft.Extensions.Configuration.Binder.dll (deflated 46%)
+  adding: bin/Microsoft.Build.Framework.dll (deflated 54%)
+  adding: bin/Microsoft.Extensions.DependencyModel.dll (deflated 53%)
+  adding: bin/Microsoft.DotNet.PlatformAbstractions.dll (deflated 47%)
+  adding: bin/Newtonsoft.Json.Bson.dll (deflated 59%)
+  adding: bin/Microsoft.AspNetCore.Http.dll (deflated 54%)
+  adding: bin/Microsoft.AspNetCore.Http.Features.dll (deflated 51%)
+  adding: bin/Newtonsoft.Json.dll (deflated 62%)
+  adding: bin/Microsoft.AspNetCore.Hosting.Server.Abstractions.dll (deflated 44%)
+  adding: bin/PackageService.pdb (deflated 29%)
+  adding: bin/Microsoft.Extensions.Options.dll (deflated 52%)
+  adding: bin/DroneDelivery.Common.pdb (deflated 46%)
+  adding: bin/Microsoft.AspNetCore.Mvc.Formatters.Json.dll (deflated 49%)
+  adding: bin/Microsoft.Extensions.Options.ConfigurationExtensions.dll (deflated 47%)
+  adding: bin/Microsoft.AspNetCore.Authorization.dll (deflated 51%)
+  adding: bin/Microsoft.Azure.WebJobs.Host.dll (deflated 51%)
+  adding: bin/Microsoft.AspNetCore.WebUtilities.dll (deflated 54%)
+  adding: bin/Microsoft.AspNetCore.Http.Extensions.dll (deflated 50%)
+  adding: bin/System.Net.Http.Formatting.dll (deflated 58%)
+  adding: bin/PackageService.dll (deflated 60%)
+  adding: bin/Microsoft.AspNetCore.Authentication.Core.dll (deflated 56%)
+  adding: bin/Microsoft.Extensions.DependencyInjection.Abstractions.dll (deflated54%)
+  adding: bin/System.Text.Encodings.Web.dll (deflated 57%)
+  adding: bin/Microsoft.Extensions.Logging.Abstractions.dll (deflated 53%)
+  adding: bin/Microsoft.Extensions.DependencyInjection.dll (deflated 53%)
+  adding: bin/Microsoft.Azure.WebJobs.Extensions.dll (deflated 43%)
+  adding: bin/Microsoft.Extensions.Configuration.dll (deflated 45%)
+  adding: bin/System.Runtime.CompilerServices.Unsafe.dll (deflated 43%)
+  adding: bin/Microsoft.Build.Utilities.Core.dll (deflated 58%)
+rajani_net@Azure:~/mslearn-microservices-architecture/src/after/PackageService/bin/Release/netcoreapp2.2$
+]
+
+3. Run this command to push the code to the function app.
+
+Azure CLI
+az functionapp deployment source config-zip \
+    --resource-group learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a \
+    --name $FUNCTIONAPPNAME \
+    --src PackageService.zip
+
+$ az functionapp deployment source config-zip \
+    --resource-group learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a \
+    --name $FUNCTIONAPPNAME \
+    --src PackageService.zip
+[
+rajani_net@Azure:~/mslearn-microservices-architecture/src/after/PackageService/bin/Release/netcoreapp2.2$ az functionapp deployment source config-zip \
+>     --resource-group learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a \
+>     --name $FUNCTIONAPPNAME \
+>     --src PackageService.zip
+Setting SCM_DO_BUILD_DURING_DEPLOYMENT to false
+Waiting SCM site to be updated with the latest app settings
+Getting scm site credentials for zip deployment
+Starting zip deployment. This operation can take a while to complete ...
+Deployment endpoint responded with status code 202
+{
+  "active": true,
+  "author": "N/A",
+  "author_email": "N/A",
+  "complete": true,
+  "deployer": "ZipDeploy",
+  "end_time": "2020-08-14T13:23:55.4541862Z",
+  "id": "64312613a5ea4f179ec3d50da61037b0",
+  "is_readonly": true,
+  "is_temp": false,
+  "last_success_end_time": "2020-08-14T13:23:55.4541862Z",
+  "log_url": "https://packageservicefunction-5gf.scm.azurewebsites.net/api/deployments/latest/log",
+  "message": "Created via a push deployment",
+  "progress": "",
+  "provisioningState": null,
+  "received_time": "2020-08-14T13:23:45.2018008Z",
+  "site_name": "packageservicefunction-5gf",
+  "start_time": "2020-08-14T13:23:45.7017402Z",
+  "status": 4,
+  "status_text": "",
+  "url": "https://packageservicefunction-5gf.scm.azurewebsites.net/api/deployments/latest"
+}
+rajani_net@Azure:~/mslearn-microservices-architecture/src/after/PackageService/bin/Release/netcoreapp2.2$
+]
+
+# Deploy the updated Drone Delivery application
+Now that our service is running on Azure Functions, we need to point our drone application to that function app.
+
+We first need to get the access code for the function app so that we can successfully call it from the application. Run the following commands to retrieve this code. You display the function app name and code for use in the next steps.
+
+Azure CLI
+RESOURCEGROUPID=$(az group show \
+                    --resource-group learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a \
+                    --query id \
+                    --output tsv)
+FUNCTIONCODE=$(az rest \
+                    --method post \
+                    --query default \
+                    --output tsv \
+                    --uri "https://management.azure.com$RESOURCEGROUPID/providers/Microsoft.Web/sites/$FUNCTIONAPPNAME/functions/PackageServiceFunction/listKeys?api-version=2018-02-01")
+echo "FunctionName - $FUNCTIONAPPNAME"
+echo "FunctionCode - $FUNCTIONCODE"
+
+$ RESOURCEGROUPID=$(az group show \
+                    --resource-group learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a \
+                    --query id \
+                    --output tsv)
+$ FUNCTIONCODE=$(az rest \
+                    --method post \
+                    --query default \
+                    --output tsv \
+                    --uri "https://management.azure.com$RESOURCEGROUPID/providers/Microsoft.Web/sites/$FUNCTIONAPPNAME/functions/PackageServiceFunction/listKeys?api-version=2018-02-01")
+$ echo "FunctionName - $FUNCTIONAPPNAME"
+$ echo "FunctionCode - $FUNCTIONCODE"
+[
+rajani_net@Azure:~/mslearn-microservices-architecture/src/after/PackageService/bin/Release/netcoreapp2.2$ RESOURCEGROUPID=$(az group show \
+>                     --resource-group learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a\
+>                     --query id \
+>                     --output tsv)
+rajani_net@Azure:~/mslearn-microservices-architecture/src/after/PackageService/bin/Release/netcoreapp2.2$ FUNCTIONCODE=$(az rest \
+>                     --method post \
+>                     --query default \
+>                     --output tsv \
+>                     --uri "https://management.azure.com$RESOURCEGROUPID/providers/Microsoft.Web/sites/$FUNCTIONAPPNAME/functions/PackageServiceFunction/listKeys?api-version=2018-02-01")
+rajani_net@Azure:~/mslearn-microservices-architecture/src/after/PackageService/bin/Release/netcoreapp2.2$ echo "FunctionName - $FUNCTIONAPPNAME"
+FunctionName - packageservicefunction-5gf
+rajani_net@Azure:~/mslearn-microservices-architecture/src/after/PackageService/bin/Release/netcoreapp2.2$ echo "FunctionCode - $FUNCTIONCODE"
+FunctionCode - w0Rh5n72hSRXvNZa8L/JmQa2KKMOaU3Myy0IRht/mkD2DEDIWmjfKg==
+rajani_net@Azure:~/mslearn-microservices-architecture/src/after/PackageService/bin/Release/netcoreapp2.2$
+]
+
+2. In Azure Cloud Shell, run these commands to open appsettings.json in the code editor.
+
+Bash
+cd ~/mslearn-microservices-architecture/src/after
+code ./DroneDelivery-after/appsettings.json
+
+$ cd ~/mslearn-microservices-architecture/src/after
+$ code ./DroneDelivery-after/appsettings.json
+[
+rajani_net@Azure:~/mslearn-microservices-architecture/src/after/PackageService/bin/Release/netcoreapp2.2$ cd ~/mslearn-microservices-architecture/src/after
+rajani_net@Azure:~/mslearn-microservices-architecture/src/after$ cat ./DroneDelivery-after/appsettings.json
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "PackageServiceUri": "https://<FunctionName>.azurewebsites.net/api/packages/",
+  "PackageServiceFunctionCode": "<FunctionCode>"
+}
+rajani_net@Azure:~/mslearn-microservices-architecture/src/after$ code ./DroneDelivery-after/appsettings.json
+]
+
+3. In the code editor, replace the values PackageServiceUri and PackageServiceFunctionCode. In PackageServiceUri, replace <FunctionName> with the name of your function app.
+
+In PackageServiceFunctionCode, replace the <FunctionCode> with the function code you retrieved. Your appsettings.json file should look similar to this:
+
+JSON
+{
+    "Logging": {
+    "LogLevel": {
+        "Default": "Warning"
+    }
+    },
+    "AllowedHosts": "*",
+    "PackageServiceUri": "https://packageservicefunction-abc.azurewebsites.net/api/packages/",
+    "PackageServiceFunctionCode": "SvrbiyhjXJUdTPXrkcUtY6bQaUf7OXQjWvnM0Gq63hFUhbH2vn6qYA=="
+}
+
+4. Select Ctrl+S to save the file, and select Ctrl+Q to close the code editor.
+
+[
+rajani_net@Azure:~/mslearn-microservices-architecture/src/after$ cat ./DroneDelivery-after/appsettings.json
+{
+    "Logging": {
+    "LogLevel": {
+        "Default": "Warning"
+    }
+    },
+    "AllowedHosts": "*",
+    "PackageServiceUri": "https://packageservicefunction-abc.azurewebsites.net/api/packages/",
+    "PackageServiceFunctionCode": "SvrbiyhjXJUdTPXrkcUtY6bQaUf7OXQjWvnM0Gq63hFUhbH2vn6qYA=="
+}rajani_net@Azure:~/mslearn-microservices-architecture/src/after$
+]
+
+5. Run this command to deploy the updated application to App Service.
+
+Bash
+zip -r DroneDelivery-after.zip . -x \*/obj/\* \*/bin/\*
+az webapp deployment source config-zip \
+    --resource-group learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a \
+    --name $APPSERVICENAME \
+    --src DroneDelivery-after.zip
+
+$ zip -r DroneDelivery-after.zip . -x \*/obj/\* \*/bin/\*
+$ az webapp deployment source config-zip \
+    --resource-group learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a \
+    --name $APPSERVICENAME \
+    --src DroneDelivery-after.zip
+[
+rajani_net@Azure:~/mslearn-microservices-architecture/src/after$ zip -r DroneDelivery-after.zip . -x \*/obj/\* \*/bin/\*
+  adding: DroneDelivery.Common/ (stored 0%)
+  adding: DroneDelivery.Common/Services/ (stored 0%)
+  adding: DroneDelivery.Common/Services/IDeliveryRepository.cs (deflated 37%)
+  adding: DroneDelivery.Common/Services/Utility.cs (deflated 67%)
+  adding: DroneDelivery.Common/Services/RequestProcessor.cs (deflated 75%)
+  adding: DroneDelivery.Common/Services/IDroneScheduler.cs (deflated 29%)
+  adding: DroneDelivery.Common/Services/IPackageProcessor.cs (deflated 30%)
+  adding: DroneDelivery.Common/Services/DeliveryRepository.cs (deflated 47%)
+  adding: DroneDelivery.Common/Services/IRequestProcessor.cs (deflated 33%)
+  adding: DroneDelivery.Common/Services/DroneScheduler.cs (deflated 39%)
+  adding: DroneDelivery.Common/Models/ (stored 0%)
+  adding: DroneDelivery.Common/Models/ContainerSize.cs (deflated 12%)
+  adding: DroneDelivery.Common/Models/DeliveryStatus.cs (deflated 64%)
+  adding: DroneDelivery.Common/Models/Delivery.cs (deflated 63%)
+  adding: DroneDelivery.Common/Models/Location.cs (deflated 59%)
+  adding: DroneDelivery.Common/Models/ConfirmationType.cs (deflated 24%)
+  adding: DroneDelivery.Common/Models/UserAccount.cs (deflated 51%)
+  adding: DroneDelivery.Common/Models/PackageGen.cs (deflated 54%)
+  adding: DroneDelivery.Common/Models/ConfirmationRequired.cs (deflated 24%)
+  adding: DroneDelivery.Common/Models/PackageInfo.cs (deflated 55%)
+  adding: DroneDelivery.Common/Models/DeliveryStage.cs (deflated 36%)
+  adding: DroneDelivery.Common/DroneDelivery.Common.csproj (deflated 42%)
+  adding: DroneDelivery.sln (deflated 72%)
+  adding: PackageService/ (stored 0%)
+  adding: PackageService/PackageService.csproj (deflated 61%)
+  adding: PackageService/.gitignore (deflated 53%)
+  adding: PackageService/PackageServiceFunction.cs (deflated 49%)
+  adding: PackageService/host.json (stored 0%)
+  adding: DroneDelivery-after/ (stored 0%)
+  adding: DroneDelivery-after/Services/ (stored 0%)
+  adding: DroneDelivery-after/Services/PackageServiceCaller.cs (deflated 55%)
+  adding: DroneDelivery-after/Controllers/ (stored 0%)
+  adding: DroneDelivery-after/Controllers/DeliveriesController.cs (deflated 69%)
+  adding: DroneDelivery-after/Controllers/DeliveryRequestsController.cs (deflated59%)
+  adding: DroneDelivery-after/Controllers/HomeController.cs (deflated 64%)
+  adding: DroneDelivery-after/DroneDelivery-after.csproj (deflated 58%)
+  adding: DroneDelivery-after/Program.cs (deflated 50%)
+  adding: DroneDelivery-after/appsettings.json (deflated 31%)
+  adding: DroneDelivery-after/Connected Services/ (stored 0%)
+  adding: DroneDelivery-after/Connected Services/Application Insights/ (stored 0%)
+  adding: DroneDelivery-after/Connected Services/Application Insights/ConnectedService.json (deflated 21%)
+  adding: DroneDelivery-after/Startup.cs (deflated 66%)
+  adding: DroneDelivery-after/Views/ (stored 0%)
+  adding: DroneDelivery-after/Views/Home/ (stored 0%)
+  adding: DroneDelivery-after/Views/Home/SendRequests.cshtml (deflated 35%)
+  adding: DroneDelivery-after/Views/Home/Index.cshtml (deflated 37%)
+  adding: DroneDelivery-after/appsettings.Development.json (deflated 31%)
+rajani_net@Azure:~/mslearn-microservices-architecture/src/after$ az webapp deployment source config-zip \
+>     --resource-group learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a \
+>     --name $APPSERVICENAME \
+>     --src DroneDelivery-after.zip
+Getting scm site credentials for zip deployment
+Starting zip deployment. This operation can take a while to complete ...
+Deployment endpoint responded with status code 202
+{
+  "active": true,
+  "author": "N/A",
+  "author_email": "N/A",
+  "complete": true,
+  "deployer": "ZipDeploy",
+  "end_time": "2020-08-14T13:32:23.2264841Z",
+  "id": "ce49c2d0b3ac401586609fc2fa84d42f",
+  "is_readonly": true,
+  "is_temp": false,
+  "last_success_end_time": "2020-08-14T13:32:23.2264841Z",
+  "log_url": "https://microserviceslearnmodule-5gf.scm.azurewebsites.net/api/deployments/latest/log",
+  "message": "Created via a push deployment",
+  "progress": "",
+  "provisioningState": null,
+  "received_time": "2020-08-14T13:31:39.7239717Z",
+  "site_name": "microserviceslearnmodule-5gf",
+  "start_time": "2020-08-14T13:31:39.8177357Z",
+  "status": 4,
+  "status_text": "",
+  "url": "https://microserviceslearnmodule-5gf.scm.azurewebsites.net/api/deployments/latest"
+}
+rajani_net@Azure:~/mslearn-microservices-architecture/src/after$
+]
+
+6. With the site redeployed, refresh your page and you should see that it updated.
+[
+rajani_net@Azure:~/mslearn-microservices-architecture/src/after$ echo https://$(az webapp config hostname list \
+>                 --resource-group learn-bdae2072-cd38-4abb-9e0a-04f5d380f25a \
+>                 --webapp-name $APPSERVICENAME \
+>                 --query [].name \
+>                 --output tsv)
+https://microserviceslearnmodule-5gf.azurewebsites.net
+rajani_net@Azure:~/mslearn-microservices-architecture/src/after$
+]

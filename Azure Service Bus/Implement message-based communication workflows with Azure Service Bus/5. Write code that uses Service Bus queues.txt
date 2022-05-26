@@ -1,0 +1,891 @@
+# Clone and open the starter application
+In this unit, you'll build two console applications. The first application places messages into a Service Bus queue and the second retrieves them. The applications are part of a single .NET Core solution.
+
+1. Start by cloning the solution: run the following commands in the Cloud Shell:
+
+Bash 
+cd ~
+git clone https://github.com/MicrosoftDocs/mslearn-connect-services-together.git
+
+$ cd ~
+$ git clone https://github.com/MicrosoftDocs/mslearn-connect-services-together.git
+[
+rajani_net@Azure:~$ cd ~
+rajani_net@Azure:~$ git clone https://github.com/MicrosoftDocs/mslearn-connect-services-together.git
+Cloning into 'mslearn-connect-services-together'...
+remote: Enumerating objects: 90, done.
+remote: Total 90 (delta 0), reused 0 (delta 0), pack-reused 90
+Unpacking objects: 100% (90/90), done.
+Checking connectivity... done.
+rajani_net@Azure:~$
+]
+
+2. Next, change directories into the starter folder and open the Cloud Shell editor.
+
+Bash
+cd mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start
+code .
+
+$ cd mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start
+$ code .
+$ ll
+$ cat performancemessagereceiver/Program.cs
+$ cat performancemessagesender/Program.cs
+$ cat privatemessagereceiver/Program.cs
+$ cat privatemessagesender/Program.cs
+[
+rajani_net@Azure:~$ cd mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ code .
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ ll
+total 24
+drwxr-xr-x 6 rajani_net rajani_net 4096 May 21 15:27 ./
+drwxr-xr-x 4 rajani_net rajani_net 4096 May 21 15:27 ../
+drwxr-xr-x 2 rajani_net rajani_net 4096 May 21 15:27 performancemessagereceiver/
+drwxr-xr-x 2 rajani_net rajani_net 4096 May 21 15:27 performancemessagesender/
+drwxr-xr-x 2 rajani_net rajani_net 4096 May 21 15:27 privatemessagereceiver/
+drwxr-xr-x 2 rajani_net rajani_net 4096 May 21 15:27 privatemessagesender/
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ cat performancemessagereceiver/Program.cs
+﻿using System;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Azure.ServiceBus;
+
+namespace performancemessagereceiver
+{
+    class Program
+    {
+        const string ServiceBusConnectionString = "";
+        const string TopicName = "salesperformancemessages";
+        const string SubscriptionName = "Americas";
+        static ISubscriptionClient subscriptionClient;
+
+        static void Main(string[] args)
+        {
+            MainAsync().GetAwaiter().GetResult();
+        }
+
+        static async Task MainAsync()
+        {
+            // Create a Subscription Client here
+
+            Console.WriteLine("======================================================");
+            Console.WriteLine("Press ENTER key to exit after receiving all the messages.");
+            Console.WriteLine("======================================================");
+
+            // Register subscription message handler and receive messages in a loop
+            RegisterMessageHandler();
+
+            Console.Read();
+
+            // Close the subscription here
+        }
+
+        static void RegisterMessageHandler()
+        {
+            throw new NotImplementedException();
+        }
+
+        static async Task ProcessMessagesAsync(Message message, CancellationTokentoken)
+        {
+            throw new NotImplementedException();
+        }
+
+        static Task ExceptionReceivedHandler(ExceptionReceivedEventArgs exceptionReceivedEventArgs)
+        {
+            Console.WriteLine($"Message handler encountered an exception {exceptionReceivedEventArgs.Exception}.");
+            var context = exceptionReceivedEventArgs.ExceptionReceivedContext;
+            Console.WriteLine("Exception context for troubleshooting:");
+            Console.WriteLine($"- Endpoint: {context.Endpoint}");
+            Console.WriteLine($"- Entity Path: {context.EntityPath}");
+            Console.WriteLine($"- Executing Action: {context.Action}");
+            return Task.CompletedTask;
+        }
+    }
+}
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ cat performancemessagesender/Program.cs
+﻿using System;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Azure.ServiceBus;
+
+namespace performancemessagesender
+{
+    class Program
+    {
+        const string ServiceBusConnectionString = "";
+        const string TopicName = "salesperformancemessages";
+        static ITopicClient topicClient;
+
+        static void Main(string[] args)
+        {
+
+            Console.WriteLine("Sending a message to the Sales Performance topic...");
+
+            SendPerformanceMessageAsync().GetAwaiter().GetResult();
+
+            Console.WriteLine("Message was sent successfully.");
+
+        }
+
+        static async Task SendPerformanceMessageAsync()
+        {
+            // Create a Topic Client here
+
+            // Send messages.
+            try
+            {
+                // Create and send a message here
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"{DateTime.Now} :: Exception: {exception.Message}");
+            }
+
+            // Close the connection to the topic here
+        }
+    }
+}
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ cat privatemessagereceiver/Program.cs
+﻿using System;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Azure.ServiceBus;
+
+namespace privatemessagereceiver
+{
+    class Program
+    {
+
+        const string ServiceBusConnectionString = "";
+        const string QueueName = "salesmessages";
+        static IQueueClient queueClient;
+
+        static void Main(string[] args)
+        {
+
+            ReceiveSalesMessageAsync().GetAwaiter().GetResult();
+
+        }
+
+        static async Task ReceiveSalesMessageAsync()
+        {
+
+            // Create a Queue Client here
+
+            Console.WriteLine("======================================================");
+            Console.WriteLine("Press ENTER key to exit after receiving all the messages.");
+            Console.WriteLine("======================================================");
+
+            RegisterMessageHandler();
+
+            Console.Read();
+
+            // Close the queue here
+
+        }
+
+        static void RegisterMessageHandler()
+        {
+            throw new NotImplementedException();
+        }
+
+        static async Task ProcessMessagesAsync(Message message, CancellationTokentoken)
+        {
+            throw new NotImplementedException();
+        }
+
+        static Task ExceptionReceivedHandler(ExceptionReceivedEventArgs exceptionReceivedEventArgs)
+        {
+            Console.WriteLine($"Message handler encountered an exception {exceptionReceivedEventArgs.Exception}.");
+            var context = exceptionReceivedEventArgs.ExceptionReceivedContext;
+            Console.WriteLine("Exception context for troubleshooting:");
+            Console.WriteLine($"- Endpoint: {context.Endpoint}");
+            Console.WriteLine($"- Entity Path: {context.EntityPath}");
+            Console.WriteLine($"- Executing Action: {context.Action}");
+            return Task.CompletedTask;
+        }
+    }
+}
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ cat privatemessagesender/Program.cs
+﻿using System;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Azure.ServiceBus;
+
+namespace privatemessagesender
+{
+    class Program
+    {
+
+        const string ServiceBusConnectionString = "";
+        const string QueueName = "salesmessages";
+        static IQueueClient queueClient;
+
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Sending a message to the Sales Messages queue...");
+
+            SendSalesMessageAsync().GetAwaiter().GetResult();
+
+            Console.WriteLine("Message was sent successfully.");
+        }
+
+        static async Task SendSalesMessageAsync()
+        {
+            // Create a Queue Client here
+
+            // Send messages.
+            try
+            {
+                // Create and send a message here
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"{DateTime.Now} :: Exception: {exception.Message}");
+            }
+
+            // Close the connection to the queue here
+        }
+    }
+}
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$
+]
+
+Configure a connection string to a Service Bus namespace
+In order to access a Service Bus namespace and use a queue, you must configure two pieces of information in your console apps:
+
+• The endpoint for your namespace
+• The shared access key for authentication
+
+Both of these values can be obtained from the Azure portal in the form of a complete connection string.
+
+Note
+For simplicity, you will hard-code the connection string in the Program.cs file of both console applications. In a production application, you might use a configuration file or even Azure Key Vault to store the connection string.
+
+1. Run the following command in the CloudShell to display the primary connection string for your Service Bus namespace. Replace <namespace-name> with the name of your Service Bus namespace.
+
+Azure CLI
+az servicebus namespace authorization-rule keys list \
+    --resource-group learn-d6156237-49fa-486e-b28a-133de5188629 \
+    --name RootManageSharedAccessKey \
+    --query primaryConnectionString \
+    --output tsv \
+    --namespace-name <namespace-name>
+
+You'll need this connection string multiple times throughout this module, so you might want to paste it somewhere handy.
+
+$ az servicebus namespace authorization-rule keys list \
+    --resource-group learn-d6156237-49fa-486e-b28a-133de5188629 \
+    --name RootManageSharedAccessKey \
+    --query primaryConnectionString \
+    --output tsv \
+    --namespace-name salesteamapprs21may2020
+[
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ az servicebus namespace authorization-rule keys list \
+>     --resource-group learn-d6156237-49fa-486e-b28a-133de5188629 \
+>     --name RootManageSharedAccessKey \
+>     --query primaryConnectionString \
+>     --output tsv \
+>     --namespace-name salesteamapprs21may2020
+Endpoint=sb://salesteamapprs21may2020.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Bi/8LSH4W2+f/D2OSqvARQbo4b0mcPp3252R3L8hzh0=
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$
+]
+
+2. Copy the key from Cloud Shell. In the editor, open privatemessagesender/Program.cs and locate the following line of code:
+C#
+const string ServiceBusConnectionString = "";
+
+3. Repeat the previous step in privatemessagereceiver/Program.cs, pasting in the same connection string value. Save the file either through the "..." menu, or the accelerator key (Ctrl+S on Windows and Linux, Cmd+S on macOS).
+
+# privatemessagesender/Program.cs
+# privatemessagereceiver/Program.cs
+const string ServiceBusConnectionString = "Endpoint=sb://salesteamapprs21may2020.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Bi/8LSH4W2+f/D2OSqvARQbo4b0mcPp3252R3L8hzh0=";
+
+$ code .
+$ cat privatemessagesender/Program.cs
+$ cat privatemessagereceiver/Program.cs
+[
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ code .
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ cat privatemessagesender/Program.cs
+using System;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Azure.ServiceBus;
+
+namespace privatemessagesender
+{
+    class Program
+    {
+
+        const string ServiceBusConnectionString = "Endpoint=sb://salesteamapprs21may2020.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Bi/8LSH4W2+f/D2OSqvARQbo4b0mcPp3252R3L8hzh0=";
+        const string QueueName = "salesmessages";
+        static IQueueClient queueClient;
+
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Sending a message to the Sales Messages queue...");
+
+            SendSalesMessageAsync().GetAwaiter().GetResult();
+
+            Console.WriteLine("Message was sent successfully.");
+        }
+
+        static async Task SendSalesMessageAsync()
+        {
+            // Create a Queue Client here
+
+            // Send messages.
+            try
+            {
+                // Create and send a message here
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"{DateTime.Now} :: Exception: {exception.Message}");
+            }
+
+            // Close the connection to the queue here
+        }
+    }
+}
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ cat privatemessagereceiver/Program.cs
+using System;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Azure.ServiceBus;
+
+namespace privatemessagereceiver
+{
+    class Program
+    {
+
+        const string ServiceBusConnectionString = "Endpoint=sb://salesteamapprs21may2020.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Bi/8LSH4W2+f/D2OSqvARQbo4b0mcPp3252R3L8hzh0=";
+        const string QueueName = "salesmessages";
+        static IQueueClient queueClient;
+
+        static void Main(string[] args)
+        {
+
+            ReceiveSalesMessageAsync().GetAwaiter().GetResult();
+
+        }
+
+        static async Task ReceiveSalesMessageAsync()
+        {
+
+            // Create a Queue Client here
+
+            Console.WriteLine("======================================================");
+            Console.WriteLine("Press ENTER key to exit after receiving all the messages.");
+            Console.WriteLine("======================================================");
+
+            RegisterMessageHandler();
+
+            Console.Read();
+
+            // Close the queue here
+
+        }
+
+        static void RegisterMessageHandler()
+        {
+            throw new NotImplementedException();
+        }
+
+        static async Task ProcessMessagesAsync(Message message, CancellationTokentoken)
+        {
+            throw new NotImplementedException();
+        }
+
+        static Task ExceptionReceivedHandler(ExceptionReceivedEventArgs exceptionReceivedEventArgs)
+        {
+            Console.WriteLine($"Message handler encountered an exception {exceptionReceivedEventArgs.Exception}.");
+            var context = exceptionReceivedEventArgs.ExceptionReceivedContext;
+            Console.WriteLine("Exception context for troubleshooting:");
+            Console.WriteLine($"- Endpoint: {context.Endpoint}");
+            Console.WriteLine($"- Entity Path: {context.EntityPath}");
+            Console.WriteLine($"- Executing Action: {context.Action}");
+            return Task.CompletedTask;
+        }
+    }
+}
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$
+]
+
+# Write code that sends a message to the queue
+To complete the component that sends messages about sales, follow these steps:
+
+1. Open privatemessagesender/Program.cs in the editor.
+
+2. Locate the SendSalesMessageAsync() method.
+
+3. Within that method, locate the following line of code:
+
+C#
+// Create a queue client here
+
+4. To create a queue client, replace that line of code with the following code:
+
+C#
+queueClient = new QueueClient(ServiceBusConnectionString, QueueName);
+
+5. Within the try...catch block, locate the following line of code:
+
+C#
+// Create and send a message here
+
+6. To create and format a message for the queue, replace that line of code with the following code:
+
+C#
+string messageBody = $"$10,000 order for bicycle parts from retailer Adventure Works.";
+var message = new Message(Encoding.UTF8.GetBytes(messageBody));
+
+7. To display the message in the console, on the next line, add the following code:
+
+C#
+Console.WriteLine($"Sending message: {messageBody}");
+
+8. To send the message to the queue, on the next line, add the following code:
+
+C#
+await queueClient.SendAsync(message);
+
+9. Locate the following line of code:
+
+C#
+// Close the connection to the queue here
+
+10. To close the connection to the Service Bus, replace that line of code with the following code:
+
+C#
+await queueClient.CloseAsync();
+
+11. Save the file.
+
+# privatemessagesender/Program.cs
+using System;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Azure.ServiceBus;
+
+namespace privatemessagesender
+{
+    class Program
+    {
+
+        const string ServiceBusConnectionString = "Endpoint=sb://salesteamapprs21may2020.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Bi/8LSH4W2+f/D2OSqvARQbo4b0mcPp3252R3L8hzh0=";
+        const string QueueName = "salesmessages";
+        static IQueueClient queueClient;
+
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Sending a message to the Sales Messages queue...");
+
+            SendSalesMessageAsync().GetAwaiter().GetResult();
+
+            Console.WriteLine("Message was sent successfully.");
+        }
+
+        static async Task SendSalesMessageAsync()
+        {
+            // Create Queue Client
+            queueClient = new QueueClient(ServiceBusConnectionString, QueueName);
+
+            // Send messages.
+            try
+            {
+                // Create and send message
+                string messageBody = $"$10,000 order for bicycle parts from retailer Adventure Works.";
+                var message = new Message(Encoding.UTF8.GetBytes(messageBody));
+                Console.WriteLine($"Sending message: {messageBody}");
+                await queueClient.SendAsync(message);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"{DateTime.Now} :: Exception: {exception.Message}");
+            }
+
+            // Close connection to queue
+            await queueClient.CloseAsync();
+        }
+    }
+}
+[
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ code .
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ cat privatemessagesender/Program.cs
+using System;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Azure.ServiceBus;
+
+namespace privatemessagesender
+{
+    class Program
+    {
+
+        const string ServiceBusConnectionString = "Endpoint=sb://salesteamapprs21may2020.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Bi/8LSH4W2+f/D2OSqvARQbo4b0mcPp3252R3L8hzh0=";
+        const string QueueName = "salesmessages";
+        static IQueueClient queueClient;
+
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Sending a message to the Sales Messages queue...");
+
+            SendSalesMessageAsync().GetAwaiter().GetResult();
+
+            Console.WriteLine("Message was sent successfully.");
+        }
+
+        static async Task SendSalesMessageAsync()
+        {
+            // Create Queue Client
+            queueClient = new QueueClient(ServiceBusConnectionString, QueueName);
+
+            // Send messages.
+            try
+            {
+                // Create and send message
+                string messageBody = $"$10,000 order for bicycle parts from retailer Adventure Works.";
+                var message = new Message(Encoding.UTF8.GetBytes(messageBody));
+                Console.WriteLine($"Sending message: {messageBody}");
+                await queueClient.SendAsync(message);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"{DateTime.Now} :: Exception: {exception.Message}");
+            }
+
+            // Close connection to queue
+            await queueClient.CloseAsync();
+        }
+    }
+}
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$
+]
+
+# Send a message to the queue
+To run the component that sends a message about a sale, run the following command in the Cloud Shell:
+
+Bash
+dotnet run -p privatemessagesender
+
+Note
+The apps you run during this exercise may take a moment to start up, as dotnet has to restore packages from remote sources and build the apps the first time they are run.
+
+As the program executes, you'll see messages printed indicating that it's sending a message. Each time you run the app, one additional message will be added to the queue.
+
+$ dotnet run -p privatemessagesender
+[
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ dotnet run -p privatemessagesender
+
+Welcome to .NET Core!
+---------------------
+Learn more about .NET Core: https://aka.ms/dotnet-docs
+Use 'dotnet --help' to see available commands or visit: https://aka.ms/dotnet-cli-docs
+
+Telemetry
+---------
+The .NET Core tools collect usage data in order to help us improve your experience. The data is anonymous and doesn't include command-line arguments. The data is collected by Microsoft and shared with the community. You can opt-out of telemetry by setting the DOTNET_CLI_TELEMETRY_OPTOUT environment variable to '1' or 'true' using your favorite shell.
+
+Read more about .NET Core CLI Tools telemetry: https://aka.ms/dotnet-cli-telemetry
+
+ASP.NET Core
+------------
+Successfully installed the ASP.NET Core HTTPS Development Certificate.
+To trust the certificate run 'dotnet dev-certs https --trust' (Windows and macOS only). For establishing trust on other platforms refer to the platform specific documentation.
+For more information on configuring HTTPS see https://go.microsoft.com/fwlink/?linkid=848054.
+Sending a message to the Sales Messages queue...
+Sending message: $10,000 order for bicycle parts from retailer Adventure Works.
+Message was sent successfully.
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ dotnet run -p privatemessagesender
+Sending a message to the Sales Messages queue...
+Sending message: $10,000 order for bicycle parts from retailer Adventure Works.
+Message was sent successfully.
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ dotnet run -p privatemessagesender
+Sending a message to the Sales Messages queue...
+Sending message: $10,000 order for bicycle parts from retailer Adventure Works.
+Message was sent successfully.
+]
+
+Once it's finished, run the following command to see how many messages are in the queue:
+
+Azure CLI
+az servicebus queue show \
+    --resource-group learn-d6156237-49fa-486e-b28a-133de5188629 \
+    --name salesmessages \
+    --query messageCount \
+    --namespace-name <namespace-name>
+
+$ az servicebus queue show \
+    --resource-group learn-d6156237-49fa-486e-b28a-133de5188629 \
+    --name salesmessages \
+    --query messageCount \
+    --namespace-name salesteamapprs21may2020
+[
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ az servicebus queue show \
+>     --resource-group learn-d6156237-49fa-486e-b28a-133de5188629 \
+>     --name salesmessages \
+>     --query messageCount \
+>     --namespace-name salesteamapprs21may2020
+3
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$
+]
+
+# Write code that receives a message from the queue
+1. Open privatemessagereceiver/Program.cs in the editor
+
+2. Locate the ReceiveSalesMessageAsync() method.
+
+3. Within that method, locate the following line of code:
+
+C#
+// Create a queue client here
+
+4. To create a queue client, replace that line with the following code:
+
+C#
+queueClient = new QueueClient(ServiceBusConnectionString, QueueName);
+
+5. Locate the RegisterMessageHandler() method.
+
+6. To configure message handling options, replace all the code within that method with the following code:
+
+C#
+var messageHandlerOptions = new MessageHandlerOptions(ExceptionReceivedHandler)
+{
+    MaxConcurrentCalls = 1,
+    AutoComplete = false
+};
+
+7. To register the message handler, on the next line, add the following code:
+
+C#
+queueClient.RegisterMessageHandler(ProcessMessagesAsync, messageHandlerOptions);
+
+8. Locate the ProcessMessagesAsync() method. You have registered this method as the one that handles incoming messages.
+
+9. To display incoming messages in the console, replace all the code within that method with the following code:
+
+C#
+Console.WriteLine($"Received message: SequenceNumber:{message.SystemProperties.SequenceNumber} Body:{Encoding.UTF8.GetString(message.Body)}");
+
+10. To remove the received message from the queue, on the next line, add the following code:
+
+C#
+await queueClient.CompleteAsync(message.SystemProperties.LockToken);
+
+11. Return to the ReceiveSalesMessageAsync() method and locate the following line of code:
+
+C#
+// Close the queue here
+
+12. To close the connection to Service Bus, replace that line with the following code:
+
+C#
+await queueClient.CloseAsync();
+
+13. Save the file.
+
+# privatemessagereceiver/Program.cs
+using System;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Azure.ServiceBus;
+
+namespace privatemessagereceiver
+{
+    class Program
+    {
+
+        const string ServiceBusConnectionString = "Endpoint=sb://salesteamapprs21may2020.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Bi/8LSH4W2+f/D2OSqvARQbo4b0mcPp3252R3L8hzh0=";
+        const string QueueName = "salesmessages";
+        static IQueueClient queueClient;
+
+        static void Main(string[] args)
+        {
+
+            ReceiveSalesMessageAsync().GetAwaiter().GetResult();
+
+        }
+
+        static async Task ReceiveSalesMessageAsync()
+        {
+
+            // Create Queue Client
+            queueClient = new QueueClient(ServiceBusConnectionString, QueueName);
+            Console.WriteLine("======================================================");
+            Console.WriteLine("Press ENTER key to exit after receiving all the messages.");
+            Console.WriteLine("======================================================");
+
+            RegisterMessageHandler();
+
+            Console.Read();
+
+            // Close queue
+            await queueClient.CloseAsync();
+        }
+
+        static void RegisterMessageHandler()
+        {
+            var messageHandlerOptions = new MessageHandlerOptions(ExceptionReceivedHandler)
+            {
+                MaxConcurrentCalls = 1,
+                AutoComplete = false
+            };
+
+            queueClient.RegisterMessageHandler(ProcessMessagesAsync, messageHandlerOptions);
+        }
+
+        static async Task ProcessMessagesAsync(Message message, CancellationToken token)
+        {
+            Console.WriteLine($"Received message: SequenceNumber:{message.SystemProperties.SequenceNumber} Body:{Encoding.UTF8.GetString(message.Body)}");
+            await queueClient.CompleteAsync(message.SystemProperties.LockToken);
+        }
+
+        static Task ExceptionReceivedHandler(ExceptionReceivedEventArgs exceptionReceivedEventArgs)
+        {
+            Console.WriteLine($"Message handler encountered an exception {exceptionReceivedEventArgs.Exception}.");
+            var context = exceptionReceivedEventArgs.ExceptionReceivedContext;
+            Console.WriteLine("Exception context for troubleshooting:");
+            Console.WriteLine($"- Endpoint: {context.Endpoint}");
+            Console.WriteLine($"- Entity Path: {context.EntityPath}");
+            Console.WriteLine($"- Executing Action: {context.Action}");
+            return Task.CompletedTask;
+        }
+    }
+}
+[
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ code .
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ cat privatemessagereceiver/Program.cs
+using System;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Azure.ServiceBus;
+
+namespace privatemessagereceiver
+{
+    class Program
+    {
+
+        const string ServiceBusConnectionString = "Endpoint=sb://salesteamapprs21may2020.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Bi/8LSH4W2+f/D2OSqvARQbo4b0mcPp3252R3L8hzh0=";
+        const string QueueName = "salesmessages";
+        static IQueueClient queueClient;
+
+        static void Main(string[] args)
+        {
+
+            ReceiveSalesMessageAsync().GetAwaiter().GetResult();
+
+        }
+
+        static async Task ReceiveSalesMessageAsync()
+        {
+
+            // Create Queue Client
+            queueClient = new QueueClient(ServiceBusConnectionString, QueueName);
+            Console.WriteLine("======================================================");
+            Console.WriteLine("Press ENTER key to exit after receiving all the messages.");
+            Console.WriteLine("======================================================");
+
+            RegisterMessageHandler();
+
+            Console.Read();
+
+            // Close queue
+            await queueClient.CloseAsync();
+        }
+
+        static void RegisterMessageHandler()
+        {
+            var messageHandlerOptions = new MessageHandlerOptions(ExceptionReceivedHandler)
+            {
+                MaxConcurrentCalls = 1,
+                AutoComplete = false
+            };
+
+            queueClient.RegisterMessageHandler(ProcessMessagesAsync, messageHandlerOptions);
+        }
+
+        static async Task ProcessMessagesAsync(Message message, CancellationToken token)
+        {
+            Console.WriteLine($"Received message: SequenceNumber:{message.SystemProperties.SequenceNumber} Body:{Encoding.UTF8.GetString(message.Body)}");
+            await queueClient.CompleteAsync(message.SystemProperties.LockToken);
+        }
+
+        static Task ExceptionReceivedHandler(ExceptionReceivedEventArgs exceptionReceivedEventArgs)
+        {
+            Console.WriteLine($"Message handler encountered an exception {exceptionReceivedEventArgs.Exception}.");
+            var context = exceptionReceivedEventArgs.ExceptionReceivedContext;
+            Console.WriteLine("Exception context for troubleshooting:");
+            Console.WriteLine($"- Endpoint: {context.Endpoint}");
+            Console.WriteLine($"- Entity Path: {context.EntityPath}");
+            Console.WriteLine($"- Executing Action: {context.Action}");
+            return Task.CompletedTask;
+        }
+    }
+}
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$
+]
+
+# Retrieve a message from the queue
+To run the component that receives a message about a sale, run this command in the Cloud Shell:
+
+Bash
+dotnet run -p privatemessagereceiver
+
+$ dotnet run -p privatemessagereceiver
+[
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ dotnet run -p privatemessagereceiver
+======================================================
+Press ENTER key to exit after receiving all the messages.
+======================================================
+Received message: SequenceNumber:27303072740933633 Body:$10,000 order for bicycleparts from retailer Adventure Works.
+Received message: SequenceNumber:22799473113563137 Body:$10,000 order for bicycleparts from retailer Adventure Works.
+Received message: SequenceNumber:58828270132527105 Body:$10,000 order for bicycleparts from retailer Adventure Works.
+
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$
+]
+
+When you see that the message has been received and displayed in the console, press Enter to stop the app. Then, run the same command as before to confirm that all of the messages have been removed from the queue:
+
+Bash
+az servicebus queue show \
+    --resource-group learn-d6156237-49fa-486e-b28a-133de5188629 \
+    --name salesmessages \
+    --query messageCount \
+    --namespace-name <namespace-name>
+
+$ az servicebus queue show \
+    --resource-group learn-d6156237-49fa-486e-b28a-133de5188629 \
+    --name salesmessages \
+    --query messageCount \
+    --namespace-name salesteamapprs21may2020
+[
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ dotnet run -p privatemessagereceiver
+======================================================
+Press ENTER key to exit after receiving all the messages.
+======================================================
+
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$ az servicebus queue show \
+>     --resource-group learn-d6156237-49fa-486e-b28a-133de5188629 \
+>     --name salesmessages \
+>     --query messageCount \
+>     --namespace-name salesteamapprs21may2020
+0
+rajani_net@Azure:~/mslearn-connect-services-together/implement-message-workflows-with-service-bus/src/start$
+]
+
+You have written code that sends a message about individual sales to a Service Bus queue. In the sales force distributed application, you should write this code in the mobile app that sales personnel use on devices.
+
+You have also written code that receives a message from the Service Bus queue. In the sales force distributed application, you should write this code in the web service that runs in Azure and processes received messages.
+

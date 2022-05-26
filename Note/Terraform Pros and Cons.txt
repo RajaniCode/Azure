@@ -1,0 +1,22 @@
+Terraform [https://github.com/hashicorp/terraform]
+Terraform is a tool for building, changing, and versioning infrastructure safely and efficiently. Terraform can manage existing and popular service providers as well as custom in-house solutions. The key features of Terraform are:
+• Infrastructure as Code: Infrastructure is described using a high-level configuration syntax. This allows a blueprint of the datacenter to be versioned and treated as any other code.
+• Execution Plans: Terraform has a "planning" step where it generates an execution plan. The execution plan shows what Terraform will do. This helps avoid any surprises when Terraform manipulates infrastructure.
+• Resource Graph: Terraform builds a graph of all the resources, and parallelizes the creation and modification of any non-dependent resources. Because of this, Terraform builds infrastructure as efficiently as possible, and operators get insight into dependencies in their infrastructure.
+• Change Automation: Complex changesets can be applied to the infrastructure with minimal human interaction.
+
+Pros [https://www.trustradius.com/products/terraform/reviews?qs=pros-and-cons]
+• Terraform provides building blocks for the resources available in the cloud.
+• The Terraform CLI lends itself to a flow of formatting and validating code before a plan is developed, reviewed, and applied.
+• The modular approach of terraform encourages collaboration and consistency. 
+• Review plan before deployment.
+• Terraform files are equivalent to documentation since the entire environment is described there.
+• With Terraform, different cloud environments can be managed with the same configuration files.
+• Integration with many infrastructure providers including AWS, Azure, Google Cloud, Datadog, Gitlab, Heroku, SignalFX.
+• Changes to environments can be seen before making real changes.
+
+Cons [https://www.trustradius.com/products/terraform/reviews?qs=pros-and-cons]
+• Terraform has no rollback capability.
+• Terraform errors in some cases are not detailed enough for debugging.
+• If Terraform state is corrupted, it can't be restored.
+• Terraform has its own DSL language and will require time to learn the product.

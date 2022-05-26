@@ -1,0 +1,87 @@
+# Create a Storage Account with the Azure CLI
+Tip
+Normally, you'd start a new project by creating a resource group to hold all the associated resources. In this case, we'll be using the Azure sandbox which provides a resource group named learn-1b06eb83-e23d-4297-b8b9-408bf017c423
+
+Azure CLI
+az storage account create --name [unique-name] -g learn-1b06eb83-e23d-4297-b8b9-408bf017c423 --kind StorageV2 --sku Standard_LRS
+
+$ az storage account create --name sandboxazurequeuestorage -g learn-1b06eb83-e23d-4297-b8b9-408bf017c423 --kind StorageV2 --sku Standard_LRS
+[
+Requesting a Cloud Shell.Succeeded.
+Connecting terminal...
+
+Welcome to Azure Cloud Shell
+
+Type "az" to use Azure CLI
+Type "help" to learn about Cloud Shell
+
+rajani_net@Azure:~$ az storage account create --name sandboxazurequeuestorage -g learn-1b06eb83-e23d-4297-b8b9-408bf017c423 --kind StorageV2 --sku Standard_LRS
+{- Finished ..
+  "accessTier": "Hot",
+  "azureFilesIdentityBasedAuthentication": null,
+  "blobRestoreStatus": null,
+  "creationTime": "2020-05-19T06:58:12.560487+00:00",
+  "customDomain": null,
+  "enableHttpsTrafficOnly": true,
+  "encryption": {
+    "keySource": "Microsoft.Storage",
+    "keyVaultProperties": null,
+    "services": {
+      "blob": {
+        "enabled": true,
+        "keyType": "Account",
+        "lastEnabledTime": "2020-05-19T06:58:12.638599+00:00"
+      },
+      "file": {
+        "enabled": true,
+        "keyType": "Account",
+        "lastEnabledTime": "2020-05-19T06:58:12.638599+00:00"
+      },
+      "queue": null,
+      "table": null
+    }
+  },
+  "failoverInProgress": null,
+  "geoReplicationStats": null,
+  "id": "/subscriptions/5c880e39-4cae-4924-81f6-d3bb8661ba69/resourceGroups/learn-1b06eb83-e23d-4297-b8b9-408bf017c423/providers/Microsoft.Storage/storageAccounts/sandboxazurequeuestorage",
+  "identity": null,
+  "isHnsEnabled": null,
+  "kind": "StorageV2",
+  "largeFileSharesState": null,
+  "lastGeoFailoverTime": null,
+  "location": "westus",
+  "name": "sandboxazurequeuestorage",
+  "networkRuleSet": {
+    "bypass": "AzureServices",
+    "defaultAction": "Allow",
+    "ipRules": [],
+    "virtualNetworkRules": []
+  },
+  "primaryEndpoints": {
+    "blob": "https://sandboxazurequeuestorage.blob.core.windows.net/",
+    "dfs": "https://sandboxazurequeuestorage.dfs.core.windows.net/",
+    "file": "https://sandboxazurequeuestorage.file.core.windows.net/",
+    "internetEndpoints": null,
+    "microsoftEndpoints": null,
+    "queue": "https://sandboxazurequeuestorage.queue.core.windows.net/",
+    "table": "https://sandboxazurequeuestorage.table.core.windows.net/",
+    "web": "https://sandboxazurequeuestorage.z22.web.core.windows.net/"
+  },
+  "primaryLocation": "westus",
+  "privateEndpointConnections": [],
+  "provisioningState": "Succeeded",
+  "resourceGroup": "learn-1b06eb83-e23d-4297-b8b9-408bf017c423",
+  "routingPreference": null,
+  "secondaryEndpoints": null,
+  "secondaryLocation": null,
+  "sku": {
+    "name": "Standard_LRS",
+    "tier": "Standard"
+  },
+  "statusOfPrimary": "available",
+  "statusOfSecondary": null,
+  "tags": {},
+  "type": "Microsoft.Storage/storageAccounts"
+}
+rajani_net@Azure:~$
+]

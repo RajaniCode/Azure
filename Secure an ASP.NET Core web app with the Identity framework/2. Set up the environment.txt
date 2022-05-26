@@ -1,0 +1,520 @@
+# Set up development environment
+Run the following command in the command shell. The command reflects your data store choice in the toggle above. Be patient, as setup can take a few minutes to complete. Continue reading while the script runs.
+
+Bash
+. <(wget -q -O - https://aka.ms/secure-aspnet-core-identity-setup) "sql"
+
+The preceding command retrieves and runs a setup script from a GitHub repository. The script completes the following steps:
+
+• Clones the ASP.NET Core starter code from a GitHub repository.
+• Builds and deploys an ASP.NET Core web API to supply the web app with data.
+• Provisions a database to store Identity framework entities.
+• Sets environment variables that are required for this module.
+• Displays connection information for the Azure resources.
+• Launches the Cloud Shell Editor to view the starter code.
+
+$ . <(wget -q -O - https://aka.ms/secure-aspnet-core-identity-setup) "sql"
+[
+Requesting a Cloud Shell.Succeeded.
+Connecting terminal...
+
+Welcome to Azure Cloud Shell
+
+Type "az" to use Azure CLI
+Type "help" to learn about Cloud Shell
+
+rajani_net@Azure:~$ dotnet --version
+2.2.402
+rajani_net@Azure:~$ . <(wget -q -O - https://aka.ms/secure-aspnet-core-identity-setup) "sql"
+Using Azure resource group learn-ec1568de-3216-4576-94a9-dba55707bfba.
+
+Configuring the .NET Core CLI...
+dotnet_install: Warning: Unable to locate zlib. Probable prerequisite missing; install zlib.
+dotnet-install: Downloading link: https://dotnetcli.azureedge.net/dotnet/Sdk/3.1.201/dotnet-sdk-3.1.201-linux-x64.tar.gz
+dotnet-install: Extracting zip from https://dotnetcli.azureedge.net/dotnet/Sdk/3.1.201/dotnet-sdk-3.1.201-linux-x64.tar.gz
+dotnet-install: Adding to current process PATH: `/home/rajani_net/.dotnet`. Note:This change will be visible only when sourcing script.
+dotnet-install: Installation finished successfully.
+Using .NET Core SDK version 3.1.201
+You can invoke the tool using the following command: dotnetsay
+Tool 'dotnetsay' (version '2.1.4') was successfully installed.
+
+
+Hi there!
+I'm going to provision some Azure resources
+and get the code you'll need for this module.
+    __________________
+                      \
+                       \
+                          ....
+                          ....'
+                           ....
+                        ..........
+                    .............'..'..
+                 ................'..'.....
+               .......'..........'..'..'....
+              ........'..........'..'..'.....
+             .'....'..'..........'..'.......'.
+             .'..................'...   ......
+             .  ......'.........         .....
+             .                           ......
+            ..    .            ..        ......
+           ....       .                 .......
+           ......  .......          ............
+            ................  ......................
+            ........................'................
+           ......................'..'......    .......
+        .........................'..'.....       .......
+     ........    ..'.............'..'....      ..........
+   ..'..'...      ...............'.......      ..........
+  ...'......     ...... ..........  ......         .......
+ ...........   .......              ........        ......
+.......        '...'.'.              '.'.'.'         ....
+.......       .....'..               ..'.....
+   ..       ..........               ..'........
+          ............               ..............
+         .............               '..............
+        ...........'..              .'.'............
+       ...............              .'.'.............
+      .............'..               ..'..'...........
+      ...............                 .'..............
+       .........                        ..............
+        .....
+
+
+Downloading code...
+++ wget -q -O - https://raw.githubusercontent.com/MicrosoftDocs/mslearn-aspnet-core/live/infrastructure/scripts/sparsecheckout.sh
+++ bash -s modules/secure-aspnet-core-identity/setup/ modules/secure-aspnet-core-identity/src/
+Updating origin
+remote: Enumerating objects: 605, done.
+remote: Counting objects: 100% (605/605), done.
+remote: Compressing objects: 100% (377/377), done.
+remote: Total 4136 (delta 300), reused 443 (delta 176), pack-reused 3531
+Receiving objects: 100% (4136/4136), 7.51 MiB | 858.00 KiB/s, done.
+Resolving deltas: 100% (2002/2002), done.
+From https://github.com/MicrosoftDocs/mslearn-aspnet-core
+ * [new branch]      live       -> origin/live
+ * [new branch]      master     -> origin/master
+ * [new branch]      microservices-devops-aspnet-core -> origin/microservices-devops-aspnet-core
+ * [new branch]      microservices-resiliency-aspnet-core -> origin/microservices-resiliency-aspnet-core
+~/aspnet-learn/modules/secure-aspnet-core-identity/setup ~/aspnet-learn
+~/aspnet-learn
+
+Setting default Azure CLI values...
+++ az configure --defaults group=learn-ec1568de-3216-4576-94a9-dba55707bfba location=centralus
+
+Provisioning App Service Plan...
++++ az appservice plan create --name plan323652297 --sku F1 --output none
+
+
+Provisioning ContosoPets.Api API Web App...
++++ az webapp create --name apiapp323652297 --plan plan323652297 --output none
+Provisioning ContosoPets.Ui Web App Web App...
++++ az webapp create --name webapp323652297 --plan plan323652297 --output none
+
+Provisioning Azure SQL Database Server...
++++ az sql server create --name azsql323652297 --admin-user SqlUser --admin-password Pass.30103.word --location 'west us' --output none
+
+Configuring ContosoPets.Ui Web App Web App...
++++ az webapp config appsettings set --name webapp323652297 --settings SCM_DO_BUILD_DURING_DEPLOYMENT=True --output none
+
+Configuring ContosoPets.Api API Web App...
++++ az webapp config appsettings set --name apiapp323652297 --settings SCM_DO_BUILD_DURING_DEPLOYMENT=True --output none
+ - Running ..
+Provisioning Azure Key Vault...
++++ az keyvault create --name keyvault323652297 --enable-soft-delete --output none
+
+Provisioning Azure SQL Database...
++++ az sql db create --name ContosoPetsAuth --server azsql323652297 --service-objective BASIC --output none
+ - Running ..
+Assigning managed service identity for web app...
++++ az webapp identity assign --name webapp323652297 --output none
+
+Adding managed service identity to Key Vault...
++++ az keyvault set-policy --name keyvault323652297 --object-id 0266dcc1-a803-4fb7-b489-f465a19e0932 --secret-permissions get list --output none
+
+Adding database username to Azure Key Vault...
+++ az keyvault secret set --vault-name keyvault323652297 --name DbUsername --value SqlUser --output none
+ - Running ..
+Adding database password to Azure Key Vault...
+++ az keyvault secret set --vault-name keyvault323652297 --name DbPassword --value Pass.30103.word --output none
+ - Running ..
+Setting Web App environment variable with location of Key Vault...
+++ az webapp config appsettings set --name webapp323652297 --settings ASPNETCORE_HOSTINGSTARTUP__KEYVAULT__CONFIGURATIONVAULT=https://keyvault323652297.vault.azure.net --output none
+
+Adding Azure IP addresses to Azure SQL Database firewall rules...
++++ az sql server firewall-rule create --name AllowAzureAccess --start-ip-address0.0.0.0 --end-ip-address 0.0.0.0 --server azsql323652297 --output none
+
+~/aspnet-learn/src/ContosoPets.Ui/.azure ~/aspnet-learn/src/ContosoPets.Ui
+~/aspnet-learn/src/ContosoPets.Ui
+
+
+Your environment is ready!
+I set up some Azure resources and downloaded the code you'll need.
+You can resume this session and display this message again by re-running the script.
+    __________________
+                      \
+                       \
+                          ....
+                          ....'
+                           ....
+                        ..........
+                    .............'..'..
+                 ................'..'.....
+               .......'..........'..'..'....
+              ........'..........'..'..'.....
+             .'....'..'..........'..'.......'.
+             .'..................'...   ......
+             .  ......'.........         .....
+             .                           ......
+            ..    .            ..        ......
+           ....       .                 .......
+           ......  .......          ............
+            ................  ......................
+            ........................'................
+           ......................'..'......    .......
+        .........................'..'.....       .......
+     ........    ..'.............'..'....      ..........
+   ..'..'...      ...............'.......      ..........
+  ...'......     ...... ..........  ......         .......
+ ...........   .......              ........        ......
+.......        '...'.'.              '.'.'.'         ....
+.......       .....'..               ..'.....
+   ..       ..........               ..'........
+          ............               ..............
+         .............               '..............
+        ...........'..              .'.'............
+       ...............              .'.'.............
+      .............'..               ..'..'...........
+      ...............                 .'..............
+       .........                        ..............
+        .....
+
+The following variables are used in this module:
+webAppUrl: https://webapp323652297.azurewebsites.net
+dbConnectionString: Data Source=azsql323652297.database.windows.net;Initial Catalog=ContosoPetsAuth;Connect Timeout=30;Encrypt=True;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False
+sqlUsername: SqlUser
+sqlPassword: Pass.30103.word
+
+db is an alias for sqlcmd -U SqlUser -P Pass.30103.word -S azsql323652297.database.windows.net -d ContosoPetsAuth
+
+rajani_net@Azure:~/aspnet-learn/src/ContosoPets.Ui$
+]
+
+# Review starter code
+The app consists of a single ASP.NET Core Razor Pages project named ContosoPets.Ui. The project contains the user interface for viewing and managing product data. The product data is obtained via an external ASP.NET Core web API.
+
+Of particular interest are the following files and directories in ContosoPets.Ui:
+Name						Description
+Controllers/AdminTokenController.cs		Exposes AdminRegistrationTokenService as an HTTP endpoint. Unused until Unit 6.
+Pages/Products/					Contains web UI for CRUD operations.
+Services/AdminRegistrationTokenService.cs	Generates tokens allowing administrators to self-register. Unused until Unit 6.
+Services/ProductService.cs			Manages all interactions with the external ASP.NET Core web API.
+Services/QRCodeService.cs			Manages the creation of QR codes for supporting multi-factor authentication. Unused until Unit 5.
+wwwroot/js/product.js				Enables deletion of a product from Pages/Products/Index.cshtml without a server-side postback.
+Program.cs					Serves as the app's main entry point and registers the Azure Key Vault configuration provider.
+Startup.cs					Configures services and the app's HTTP request pipeline.
+[
+rajani_net@Azure:~/aspnet-learn/src/ContosoPets.Ui$ ll
+total 60
+drwxr-xr-x 10 rajani_net rajani_net 4096 Jul 29 08:55 ./
+drwxr-xr-x  5 rajani_net rajani_net 4096 Jul 29 08:55 ../
+-rw-r--r--  1 rajani_net rajani_net  163 Jul 29 08:53 appsettings.Development.json
+-rw-r--r--  1 rajani_net rajani_net  326 Jul 29 08:55 appsettings.json
+drwxr-xr-x  2 rajani_net rajani_net 4096 Jul 29 08:55 .azure/
+drwxr-xr-x  2 rajani_net rajani_net 4096 Jul 29 08:53 .config/
+-rw-r--r--  1 rajani_net rajani_net  412 Jul 29 08:53 ContosoPets.Ui.csproj
+drwxr-xr-x  2 rajani_net rajani_net 4096 Jul 29 08:53 Controllers/
+drwxr-xr-x  2 rajani_net rajani_net 4096 Jul 29 08:53 Extensions/
+drwxr-xr-x  2 rajani_net rajani_net 4096 Jul 29 08:53 Models/
+drwxr-xr-x  4 rajani_net rajani_net 4096 Jul 29 08:53 Pages/
+-rw-r--r--  1 rajani_net rajani_net 1422 Jul 29 08:53 Program.cs
+drwxr-xr-x  2 rajani_net rajani_net 4096 Jul 29 08:53 Services/
+-rw-r--r--  1 rajani_net rajani_net 2379 Jul 29 08:53 Startup.cs
+drwxr-xr-x  5 rajani_net rajani_net 4096 Jul 29 08:53 wwwroot/
+rajani_net@Azure:~/aspnet-learn/src/ContosoPets.Ui$ cat Controllers/AdminTokenController.cs
+﻿using ContosoPets.Ui.Services;
+using Microsoft.AspNetCore.Mvc;
+
+namespace ContosoPets.Ui.Controllers
+{
+    /// <summary>
+    /// This is a controller to expose an admin registration key. Note that this controller
+    /// allows anonymous access, and this mechanism SHOULD NOT be used for production code
+    /// without securing this endpoint!!!
+    /// </summary>
+    [Route("[controller]")]
+    [ApiController]
+    public class AdminTokenController : ControllerBase
+    {
+        private readonly AdminRegistrationTokenService _adminService;
+
+        public AdminTokenController(AdminRegistrationTokenService adminService)
+        {
+            _adminService = adminService;
+        }
+
+        [HttpGet]
+        public ActionResult<ulong> Get() =>
+            _adminService.CreationKey;
+    }
+}rajani_net@Azure:~/aspnet-learn/src/ContosoPets.Ui$ ll Pages/Products/
+total 32
+drwxr-xr-x 2 rajani_net rajani_net 4096 Jul 29 08:53 ./
+drwxr-xr-x 4 rajani_net rajani_net 4096 Jul 29 08:53 ../
+-rw-r--r-- 1 rajani_net rajani_net  759 Jul 29 08:53 Create.cshtml
+-rw-r--r-- 1 rajani_net rajani_net  887 Jul 29 08:53 Create.cshtml.cs
+-rw-r--r-- 1 rajani_net rajani_net  812 Jul 29 08:53 Edit.cshtml
+-rw-r--r-- 1 rajani_net rajani_net  896 Jul 29 08:53 Edit.cshtml.cs
+-rw-r--r-- 1 rajani_net rajani_net 1114 Jul 29 08:53 Index.cshtml
+-rw-r--r-- 1 rajani_net rajani_net 1284 Jul 29 08:53 Index.cshtml.cs
+rajani_net@Azure:~/aspnet-learn/src/ContosoPets.Ui$ cat Services/AdminRegistrationTokenService.cs
+﻿using System;
+
+namespace ContosoPets.Ui.Services
+{
+    public class AdminRegistrationTokenService
+    {
+        private readonly Lazy<ulong> _creationKey =
+            new Lazy<ulong>(() => BitConverter.ToUInt64(Guid.NewGuid().ToByteArray(), 7));
+
+        public ulong CreationKey => _creationKey.Value;
+    }
+}
+rajani_net@Azure:~/aspnet-learn/src/ContosoPets.Ui$ cat Services/ProductService.cs﻿using ContosoPets.Ui.Models;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
+
+namespace ContosoPets.Ui.Services
+{
+    public class ProductService
+    {
+        private readonly string _route;
+        private readonly HttpClient _httpClient;
+
+        public ProductService(HttpClient httpClient)
+        {
+            _httpClient = httpClient;
+            _route = httpClient.BaseAddress.AbsoluteUri;
+        }
+
+        public async Task<IEnumerable<Product>> GetProducts()
+        {
+            var response = await _httpClient.GetAsync(_route);
+            response.EnsureSuccessStatusCode();
+
+            var products = await response.Content.ReadAsAsync<IEnumerable<Product>>();
+
+            return products;
+        }
+
+        public async Task<Product> GetProductById(int productId)
+        {
+            var response = await _httpClient.GetAsync($"{_route}/{productId}");
+            response.EnsureSuccessStatusCode();
+
+            var product = await response.Content.ReadAsAsync<Product>();
+
+            return product;
+        }
+
+        public async Task UpdateProduct(Product product) =>
+            await _httpClient.PutAsJsonAsync<Product>($"{_route}/{product.Id}", product);
+
+        public async Task CreateProduct(Product product) =>
+            await _httpClient.PostAsJsonAsync<Product>(_route, product);
+
+        public async Task DeleteProduct(int productId) =>
+            await _httpClient.DeleteAsync($"{_route}/{productId}");
+    }
+}
+rajani_net@Azure:~/aspnet-learn/src/ContosoPets.Ui$ cat Services/QRCodeService.cs
+using QRCoder;
+
+namespace ContosoPets.Ui.Services
+{
+    public class QRCodeService
+    {
+        private readonly QRCodeGenerator _generator;
+
+        public QRCodeService(QRCodeGenerator generator)
+        {
+            _generator = generator;
+        }
+
+        public string GetQRCodeAsBase64(string textToEncode)
+        {
+            QRCodeData qrCodeData = _generator.CreateQrCode(textToEncode, QRCodeGenerator.ECCLevel.Q);
+            var qrCode = new Base64QRCode(qrCodeData);
+
+            return qrCode.GetGraphic(4);
+        }
+    }
+}rajani_net@Azure:~/aspnet-learn/src/ContosoPets.Ui$ cat wwwroot/js/product.js
+﻿async function deleteProduct(productId, xCsrfToken) {
+    if(confirm('Are you sure?')) {
+        await fetch(`Products/Index/${productId}`, {
+            method: 'delete',
+            headers: {
+                'X-CSRF-TOKEN': xCsrfToken
+            }
+        })
+        .then(response => {
+            if (response.status === 204) {
+                location.reload();
+            }
+            else {
+                throw `Unable to delete product. HTTP status code: ${response.status}`;
+            }
+        })
+        .catch(error => {
+            document.getElementById('spanError').innerText = error;
+            console.log(`Product ID ${productId}. ${error}`);
+        });
+    }
+}rajani_net@Azure:~/aspnet-learn/src/ContosoPets.Ui$ cat Program.cs
+using System;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Configuration.AzureKeyVault;
+using Microsoft.Azure.Services.AppAuthentication;
+using Microsoft.Azure.KeyVault;
+
+namespace ContosoPets.Ui
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            CreateHostBuilder(args).Build().Run();
+        }
+
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.ConfigureAppConfiguration(config => ConfigureKeyVault(config));
+                    webBuilder.UseStartup<Startup>();
+                });
+
+        private static void ConfigureKeyVault(IConfigurationBuilder config)
+        {
+            var azureServiceTokenProvider = new AzureServiceTokenProvider();
+            var keyVaultClient = new KeyVaultClient(
+                new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
+
+            string keyVaultEndpoint = Environment.GetEnvironmentVariable(
+                "ASPNETCORE_HOSTINGSTARTUP__KEYVAULT__CONFIGURATIONVAULT");
+
+            config.AddAzureKeyVault(
+                keyVaultEndpoint, keyVaultClient, new DefaultKeyVaultSecretManager());
+        }
+    }
+}
+rajani_net@Azure:~/aspnet-learn/src/ContosoPets.Ui$ cat Startup.cs
+using System;
+using System.Net.Mime;
+using ContosoPets.Ui.Services;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Net.Http.Headers;
+using QRCoder;
+using Http = Microsoft.AspNetCore.Http;
+
+namespace ContosoPets.Ui
+{
+    public class Startup
+    {
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+        public IConfiguration Configuration { get; }
+
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = Http.SameSiteMode.None;
+            });
+
+            IConfigurationSection cpServicesConfig = Configuration.GetSection("ContosoPetsServices");
+
+            services.AddHttpClient<ProductService>(config => {
+                config.BaseAddress = new Uri(
+                    $"{cpServicesConfig["BaseAddress"]}{cpServicesConfig["Routes:Products"]}");
+                config.DefaultRequestHeaders.Add(HeaderNames.Accept, MediaTypeNames.Application.Json);
+            });
+
+            services.AddSingleton(new QRCodeService(new QRCodeGenerator()));
+            services.AddSingleton<AdminRegistrationTokenService>();
+
+            // Add call to AddAuthorization
+
+            services.AddAntiforgery(options => options.HeaderName = "X-CSRF-TOKEN");
+            services.AddRazorPages();
+            services.AddControllers();
+        }
+
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler("/Error");
+                app.UseHsts();
+            }
+
+            app.UseStaticFiles();
+            app.UseCookiePolicy();
+
+            app.UseRouting();
+
+            // Add the app.UseAuthentication code
+            app.UseAuthorization();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+                endpoints.MapRazorPages();
+            });
+        }
+    }
+}
+rajani_net@Azure:~/aspnet-learn/src/ContosoPets.Ui$
+]
+
+# Verify database connectivity
+Run the following command:
+
+Bash
+db -Q "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='dbo' ORDER BY TABLE_NAME" -Y 25
+
+The script created a db alias. The alias corresponds to sqlcmd with -U (username), -P (password), -S (server hostname), and -d (database name) options. sqlcmd is a cross-platform command-line tool for administering and querying SQL Server databases. The preceding command retrieves a list of non-system tables from the Azure SQL Database that was created earlier.
+
+As expected, the list is empty because there are no tables in the database's dbo schema.
+
+Console
+TABLE_NAME
+-------------------------
+
+(0 rows affected)
+
+$ db -Q "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='dbo' ORDER BY TABLE_NAME" -Y 25
+[
+rajani_net@Azure:~/aspnet-learn/src/ContosoPets.Ui$ db -Q "SELECT TABLE_NAME FROMINFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='dbo' ORDER BY TABLE_NAME" -Y 25
+TABLE_NAME
+-------------------------
+
+(0 rows affected)
+rajani_net@Azure:~/aspnet-learn/src/ContosoPets.Ui$
+]

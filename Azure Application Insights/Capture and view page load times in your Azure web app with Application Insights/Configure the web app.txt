@@ -1,0 +1,8 @@
+Subscription: Concierge Subscription
+Resource Group (mslearn-appinsights): learn-3df3ab4d-653d-49cd-bb48-eb2c67c2747e
+App name (within the .azurewebsites.net domain):rajanisvideoappJune-08-2020
+Publish: Code
+Runtime stack: .NET Core 2.1
+(Operating System: Windows)
+Region: West US 2
+(Sku and size: F1)

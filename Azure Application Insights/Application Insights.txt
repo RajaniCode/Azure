@@ -1,0 +1,49 @@
+## What is Application Insights?
+Application Insights is an Azure service that helps you to monitor the performance and behavior of web applications.
+• It captures two kinds of data: events and metrics.
+• Events are individual data points that can represent any kind of event that occurs in an app.
+• Metrics are measurements of values, typically taken at regular intervals, that aren't tied to specific events.
+
+# Application Insights resources
+• Each Application Insights resource you create is a repository for application telemetry data.
+• It includes the various displays and configuration tools that you can view from the Azure portal.
+
+# Visualizations
+• Live metrics streams: Charts that display performance values as they vary in near-real time.
+• Metrics explorer: Tool that shows how metrics vary over time.
+• Alerts: Messages automatically sent to app admins when target metrics exceed specified thresholds.
+• Profiler: Shows how a set of requests, like those for a single web page, were delivered.
+• Application Map: Displays the components of an application and how they link to each other.
+• Usage analysis: Information about your app's users.
+Note
+All these are available in the following:
+• Azure portal
+• Visual Studio
+• Power BI
+
+# Two ways to configure your app to send data to Application Insights
+• Runtime instrumentation: Runtime instrumentation captures telemetry without requiring you to change the web app's source code.
+• Build-time instrumentation: With this method, developers add a server-side SDK to the web app's code.
+Note
+• You can enable client-side instrumentation for an app by including a standard Application Insights JavaScript library in pages delivered to your app's users.
+• You can configure Azure App Service web apps to automatically inject the client SDK and capture many client-side metrics.
+
+
+## What is the Application Insights SDK?
+• The Application Insights SDK hooks into the web application framework that powers your app and automatically captures detailed runtime information, including data about HTTP requests, system metrics, service dependencies, and exceptions.
+• The SDK sends this telemetry data to an Application Insights resource in Azure.
+• Use of the SDK is not limited to web applications. 
+• You can instrument any kind of service or component for which you want to record telemetry, though most of the data that the SDK can record automatically is specific to web apps.
+• And the SDK isn't limited to applications that are deployed to Azure.
+
+# Why install the SDK?
+The Application Insights SDK provides these benefits:
+• Comprehensive data collection: Data like user retention, unique users, and unique sessions is available in Application Insights only when you use the Application Insights SDK.
+• Custom telemetry: With the SDK, you can add code to your application to capture events and metrics that are specific to your app and its business domain.
+• Advanced features: Some Application Insights features are available only when you use the SDK. For example, Live Metrics Stream lets you watch and drill down into metrics in real time.
+• Local telemetry in Visual Studio: Telemetry data from applications instrumented with the SDK can be viewed locally in Visual Studio when you run the app in the debugger.
+Note
+• Azure App Service lets you enable Application Insights for an application without adding the SDK to your code. 
+• However this feature, called runtime instrumentation, doesn't offer deep insight into your app the way the SDK can. 
+• Runtime instrumentation is also an Azure-specific feature and is available only for Windows-based web apps. 
+• The SDK can be used to instrument any application, service, or component running anywhere.

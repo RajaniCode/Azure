@@ -1,0 +1,21 @@
+Subscription: Concierge Subscription.
+
+Resource Group: learn-fd939db8-bce2-40e6-bb91-1984159f4608
+
+Virtual machine name: test-ubuntu-cus-vm
+
+Region: West US 2
+
+Availability options: No infrastructure redundancy required
+
+Image: Ubuntu Server 18.04 LTS
+
+Size: Standard D2s V3
+
+Authentication: Password
+
+Username: AzureUser
+
+Password: @2#RE#$ER~!@
+
+Public inbound ports: None

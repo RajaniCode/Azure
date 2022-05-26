@@ -1,0 +1,512 @@
+# Create the web app source code
+Bash 
+dotnet new mvc -o videowebapp
+
+$ dotnet new mvc -o videowebapp
+[
+rajani_net@Azure:~$ dotnet new mvc -o videowebapp
+
+Welcome to .NET Core!
+---------------------
+Learn more about .NET Core: https://aka.ms/dotnet-docs
+Use 'dotnet --help' to see available commands or visit: https://aka.ms/dotnet-cli-docs
+
+Telemetry
+---------
+The .NET Core tools collect usage data in order to help us improve your experience. The data is anonymous and doesn't include command-line arguments. The data is collected by Microsoft and shared with the community. You can opt-out of telemetry by setting the DOTNET_CLI_TELEMETRY_OPTOUT environment variable to '1' or 'true' using your favorite shell.
+
+Read more about .NET Core CLI Tools telemetry: https://aka.ms/dotnet-cli-telemetry
+
+ASP.NET Core
+------------
+Successfully installed the ASP.NET Core HTTPS Development Certificate.
+To trust the certificate run 'dotnet dev-certs https --trust' (Windows and macOS only). For establishing trust on other platforms refer to the platform specific documentation.
+For more information on configuring HTTPS see https://go.microsoft.com/fwlink/?linkid=848054.
+Getting ready...
+The template "ASP.NET Core Web App (Model-View-Controller)" was created successfully.
+This template contains technologies from parties other than Microsoft, see https://aka.ms/aspnetcore-template-3pn-210 for details.
+
+Processing post-creation actions...
+Running 'dotnet restore' on videowebapp/videowebapp.csproj...
+  Restore completed in 12.27 sec for /home/rajani_net/videowebapp/videowebapp.csproj.
+
+Restore succeeded.
+
+rajani_net@Azure:~$
+]
+
+# Add the Application Insights SDK
+To reference the Application Insights SDK within the app, install the appropriate NuGet packages:
+
+1. In the Cloud Shell, make sure you're in the video app's directory by running the following command:
+
+Bash
+cd videowebapp
+
+2. To add the Application Insights SDK to the app, run this command:
+
+Bash
+dotnet add package Microsoft.ApplicationInsights.AspNetCore
+
+$ cd videowebapp
+$ dotnet add package Microsoft.ApplicationInsights.AspNetCore
+[
+rajani_net@Azure:~$ cd videowebapp
+rajani_net@Azure:~/videowebapp$ dotnet add package Microsoft.ApplicationInsights.AspNetCore
+  Writing /tmp/tmpUnPTis.tmp
+info : Adding PackageReference for package 'Microsoft.ApplicationInsights.AspNetCore' into project '/home/rajani_net/videowebapp/videowebapp.csproj'.
+info : Restoring packages for /home/rajani_net/videowebapp/videowebapp.csproj...
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.applicationinsights.aspnetcore/index.json
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.applicationinsights.aspnetcore/index.json 848ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.applicationinsights.aspnetcore/2.14.0/microsoft.applicationinsights.aspnetcore.2.14.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.applicationinsights.aspnetcore/2.14.0/microsoft.applicationinsights.aspnetcore.2.14.0.nupkg 4ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.applicationinsights/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.applicationinsights.windowsserver.telemetrychannel/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.logging.applicationinsights/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.applicationinsights.dependencycollector/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.applicationinsights.eventcountercollector/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.applicationinsights.perfcountercollector/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.applicationinsights.windowsserver/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.hosting/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.json/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/system.diagnostics.diagnosticsource/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/system.memory/index.json
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.applicationinsights/index.json 837ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.applicationinsights/2.14.0/microsoft.applicationinsights.2.14.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.applicationinsights/2.14.0/microsoft.applicationinsights.2.14.0.nupkg 2ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.applicationinsights.windowsserver.telemetrychannel/index.json 1163ms
+info :   OK https://api.nuget.org/v3-flatcontainer/system.memory/index.json 1157ms
+info :   GET https://api.nuget.org/v3-flatcontainer/system.memory/4.5.4/system.memory.4.5.4.nupkg
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.applicationinsights.windowsserver.telemetrychannel/2.14.0/microsoft.applicationinsights.windowsserver.telemetrychannel.2.14.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/system.diagnostics.diagnosticsource/index.json 1163ms
+info :   GET https://api.nuget.org/v3-flatcontainer/system.diagnostics.diagnosticsource/4.6.0/system.diagnostics.diagnosticsource.4.6.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/system.memory/4.5.4/system.memory.4.5.4.nupkg 6ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.logging.applicationinsights/index.json 1170ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.logging.applicationinsights/2.14.0/microsoft.extensions.logging.applicationinsights.2.14.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.applicationinsights.dependencycollector/index.json 1171ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.applicationinsights.dependencycollector/2.14.0/microsoft.applicationinsights.dependencycollector.2.14.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.applicationinsights.windowsserver.telemetrychannel/2.14.0/microsoft.applicationinsights.windowsserver.telemetrychannel.2.14.0.nupkg 6ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.json/index.json 1171ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.json/2.1.0/microsoft.extensions.configuration.json.2.1.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/system.diagnostics.diagnosticsource/4.6.0/system.diagnostics.diagnosticsource.4.6.0.nupkg 7ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.applicationinsights.dependencycollector/2.14.0/microsoft.applicationinsights.dependencycollector.2.14.0.nupkg 5ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.applicationinsights.windowsserver/index.json 1177ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.applicationinsights.windowsserver/2.14.0/microsoft.applicationinsights.windowsserver.2.14.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.logging.applicationinsights/2.14.0/microsoft.extensions.logging.applicationinsights.2.14.0.nupkg 9ms
+info :   GET https://api.nuget.org/v3-flatcontainer/newtonsoft.json/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/system.io.filesystem.accesscontrol/index.json
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.json/2.1.0/microsoft.extensions.configuration.json.2.1.0.nupkg 10ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.fileextensions/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration/index.json
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.hosting/index.json 1186ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.hosting/1.0.2/microsoft.aspnetcore.hosting.1.0.2.nupkg
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.logging/index.json
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.applicationinsights.windowsserver/2.14.0/microsoft.applicationinsights.windowsserver.2.14.0.nupkg 10ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.applicationinsights.eventcountercollector/index.json 1190ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.applicationinsights.eventcountercollector/2.14.0/microsoft.applicationinsights.eventcountercollector.2.14.0.nupkg
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.diagnosticadapter/index.json
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.hosting/1.0.2/microsoft.aspnetcore.hosting.1.0.2.nupkg 95ms
+info :   GET https://api.nuget.org/v3-flatcontainer/system.diagnostics.stacktrace/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.hosting.abstractions/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.hosting.server.abstractions/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.http/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.http.extensions/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.fileproviders.physical/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.options/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.environmentvariables/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.dependencyinjection/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.platformabstractions/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/system.reflection.metadata/index.json
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.applicationinsights.perfcountercollector/index.json 1331ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.applicationinsights.perfcountercollector/2.14.0/microsoft.applicationinsights.perfcountercollector.2.14.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.applicationinsights.eventcountercollector/2.14.0/microsoft.applicationinsights.eventcountercollector.2.14.0.nupkg 142ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.applicationinsights.perfcountercollector/2.14.0/microsoft.applicationinsights.perfcountercollector.2.14.0.nupkg 39ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.caching.memory/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/system.diagnostics.performancecounter/index.json
+info :   OK https://api.nuget.org/v3-flatcontainer/system.reflection.metadata/index.json 290ms
+info :   GET https://api.nuget.org/v3-flatcontainer/system.reflection.metadata/1.3.0/system.reflection.metadata.1.3.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/system.reflection.metadata/1.3.0/system.reflection.metadata.1.3.0.nupkg 6ms
+info :   GET https://api.nuget.org/v3-flatcontainer/system.collections.immutable/index.json
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.options/index.json 327ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.options/1.0.2/microsoft.extensions.options.1.0.2.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.options/1.0.2/microsoft.extensions.options.1.0.2.nupkg 3ms
+info :   GET https://api.nuget.org/v3-flatcontainer/system.componentmodel/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/system.linq.expressions/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.dependencyinjection.abstractions/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.primitives/index.json
+info :   OK https://api.nuget.org/v3-flatcontainer/system.linq.expressions/index.json 212ms
+info :   GET https://api.nuget.org/v3-flatcontainer/system.linq.expressions/4.1.1/system.linq.expressions.4.1.1.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/system.linq.expressions/4.1.1/system.linq.expressions.4.1.1.nupkg 2ms
+info :   OK https://api.nuget.org/v3-flatcontainer/newtonsoft.json/index.json 834ms
+info :   GET https://api.nuget.org/v3-flatcontainer/newtonsoft.json/10.0.3/newtonsoft.json.10.0.3.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.fileextensions/index.json 833ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.fileextensions/2.1.0/microsoft.extensions.configuration.fileextensions.2.1.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.logging/index.json 831ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.logging/2.1.0/microsoft.extensions.logging.2.1.0.nupkg
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.logging/1.0.2/microsoft.extensions.logging.1.0.2.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/newtonsoft.json/10.0.3/newtonsoft.json.10.0.3.nupkg 3ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.fileextensions/2.1.0/microsoft.extensions.configuration.fileextensions.2.1.0.nupkg 4ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration/index.json 840ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration/2.1.0/microsoft.extensions.configuration.2.1.0.nupkg
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration/1.0.2/microsoft.extensions.configuration.1.0.2.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.logging/1.0.2/microsoft.extensions.logging.1.0.2.nupkg 7ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.logging.abstractions/index.json
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.logging/2.1.0/microsoft.extensions.logging.2.1.0.nupkg 9ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.binder/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.options/2.1.0/microsoft.extensions.options.2.1.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration/2.1.0/microsoft.extensions.configuration.2.1.0.nupkg 13ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.abstractions/index.json
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration/1.0.2/microsoft.extensions.configuration.1.0.2.nupkg 14ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.diagnosticadapter/index.json 857ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.diagnosticadapter/1.1.0/microsoft.extensions.diagnosticadapter.1.1.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.diagnosticadapter/1.1.0/microsoft.extensions.diagnosticadapter.1.1.0.nupkg 6ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.options/2.1.0/microsoft.extensions.options.2.1.0.nupkg 44ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.hosting.abstractions/index.json 830ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.hosting.abstractions/1.0.2/microsoft.aspnetcore.hosting.abstractions.1.0.2.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.hosting.abstractions/1.0.2/microsoft.aspnetcore.hosting.abstractions.1.0.2.nupkg 3ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.http.abstractions/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.fileproviders.abstractions/index.json
+info :   OK https://api.nuget.org/v3-flatcontainer/system.diagnostics.stacktrace/index.json 850ms
+info :   GET https://api.nuget.org/v3-flatcontainer/system.diagnostics.stacktrace/4.0.1/system.diagnostics.stacktrace.4.0.1.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/system.diagnostics.stacktrace/4.0.1/system.diagnostics.stacktrace.4.0.1.nupkg 3ms
+info :   OK https://api.nuget.org/v3-flatcontainer/system.io.filesystem.accesscontrol/index.json 972ms
+info :   GET https://api.nuget.org/v3-flatcontainer/system.io.filesystem.accesscontrol/4.7.0/system.io.filesystem.accesscontrol.4.7.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/system.io.filesystem.accesscontrol/4.7.0/system.io.filesystem.accesscontrol.4.7.0.nupkg 2ms
+info :   GET https://api.nuget.org/v3-flatcontainer/system.security.accesscontrol/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/system.security.principal.windows/index.json
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.dependencyinjection/index.json 917ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.dependencyinjection/1.0.2/microsoft.extensions.dependencyinjection.1.0.2.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.dependencyinjection/1.0.2/microsoft.extensions.dependencyinjection.1.0.2.nupkg 2ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.environmentvariables/index.json 924ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.environmentvariables/1.0.2/microsoft.extensions.configuration.environmentvariables.1.0.2.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.environmentvariables/1.0.2/microsoft.extensions.configuration.environmentvariables.1.0.2.nupkg 3ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.platformabstractions/index.json 931ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.platformabstractions/1.0.0/microsoft.extensions.platformabstractions.1.0.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.platformabstractions/1.0.0/microsoft.extensions.platformabstractions.1.0.0.nupkg 4ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.fileproviders.physical/index.json 962ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.fileproviders.physical/1.0.1/microsoft.extensions.fileproviders.physical.1.0.1.nupkg
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.fileproviders.physical/2.1.0/microsoft.extensions.fileproviders.physical.2.1.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.hosting.server.abstractions/index.json 965ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.hosting.server.abstractions/1.0.2/microsoft.aspnetcore.hosting.server.abstractions.1.0.2.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.fileproviders.physical/1.0.1/microsoft.extensions.fileproviders.physical.1.0.1.nupkg 2ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.fileproviders.physical/2.1.0/microsoft.extensions.fileproviders.physical.2.1.0.nupkg 2ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.filesystemglobbing/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/system.io.filesystem.watcher/index.json
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.hosting.server.abstractions/1.0.2/microsoft.aspnetcore.hosting.server.abstractions.1.0.2.nupkg 5ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.http.features/index.json
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.caching.memory/index.json 829ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.caching.memory/1.0.0/microsoft.extensions.caching.memory.1.0.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.caching.memory/1.0.0/microsoft.extensions.caching.memory.1.0.0.nupkg 2ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.caching.abstractions/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.options/1.0.0/microsoft.extensions.options.1.0.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.http/index.json 982ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.http/1.0.2/microsoft.aspnetcore.http.1.0.2.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.options/1.0.0/microsoft.extensions.options.1.0.0.nupkg 3ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.http.extensions/index.json 990ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.http.extensions/1.0.2/microsoft.aspnetcore.http.extensions.1.0.2.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/system.diagnostics.performancecounter/index.json 843ms
+info :   GET https://api.nuget.org/v3-flatcontainer/system.diagnostics.performancecounter/4.7.0/system.diagnostics.performancecounter.4.7.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.http/1.0.2/microsoft.aspnetcore.http.1.0.2.nupkg 9ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.webutilities/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.objectpool/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.net.http.headers/index.json
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.http.extensions/1.0.2/microsoft.aspnetcore.http.extensions.1.0.2.nupkg 8ms
+info :   OK https://api.nuget.org/v3-flatcontainer/system.diagnostics.performancecounter/4.7.0/system.diagnostics.performancecounter.4.7.0.nupkg 7ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.netcore.platforms/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.win32.registry/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/system.configuration.configurationmanager/index.json
+info :   OK https://api.nuget.org/v3-flatcontainer/system.security.accesscontrol/index.json 211ms
+info :   GET https://api.nuget.org/v3-flatcontainer/system.security.accesscontrol/4.7.0/system.security.accesscontrol.4.7.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/system.security.accesscontrol/4.7.0/system.security.accesscontrol.4.7.0.nupkg 3ms
+info :   OK https://api.nuget.org/v3-flatcontainer/system.security.principal.windows/index.json 243ms
+info :   GET https://api.nuget.org/v3-flatcontainer/system.security.principal.windows/4.7.0/system.security.principal.windows.4.7.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/system.security.principal.windows/4.7.0/system.security.principal.windows.4.7.0.nupkg 14ms
+info :   OK https://api.nuget.org/v3-flatcontainer/system.collections.immutable/index.json 840ms
+info :   GET https://api.nuget.org/v3-flatcontainer/system.collections.immutable/1.2.0/system.collections.immutable.1.2.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/system.collections.immutable/1.2.0/system.collections.immutable.1.2.0.nupkg 2ms
+info :   OK https://api.nuget.org/v3-flatcontainer/system.componentmodel/index.json 836ms
+info :   GET https://api.nuget.org/v3-flatcontainer/system.componentmodel/4.0.1/system.componentmodel.4.0.1.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/system.componentmodel/4.0.1/system.componentmodel.4.0.1.nupkg 3ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.primitives/index.json 850ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.primitives/1.0.1/microsoft.extensions.primitives.1.0.1.nupkg
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.primitives/2.1.0/microsoft.extensions.primitives.2.1.0.nupkg
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.primitives/1.0.0/microsoft.extensions.primitives.1.0.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.primitives/1.0.1/microsoft.extensions.primitives.1.0.1.nupkg 3ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.primitives/1.0.0/microsoft.extensions.primitives.1.0.0.nupkg 3ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.primitives/2.1.0/microsoft.extensions.primitives.2.1.0.nupkg 5ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.dependencyinjection.abstractions/index.json 858ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.dependencyinjection.abstractions/1.0.2/microsoft.extensions.dependencyinjection.abstractions.1.0.2.nupkg
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.dependencyinjection.abstractions/2.1.0/microsoft.extensions.dependencyinjection.abstractions.2.1.0.nupkg
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.dependencyinjection.abstractions/1.1.0/microsoft.extensions.dependencyinjection.abstractions.1.1.0.nupkg
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.dependencyinjection.abstractions/1.0.0/microsoft.extensions.dependencyinjection.abstractions.1.0.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.dependencyinjection.abstractions/1.1.0/microsoft.extensions.dependencyinjection.abstractions.1.1.0.nupkg 2ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.dependencyinjection.abstractions/1.0.0/microsoft.extensions.dependencyinjection.abstractions.1.0.0.nupkg 3ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.dependencyinjection.abstractions/1.0.2/microsoft.extensions.dependencyinjection.abstractions.1.0.2.nupkg 6ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.dependencyinjection.abstractions/2.1.0/microsoft.extensions.dependencyinjection.abstractions.2.1.0.nupkg 7ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.net.http.headers/index.json 214ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.net.http.headers/1.0.2/microsoft.net.http.headers.1.0.2.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.net.http.headers/1.0.2/microsoft.net.http.headers.1.0.2.nupkg 5ms
+info :   GET https://api.nuget.org/v3-flatcontainer/system.diagnostics.contracts/index.json
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.binder/index.json 838ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.binder/2.1.0/microsoft.extensions.configuration.binder.2.1.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.binder/2.1.0/microsoft.extensions.configuration.binder.2.1.0.nupkg 6ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.abstractions/index.json 835ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.abstractions/2.1.0/microsoft.extensions.configuration.abstractions.2.1.0.nupkg
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.abstractions/1.0.2/microsoft.extensions.configuration.abstractions.1.0.2.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.logging.abstractions/index.json 851ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.abstractions/2.1.0/microsoft.extensions.configuration.abstractions.2.1.0.nupkg 2ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.logging.abstractions/1.0.2/microsoft.extensions.logging.abstractions.1.0.2.nupkg
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.logging.abstractions/2.1.0/microsoft.extensions.logging.abstractions.2.1.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.logging.abstractions/2.1.0/microsoft.extensions.logging.abstractions.2.1.0.nupkg 2ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.logging.abstractions/1.0.2/microsoft.extensions.logging.abstractions.1.0.2.nupkg 3ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.fileproviders.abstractions/index.json 832ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.fileproviders.abstractions/1.0.1/microsoft.extensions.fileproviders.abstractions.1.0.1.nupkg
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.fileproviders.abstractions/2.1.0/microsoft.extensions.fileproviders.abstractions.2.1.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.fileproviders.abstractions/1.0.1/microsoft.extensions.fileproviders.abstractions.1.0.1.nupkg 3ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.http.abstractions/index.json 839ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.http.abstractions/1.0.2/microsoft.aspnetcore.http.abstractions.1.0.2.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.fileproviders.abstractions/2.1.0/microsoft.extensions.fileproviders.abstractions.2.1.0.nupkg 5ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.http.abstractions/1.0.2/microsoft.aspnetcore.http.abstractions.1.0.2.nupkg 3ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.filesystemglobbing/index.json 834ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.filesystemglobbing/2.1.0/microsoft.extensions.filesystemglobbing.2.1.0.nupkg
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.filesystemglobbing/1.0.1/microsoft.extensions.filesystemglobbing.1.0.1.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.filesystemglobbing/1.0.1/microsoft.extensions.filesystemglobbing.1.0.1.nupkg 3ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.filesystemglobbing/2.1.0/microsoft.extensions.filesystemglobbing.2.1.0.nupkg 5ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.http.features/index.json 838ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.http.features/1.0.2/microsoft.aspnetcore.http.features.1.0.2.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/system.io.filesystem.watcher/index.json 841ms
+info :   GET https://api.nuget.org/v3-flatcontainer/system.io.filesystem.watcher/4.0.0/system.io.filesystem.watcher.4.0.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.http.features/1.0.2/microsoft.aspnetcore.http.features.1.0.2.nupkg 2ms
+info :   GET https://api.nuget.org/v3-flatcontainer/system.net.websockets/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/system.security.claims/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/system.security.principal/index.json
+info :   OK https://api.nuget.org/v3-flatcontainer/system.io.filesystem.watcher/4.0.0/system.io.filesystem.watcher.4.0.0.nupkg 176ms
+info :   GET https://api.nuget.org/v3-flatcontainer/system.threading.overlapped/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/system.threading.thread/index.json
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.caching.abstractions/index.json 1014ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.caching.abstractions/1.0.0/microsoft.extensions.caching.abstractions.1.0.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.webutilities/index.json 1000ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.webutilities/1.0.2/microsoft.aspnetcore.webutilities.1.0.2.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.netcore.platforms/index.json 995ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.netcore.platforms/3.1.0/microsoft.netcore.platforms.3.1.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/system.configuration.configurationmanager/index.json 997ms
+info :   GET https://api.nuget.org/v3-flatcontainer/system.configuration.configurationmanager/4.7.0/system.configuration.configurationmanager.4.7.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.objectpool/index.json 1007ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.objectpool/1.0.1/microsoft.extensions.objectpool.1.0.1.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.win32.registry/index.json 1001ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.win32.registry/4.7.0/microsoft.win32.registry.4.7.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.caching.abstractions/1.0.0/microsoft.extensions.caching.abstractions.1.0.0.nupkg 10ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.webutilities/1.0.2/microsoft.aspnetcore.webutilities.1.0.2.nupkg 10ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.netcore.platforms/3.1.0/microsoft.netcore.platforms.3.1.0.nupkg 10ms
+info :   OK https://api.nuget.org/v3-flatcontainer/system.configuration.configurationmanager/4.7.0/system.configuration.configurationmanager.4.7.0.nupkg 7ms
+info :   GET https://api.nuget.org/v3-flatcontainer/system.security.cryptography.protecteddata/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/system.security.permissions/index.json
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.objectpool/1.0.1/microsoft.extensions.objectpool.1.0.1.nupkg 10ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.win32.registry/4.7.0/microsoft.win32.registry.4.7.0.nupkg 9ms
+info :   OK https://api.nuget.org/v3-flatcontainer/system.diagnostics.contracts/index.json 840ms
+info :   GET https://api.nuget.org/v3-flatcontainer/system.diagnostics.contracts/4.0.1/system.diagnostics.contracts.4.0.1.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/system.diagnostics.contracts/4.0.1/system.diagnostics.contracts.4.0.1.nupkg 2ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.abstractions/1.0.2/microsoft.extensions.configuration.abstractions.1.0.2.nupkg 834ms
+info :   OK https://api.nuget.org/v3-flatcontainer/system.security.claims/index.json 834ms
+info :   GET https://api.nuget.org/v3-flatcontainer/system.security.claims/4.0.1/system.security.claims.4.0.1.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/system.net.websockets/index.json 840ms
+info :   GET https://api.nuget.org/v3-flatcontainer/system.net.websockets/4.0.0/system.net.websockets.4.0.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/system.security.claims/4.0.1/system.security.claims.4.0.1.nupkg 5ms
+info :   OK https://api.nuget.org/v3-flatcontainer/system.net.websockets/4.0.0/system.net.websockets.4.0.0.nupkg 2ms
+info :   OK https://api.nuget.org/v3-flatcontainer/system.security.principal/index.json 838ms
+info :   GET https://api.nuget.org/v3-flatcontainer/system.security.principal/4.0.1/system.security.principal.4.0.1.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/system.threading.overlapped/index.json 834ms
+info :   GET https://api.nuget.org/v3-flatcontainer/system.threading.overlapped/4.0.1/system.threading.overlapped.4.0.1.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/system.threading.thread/index.json 835ms
+info :   GET https://api.nuget.org/v3-flatcontainer/system.threading.thread/4.0.0/system.threading.thread.4.0.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/system.security.principal/4.0.1/system.security.principal.4.0.1.nupkg 7ms
+info :   OK https://api.nuget.org/v3-flatcontainer/system.threading.overlapped/4.0.1/system.threading.overlapped.4.0.1.nupkg 10ms
+info :   OK https://api.nuget.org/v3-flatcontainer/system.threading.thread/4.0.0/system.threading.thread.4.0.0.nupkg 11ms
+info :   OK https://api.nuget.org/v3-flatcontainer/system.security.cryptography.protecteddata/index.json 835ms
+info :   GET https://api.nuget.org/v3-flatcontainer/system.security.cryptography.protecteddata/4.7.0/system.security.cryptography.protecteddata.4.7.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/system.security.permissions/index.json 837ms
+info :   GET https://api.nuget.org/v3-flatcontainer/system.security.permissions/4.7.0/system.security.permissions.4.7.0.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/system.security.cryptography.protecteddata/4.7.0/system.security.cryptography.protecteddata.4.7.0.nupkg 3ms
+info :   OK https://api.nuget.org/v3-flatcontainer/system.security.permissions/4.7.0/system.security.permissions.4.7.0.nupkg 6ms
+info : Installing System.Security.Permissions 4.7.0.
+info : Installing System.Security.Cryptography.ProtectedData 4.7.0.
+info : Installing Microsoft.Extensions.Primitives 1.0.0.
+info : Installing System.Threading.Thread 4.0.0.
+info : Installing System.Threading.Overlapped 4.0.1.
+info : Installing System.Diagnostics.Contracts 4.0.1.
+info : Installing System.Security.Principal 4.0.1.
+info : Installing System.Security.Claims 4.0.1.
+info : Installing System.Net.WebSockets 4.0.0.
+info : Installing Microsoft.Extensions.FileSystemGlobbing 2.1.0.
+info : Installing Microsoft.Extensions.FileProviders.Abstractions 2.1.0.
+info : Installing Microsoft.Extensions.Primitives 2.1.0.
+info : Installing System.Configuration.ConfigurationManager 4.7.0.
+info : Installing Microsoft.Win32.Registry 4.7.0.
+info : Installing Microsoft.NETCore.Platforms 3.1.0.
+info : Installing Microsoft.Extensions.Caching.Abstractions 1.0.0.
+info : Installing Microsoft.Extensions.DependencyInjection.Abstractions 1.0.0.
+info : Installing Microsoft.ApplicationInsights.AspNetCore 2.14.0.
+info : Installing Microsoft.ApplicationInsights 2.14.0.
+info : Installing Microsoft.Extensions.Options 1.0.0.
+info : Installing System.Memory 4.5.4.
+info : Installing System.IO.FileSystem.Watcher 4.0.0.
+info : Installing System.Diagnostics.DiagnosticSource 4.6.0.
+info : Installing Microsoft.ApplicationInsights.WindowsServer 2.14.0.
+info : Installing Microsoft.ApplicationInsights.DependencyCollector 2.14.0.
+info : Installing Microsoft.Extensions.FileSystemGlobbing 1.0.1.
+info : Installing Microsoft.ApplicationInsights.EventCounterCollector 2.14.0.
+info : Installing Microsoft.Net.Http.Headers 1.0.2.
+info : Installing Microsoft.Extensions.Logging.ApplicationInsights 2.14.0.
+info : Installing Microsoft.Extensions.ObjectPool 1.0.1.
+info : Installing Microsoft.AspNetCore.WebUtilities 1.0.2.
+info : Installing Microsoft.Extensions.Configuration.Json 2.1.0.
+info : Installing Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel 2.14.0.
+info : Installing Microsoft.AspNetCore.Hosting 1.0.2.
+info : Installing Microsoft.AspNetCore.Http.Abstractions 1.0.2.
+info : Installing Microsoft.Extensions.FileProviders.Abstractions 1.0.1.
+info : Installing Microsoft.ApplicationInsights.PerfCounterCollector 2.14.0.
+info : Installing Microsoft.Extensions.DiagnosticAdapter 1.1.0.
+info : Installing Microsoft.AspNetCore.Http.Features 1.0.2.
+info : Installing Microsoft.Extensions.Logging 2.1.0.
+info : Installing Microsoft.Extensions.Configuration 2.1.0.
+info : Installing Microsoft.Extensions.Configuration.FileExtensions 2.1.0.
+info : Installing Newtonsoft.Json 10.0.3.
+info : Installing System.IO.FileSystem.AccessControl 4.7.0.
+info : Installing Microsoft.Extensions.Configuration.EnvironmentVariables 1.0.2.
+info : Installing Microsoft.Extensions.PlatformAbstractions 1.0.0.
+info : Installing System.Reflection.Metadata 1.3.0.
+info : Installing System.Diagnostics.StackTrace 4.0.1.
+info : Installing Microsoft.Extensions.Options 1.0.2.
+info : Installing Microsoft.Extensions.DependencyInjection 1.0.2.
+info : Installing Microsoft.Extensions.Logging 1.0.2.
+info : Installing Microsoft.Extensions.Configuration 1.0.2.
+info : Installing Microsoft.AspNetCore.Hosting.Server.Abstractions 1.0.2.
+info : Installing Microsoft.AspNetCore.Hosting.Abstractions 1.0.2.
+info : Installing Microsoft.AspNetCore.Http 1.0.2.
+info : Installing Microsoft.AspNetCore.Http.Extensions 1.0.2.
+info : Installing Microsoft.Extensions.FileProviders.Physical 1.0.1.
+info : Installing Microsoft.Extensions.Caching.Memory 1.0.0.
+info : Installing System.Diagnostics.PerformanceCounter 4.7.0.
+info : Installing Microsoft.Extensions.DependencyInjection.Abstractions 1.1.0.
+info : Installing Microsoft.Extensions.Options 2.1.0.
+info : Installing Microsoft.Extensions.DependencyInjection.Abstractions 2.1.0.
+info : Installing Microsoft.Extensions.Configuration.Binder 2.1.0.
+info : Installing Microsoft.Extensions.Logging.Abstractions 2.1.0.
+info : Installing Microsoft.Extensions.Configuration.Abstractions 2.1.0.
+info : Installing Microsoft.Extensions.FileProviders.Physical 2.1.0.
+info : Installing System.Security.AccessControl 4.7.0.
+info : Installing System.Security.Principal.Windows 4.7.0.
+info : Installing System.Collections.Immutable 1.2.0.
+info : Installing System.Linq.Expressions 4.1.1.
+info : Installing Microsoft.Extensions.Configuration.Abstractions 1.0.2.
+info : Installing System.ComponentModel 4.0.1.
+info : Installing Microsoft.Extensions.Logging.Abstractions 1.0.2.
+info : Installing Microsoft.Extensions.Primitives 1.0.1.
+info : Installing Microsoft.Extensions.DependencyInjection.Abstractions 1.0.2.
+info : Package 'Microsoft.ApplicationInsights.AspNetCore' is compatible with all the specified frameworks in project '/home/rajani_net/videowebapp/videowebapp.csproj'.
+info : PackageReference for package 'Microsoft.ApplicationInsights.AspNetCore' version '2.14.0' added to file '/home/rajani_net/videowebapp/videowebapp.csproj'.
+info : Committing restore...
+info : Writing assets file to disk. Path: /home/rajani_net/videowebapp/obj/project.assets.json
+log  : Restore completed in 6.9 sec for /home/rajani_net/videowebapp/videowebapp.csproj.
+rajani_net@Azure:~/videowebapp$
+]
+
+# Initialize the Application Insights SDK
+To initialize the Application Insights SDK, you need to call the UseApplicationInsights method in the Program.cs file. Take the following steps:
+
+1. Open the source code for the app in the Cloud Shell editor by running this command:
+
+Bash
+code .
+
+2. Open Program.cs by using the code editor's file navigator.
+
+3. Locate the following line of code:
+
+C#
+public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+WebHost.CreateDefaultBuilder(args)
+    .UseStartup<Startup>();
+
+4. Add a call to the UseApplicationInsights method. The call should look like this:
+
+C#
+public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+WebHost.CreateDefaultBuilder(args)
+    .UseStartup<Startup>()
+    .UseApplicationInsights();
+
+Important
+Be sure to save files when you're done editing them. You can do this by using the ellipsis menu (...) or by using a keyboard shortcut (Ctrl+S on Windows and Linux, Cmd+S on macOS).
+
+# Program.cs
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+
+namespace videowebapp
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            CreateWebHostBuilder(args).Build().Run();
+        }
+
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+            WebHost.CreateDefaultBuilder(args)
+                .UseStartup<Startup>()
+                .UseApplicationInsights();
+    }
+}
+[
+rajani_net@Azure:~/videowebapp$ ll
+total 56
+drwxr-xr-x 9 rajani_net rajani_net 4096 Jun  8 14:23 ./
+drwxr-xr-x 9 rajani_net rajani_net 4096 Jun  8 14:23 ../
+-rw-r--r-- 1 rajani_net rajani_net  146 Jun  8 14:15 appsettings.Development.json
+-rw-r--r-- 1 rajani_net rajani_net  105 Jun  8 14:15 appsettings.json
+drwxr-xr-x 3 rajani_net rajani_net 4096 Jun  8 14:23 bin/
+drwxr-xr-x 2 rajani_net rajani_net 4096 Jun  8 14:15 Controllers/
+drwxr-xr-x 2 rajani_net rajani_net 4096 Jun  8 14:15 Models/
+drwxr-xr-x 3 rajani_net rajani_net 4096 Jun  8 14:23 obj/
+-rw-r--r-- 1 rajani_net rajani_net  648 Jun  8 14:22 Program.cs
+drwxr-xr-x 2 rajani_net rajani_net 4096 Jun  8 14:15 Properties/
+-rw-r--r-- 1 rajani_net rajani_net 2201 Jun  8 14:15 Startup.cs
+-rw-r--r-- 1 rajani_net rajani_net  508 Jun  8 14:17 videowebapp.csproj
+drwxr-xr-x 4 rajani_net rajani_net 4096 Jun  8 14:15 Views/
+drwxr-xr-x 5 rajani_net rajani_net 4096 Jun  8 14:15 wwwroot/
+rajani_net@Azure:~/videowebapp$ cat Program.cs
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+
+namespace videowebapp
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            CreateWebHostBuilder(args).Build().Run();
+        }
+
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+            WebHost.CreateDefaultBuilder(args)
+                .UseStartup<Startup>()
+                .UseApplicationInsights();
+    }
+}
+rajani_net@Azure:~/videowebapp$
+]

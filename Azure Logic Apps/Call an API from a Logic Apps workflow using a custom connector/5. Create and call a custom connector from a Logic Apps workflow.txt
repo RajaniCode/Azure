@@ -1,0 +1,8 @@
+# Create and call a custom connector from a Logic Apps workflow
+Create a Logic App
+Name: sandboxlogicapp
+Subscription: Concierge Subscription
+Resource group: learn-0678b581-92a9-419c-8382-a464d7819f5a
+Location: West US 2
+Log Analytics: Off
+

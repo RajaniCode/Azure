@@ -1,0 +1,140 @@
+{
+  "id": "/subscriptions/c42268a6-fac4-4638-b014-76ff9880e070/resourceGroups/learn-2e1b8f54-4b23-4783-be4a-57afce0b1658/providers/Microsoft.Resources/deployments/sandbox-key-vault-007",
+  "name": "sandbox-key-vault-007",
+  "type": "Microsoft.Resources/deployments",
+  "tags": {
+    "primaryResourceId": "/subscriptions/c42268a6-fac4-4638-b014-76ff9880e070/resourceGroups/learn-2e1b8f54-4b23-4783-be4a-57afce0b1658/providers/Microsoft.KeyVault/vaults/sandbox-key-vault-007",
+    "marketplaceItemId": "Microsoft.KeyVault"
+  },
+  "properties": {
+    "templateHash": "1862333277051076882",
+    "parameters": {
+      "name": {
+        "type": "String",
+        "value": "sandbox-key-vault-007"
+      },
+      "location": {
+        "type": "String",
+        "value": "eastus"
+      },
+      "sku": {
+        "type": "String",
+        "value": "Standard"
+      },
+      "accessPolicies": {
+        "type": "Array",
+        "value": [
+          {
+            "objectId": "5a10ab73-4942-4b34-8611-81288ba96af5",
+            "tenantId": "604c1504-c6a3-4080-81aa-b33091104187",
+            "permissions": {
+              "keys": [
+                "Get",
+                "List",
+                "Update",
+                "Create",
+                "Import",
+                "Delete",
+                "Recover",
+                "Backup",
+                "Restore"
+              ],
+              "secrets": [
+                "Get",
+                "List",
+                "Set",
+                "Delete",
+                "Recover",
+                "Backup",
+                "Restore"
+              ],
+              "certificates": [
+                "Get",
+                "List",
+                "Update",
+                "Create",
+                "Import",
+                "Delete",
+                "Recover",
+                "Backup",
+                "Restore",
+                "ManageContacts",
+                "ManageIssuers",
+                "GetIssuers",
+                "ListIssuers",
+                "SetIssuers",
+                "DeleteIssuers"
+              ]
+            }
+          }
+        ]
+      },
+      "tenant": {
+        "type": "String",
+        "value": "604c1504-c6a3-4080-81aa-b33091104187"
+      },
+      "enabledForDeployment": {
+        "type": "Bool",
+        "value": false
+      },
+      "enabledForTemplateDeployment": {
+        "type": "Bool",
+        "value": false
+      },
+      "enabledForDiskEncryption": {
+        "type": "Bool",
+        "value": false
+      },
+      "enableRbacAuthorization": {
+        "type": "Bool",
+        "value": false
+      },
+      "enableSoftDelete": {
+        "type": "Bool",
+        "value": true
+      },
+      "softDeleteRetentionInDays": {
+        "type": "Int",
+        "value": 90
+      },
+      "networkAcls": {
+        "type": "Object",
+        "value": {
+          "defaultAction": "allow",
+          "bypass": "AzureServices",
+          "ipRules": [],
+          "virtualNetworkRules": []
+        }
+      }
+    },
+    "mode": "Incremental",
+    "debugSetting": {
+      "detailLevel": "None"
+    },
+    "provisioningState": "Succeeded",
+    "timestamp": "2020-04-02T16:33:37.7327893Z",
+    "duration": "PT34.2890053S",
+    "correlationId": "635634cb-8af8-4f25-b62c-93cb24afdb7a",
+    "providers": [
+      {
+        "namespace": "Microsoft.KeyVault",
+        "resourceTypes": [
+          {
+            "resourceType": "vaults",
+            "locations": [
+              "eastus"
+            ]
+          }
+        ]
+      }
+    ],
+    "dependencies": [],
+    "outputs": {},
+    "outputResources": [
+      {
+        "id": "/subscriptions/c42268a6-fac4-4638-b014-76ff9880e070/resourceGroups/learn-2e1b8f54-4b23-4783-be4a-57afce0b1658/providers/Microsoft.KeyVault/vaults/sandbox-key-vault-007"
+      }
+    ],
+    "validationLevel": "Template"
+  }
+}

@@ -1,0 +1,32 @@
+[
+  {
+    "id": "/subscriptions/c42268a6-fac4-4638-b014-76ff9880e070/resourceGroups/learn-2e1b8f54-4b23-4783-be4a-57afce0b1658/providers/Microsoft.Resources/deployments/sandbox-key-vault-007/operations/1E153A456E03C8B4",
+    "operationId": "1E153A456E03C8B4",
+    "properties": {
+      "provisioningOperation": "Create",
+      "provisioningState": "Succeeded",
+      "timestamp": "2020-04-02T16:33:36.6538441Z",
+      "duration": "PT25.3232753S",
+      "trackingId": "8db646f7-4b02-475e-bad1-353f0fcc8670",
+      "statusCode": "OK",
+      "targetResource": {
+        "id": "/subscriptions/c42268a6-fac4-4638-b014-76ff9880e070/resourceGroups/learn-2e1b8f54-4b23-4783-be4a-57afce0b1658/providers/Microsoft.KeyVault/vaults/sandbox-key-vault-007",
+        "resourceType": "Microsoft.KeyVault/vaults",
+        "resourceName": "sandbox-key-vault-007"
+      }
+    }
+  },
+  {
+    "id": "/subscriptions/c42268a6-fac4-4638-b014-76ff9880e070/resourceGroups/learn-2e1b8f54-4b23-4783-be4a-57afce0b1658/providers/Microsoft.Resources/deployments/sandbox-key-vault-007/operations/08586157617020338537",
+    "operationId": "08586157617020338537",
+    "properties": {
+      "provisioningOperation": "EvaluateDeploymentOutput",
+      "provisioningState": "Succeeded",
+      "timestamp": "2020-04-02T16:33:37.5097699Z",
+      "duration": "PT0.4440052S",
+      "trackingId": "96e6e468-9776-4053-aba2-d87dac109fe4",
+      "statusCode": "OK",
+      "statusMessage": null
+    }
+  }
+]

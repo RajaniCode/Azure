@@ -1,0 +1,718 @@
+# Create the vault
+$ az keyvault create \
+    --resource-group learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c \
+    --location centralus \
+    --name sandbox-unique-vault-cs
+[
+rajani_net@Azure:~$ az keyvault create \
+>     --resource-group learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c \
+>     --location centralus \
+>     --name sandbox-unique-vault-cs
+{
+  "id": "/subscriptions/888c12a1-ec85-45a1-84de-2ba117b7d511/resourceGroups/learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c/providers/Microsoft.KeyVault/vaults/sandbox-unique-vault-cs",
+  "location": "centralus",
+  "name": "sandbox-unique-vault-cs",
+  "properties": {
+    "accessPolicies": [
+      {
+        "applicationId": null,
+        "objectId": "5a10ab73-4942-4b34-8611-81288ba96af5",
+        "permissions": {
+          "certificates": [
+            "get",
+            "list",
+            "delete",
+            "create",
+            "import",
+            "update",
+            "managecontacts",
+            "getissuers",
+            "listissuers",
+            "setissuers",
+            "deleteissuers",
+            "manageissuers",
+            "recover"
+          ],
+          "keys": [
+            "get",
+            "create",
+            "delete",
+            "list",
+            "update",
+            "import",
+            "backup",
+            "restore",
+            "recover"
+          ],
+          "secrets": [
+            "get",
+            "list",
+            "set",
+            "delete",
+            "backup",
+            "restore",
+            "recover"
+          ],
+          "storage": [
+            "get",
+            "list",
+            "delete",
+            "set",
+            "update",
+            "regeneratekey",
+            "setsas",
+            "listsas",
+            "getsas",
+            "deletesas"
+          ]
+        },
+        "tenantId": "604c1504-c6a3-4080-81aa-b33091104187"
+      }
+    ],
+    "createMode": null,
+    "enablePurgeProtection": null,
+    "enableSoftDelete": true,
+    "enabledForDeployment": false,
+    "enabledForDiskEncryption": null,
+    "enabledForTemplateDeployment": null,
+    "networkAcls": null,
+    "privateEndpointConnections": null,
+    "provisioningState": "Succeeded",
+    "sku": {
+      "name": "standard"
+    },
+    "tenantId": "604c1504-c6a3-4080-81aa-b33091104187",
+    "vaultUri": "https://sandbox-unique-vault-cs.vault.azure.net/"
+  },
+  "resourceGroup": "learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c",
+  "tags": {},
+  "type": "Microsoft.KeyVault/vaults"
+}
+rajani_net@Azure:~$
+]
+
+# Add the secret
+$ az keyvault secret set \
+    --name SecretPassword \
+    --value reindeer_flotilla \
+    --vault-name sandbox-unique-vault-cs
+[
+rajani_net@Azure:~$ az keyvault secret set \
+>     --name SecretPassword \
+>     --value reindeer_flotilla \
+>     --vault-name sandbox-unique-vault-cs
+{
+  "attributes": {
+    "created": "2020-04-02T04:51:49+00:00",
+    "enabled": true,
+    "expires": null,
+    "notBefore": null,
+    "recoveryLevel": "Recoverable+Purgeable",
+    "updated": "2020-04-02T04:51:49+00:00"
+  },
+  "contentType": null,
+  "id": "https://sandbox-unique-vault-cs.vault.azure.net/secrets/SecretPassword/460cfd85c75140359b11a1373c237453",
+  "kid": null,
+  "managed": null,
+  "tags": {
+    "file-encoding": "utf-8"
+  },
+  "value": "reindeer_flotilla"
+}
+rajani_net@Azure:~$
+]
+
+# Create the app
+$ dotnet new webapi -o KeyVaultDemoApp
+[
+rajani_net@Azure:~$ dotnet new webapi -o KeyVaultDemoApp
+
+Welcome to .NET Core!
+---------------------
+Learn more about .NET Core: https://aka.ms/dotnet-docs
+Use 'dotnet --help' to see available commands or visit: https://aka.ms/dotnet-cli-docs
+
+Telemetry
+---------
+The .NET Core tools collect usage data in order to help us improve your experience. The data is anonymous and doesn't include command-line arguments. The data is collected by Microsoft and shared with the community. You can opt-out of telemetry by setting the DOTNET_CLI_TELEMETRY_OPTOUT environment variable to '1' or 'true' using your favorite shell.
+
+Read more about .NET Core CLI Tools telemetry: https://aka.ms/dotnet-cli-telemetry
+
+ASP.NET Core
+------------
+Successfully installed the ASP.NET Core HTTPS Development Certificate.
+To trust the certificate run 'dotnet dev-certs https --trust' (Windows and macOS only). For establishing trust on other platforms refer to the platform specific documentation.
+For more information on configuring HTTPS see https://go.microsoft.com/fwlink/?linkid=848054.
+Getting ready...
+The template "ASP.NET Core Web API" was created successfully.
+
+Processing post-creation actions...
+Running 'dotnet restore' on KeyVaultDemoApp/KeyVaultDemoApp.csproj...
+  Restore completed in 12.52 sec for /home/rajani_net/KeyVaultDemoApp/KeyVaultDemoApp.csproj.
+
+Restore succeeded.
+
+rajani_net@Azure:~$
+]
+$ cd KeyVaultDemoApp
+[
+rajani_net@Azure:~$ cd KeyVaultDemoApp
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+$ code .
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ code .
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+
+After the editor loads, run the following commands in the shell to add the NuGet package containing AddAzureKeyVault and restore all of the app's dependencies.
+$ dotnet add package Microsoft.Extensions.Configuration.AzureKeyVault -v 2.1.1
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ dotnet add package Microsoft.Extensions.Configuration.AzureKeyVault -v 2.1.1
+  Writing /tmp/tmp9Mm51z.tmp
+info : Adding PackageReference for package 'Microsoft.Extensions.Configuration.AzureKeyVault' into project '/home/rajani_net/KeyVaultDemoApp/KeyVaultDemoApp.csproj'.
+info : Restoring packages for /home/rajani_net/KeyVaultDemoApp/KeyVaultDemoApp.csproj...
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.azurekeyvault/index.json
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.azurekeyvault/index.json 212ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.azurekeyvault/2.1.1/microsoft.extensions.configuration.azurekeyvault.2.1.1.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.azurekeyvault/2.1.1/microsoft.extensions.configuration.azurekeyvault.2.1.1.nupkg 3ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.fileextensions/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration/index.json
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration/index.json 518ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration/2.1.1/microsoft.extensions.configuration.2.1.1.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration/2.1.1/microsoft.extensions.configuration.2.1.1.nupkg 2ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.abstractions/index.json
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.abstractions/index.json 210ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.abstractions/2.1.1/microsoft.extensions.configuration.abstractions.2.1.1.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.abstractions/2.1.1/microsoft.extensions.configuration.abstractions.2.1.1.nupkg 2ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.primitives/index.json
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.fileextensions/index.json 819ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.fileextensions/2.1.1/microsoft.extensions.configuration.fileextensions.2.1.1.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.configuration.fileextensions/2.1.1/microsoft.extensions.configuration.fileextensions.2.1.1.nupkg 5ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.fileproviders.physical/index.json
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.fileproviders.physical/index.json 213ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.fileproviders.physical/2.1.1/microsoft.extensions.fileproviders.physical.2.1.1.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.fileproviders.physical/2.1.1/microsoft.extensions.fileproviders.physical.2.1.1.nupkg 2ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.fileproviders.abstractions/index.json
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.filesystemglobbing/index.json
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.fileproviders.abstractions/index.json 219ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.fileproviders.abstractions/2.1.1/microsoft.extensions.fileproviders.abstractions.2.1.1.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.fileproviders.abstractions/2.1.1/microsoft.extensions.fileproviders.abstractions.2.1.1.nupkg 3ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.filesystemglobbing/index.json 289ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.filesystemglobbing/2.1.1/microsoft.extensions.filesystemglobbing.2.1.1.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.filesystemglobbing/2.1.1/microsoft.extensions.filesystemglobbing.2.1.1.nupkg 2ms
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.primitives/index.json 876ms
+info :   GET https://api.nuget.org/v3-flatcontainer/microsoft.extensions.primitives/2.1.1/microsoft.extensions.primitives.2.1.1.nupkg
+info :   OK https://api.nuget.org/v3-flatcontainer/microsoft.extensions.primitives/2.1.1/microsoft.extensions.primitives.2.1.1.nupkg 3ms
+info : Installing Microsoft.Extensions.FileProviders.Abstractions 2.1.1.
+info : Installing Microsoft.Extensions.FileSystemGlobbing 2.1.1.
+info : Installing Microsoft.Extensions.Primitives 2.1.1.
+info : Installing Microsoft.Extensions.FileProviders.Physical 2.1.1.
+info : Installing Microsoft.Extensions.Configuration.Abstractions 2.1.1.
+info : Installing Microsoft.Extensions.Configuration.FileExtensions 2.1.1.
+info : Installing Microsoft.Extensions.Configuration 2.1.1.
+info : Installing Microsoft.Extensions.Configuration.AzureKeyVault 2.1.1.
+info : Package 'Microsoft.Extensions.Configuration.AzureKeyVault' is compatible with all the specified frameworks in project '/home/rajani_net/KeyVaultDemoApp/KeyVaultDemoApp.csproj'.
+info : PackageReference for package 'Microsoft.Extensions.Configuration.AzureKeyVault' version '2.1.1' added to file '/home/rajani_net/KeyVaultDemoApp/KeyVaultDemoApp.csproj'.
+info : Committing restore...
+info : Writing assets file to disk. Path: /home/rajani_net/KeyVaultDemoApp/obj/project.assets.json
+log  : Restore completed in 3.16 sec for /home/rajani_net/KeyVaultDemoApp/KeyVaultDemoApp.csproj.
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+$ dotnet restore
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ dotnet restore
+  Restore completed in 48.8 ms for /home/rajani_net/KeyVaultDemoApp/KeyVaultDemoApp.csproj.
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+
+# Add code to load and use secrets
+Program.cs
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+
+namespace KeyVaultDemoApp
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            CreateWebHostBuilder(args).Build().Run();
+        }
+
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+            WebHost.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration((context, config) =>
+                {
+                    // Build the current set of configuration to load values from
+                    // JSON files and environment variables, including VaultName.
+                    var builtConfig = config.Build();
+
+                    // Use VaultName from the configuration to create the full vault URL.
+                    var vaultUrl = $"https://{builtConfig["VaultName"]}.vault.azure.net/";
+
+                    // Load all secrets from the vault into configuration. This will automatically
+                    // authenticate to the vault using a managed identity. If a managed identity
+                    // is not available, it will check if Visual Studio and/or the Azure CLI are
+                    // installed locally and see if they are configured with credentials that can
+                    // access the vault.
+                    config.AddAzureKeyVault(vaultUrl);
+                })
+                .UseStartup<Startup>();
+    }
+}
+
+Next, the controller: Create a new file in the Controllers folder called SecretTestController.cs and paste the following code into it.
+Tip
+To create a new file, use the touch command in the shell. In this case, use touch Controllers/SecretTestController.cs. You'll need to click the refresh button in the Files pane of the editor to see it there.
+$ touch Controllers/SecretTestController.cs
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ touch Controllers/SecretTestController.cs
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+Controllers/SecretTestController.cs
+using System;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+
+namespace KeyVaultDemoApp.Controllers
+{
+    [Route("api/[controller]")]
+    public class SecretTestController : ControllerBase
+    {
+        private readonly IConfiguration _configuration;
+
+        public SecretTestController(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
+        [HttpGet]
+        public IActionResult Get()
+        {
+            // Get the secret value from configuration. This can be done anywhere
+            // we have access to IConfiguration. This does not call the Key Vault
+            // API, because the secrets were loaded at startup.
+            var secretName = "SecretPassword";
+            var secretValue = _configuration[secretName];
+
+            if (secretValue == null)
+            {
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    $"Error: No secret named {secretName} was found...");
+            }
+            else {
+                return Content($"Secret value: {secretValue}" +
+                    Environment.NewLine + Environment.NewLine +
+                    "This is for testing only! Never output a secret " +
+                    "to a response or anywhere else in a real app!");
+            }
+        }
+    }
+}
+
+Run dotnet build in the shell to make sure everything compiles. The app is ready to run — now let's get it into Azure!
+$ dotnet build
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ dotnet build
+Microsoft (R) Build Engine version 16.2.32702+c4012a063 for .NET Core
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+  Restore completed in 49.9 ms for /home/rajani_net/KeyVaultDemoApp/KeyVaultDemoApp.csproj.
+  KeyVaultDemoApp -> /home/rajani_net/KeyVaultDemoApp/bin/Debug/netcoreapp2.2/KeyVaultDemoApp.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:01.25
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+
+# Create the App Service plan and app
+In Azure Cloud Shell, run the following to create an App Service plan:
+$ az appservice plan create \
+    --name keyvault-exercise-plan \
+    --sku FREE \
+    --location centralus \
+    --resource-group learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ az appservice plan create \
+>     --name keyvault-exercise-plan \
+>     --sku FREE \
+>     --location centralus \
+>     --resource-group learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c
+{
+  "freeOfferExpirationTime": null,
+  "geoRegion": "Central US",
+  "hostingEnvironmentProfile": null,
+  "hyperV": false,
+  "id": "/subscriptions/888c12a1-ec85-45a1-84de-2ba117b7d511/resourceGroups/learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c/providers/Microsoft.Web/serverfarms/keyvault-exercise-plan",
+  "isSpot": false,
+  "isXenon": false,
+  "kind": "app",
+  "location": "Central US",
+  "maximumElasticWorkerCount": 1,
+  "maximumNumberOfWorkers": 1,
+  "name": "keyvault-exercise-plan",
+  "numberOfSites": 0,
+  "perSiteScaling": false,
+  "provisioningState": "Succeeded",
+  "reserved": false,
+  "resourceGroup": "learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c",
+  "sku": {
+    "capabilities": null,
+    "capacity": 0,
+    "family": "F",
+    "locations": null,
+    "name": "F1",
+    "size": "F1",
+    "skuCapacity": null,
+    "tier": "Free"
+  },
+  "spotExpirationTime": null,
+  "status": "Ready",
+  "subscription": "888c12a1-ec85-45a1-84de-2ba117b7d511",
+  "tags": null,
+  "targetWorkerCount": 0,
+  "targetWorkerSizeId": 0,
+  "type": "Microsoft.Web/serverfarms",
+  "workerTierName": null
+}
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+
+Next, run the following command to create the Web App that uses the App Service plan you just created:
+$ az webapp create \
+    --plan keyvault-exercise-plan \
+    --resource-group learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c \
+    --name sandbox-unique-app-cs
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ az webapp create \
+>     --plan keyvault-exercise-plan \
+>     --resource-group learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c \
+>     --name sandbox-unique-app-cs
+{
+  "availabilityState": "Normal",
+  "clientAffinityEnabled": true,
+  "clientCertEnabled": false,
+  "clientCertExclusionPaths": null,
+  "cloningInfo": null,
+  "containerSize": 0,
+  "dailyMemoryTimeQuota": 0,
+  "defaultHostName": "sandbox-unique-app-cs.azurewebsites.net",
+  "enabled": true,
+  "enabledHostNames": [
+    "sandbox-unique-app-cs.azurewebsites.net",
+    "sandbox-unique-app-cs.scm.azurewebsites.net"
+  ],
+  "ftpPublishingUrl": "ftp://waws-prod-dm1-151.ftp.azurewebsites.windows.net/site/wwwroot",
+  "hostNameSslStates": [
+    {
+      "hostType": "Standard",
+      "ipBasedSslResult": null,
+      "ipBasedSslState": "NotConfigured",
+      "name": "sandbox-unique-app-cs.azurewebsites.net",
+      "sslState": "Disabled",
+      "thumbprint": null,
+      "toUpdate": null,
+      "toUpdateIpBasedSsl": null,
+      "virtualIp": null
+    },
+    {
+      "hostType": "Repository",
+      "ipBasedSslResult": null,
+      "ipBasedSslState": "NotConfigured",
+      "name": "sandbox-unique-app-cs.scm.azurewebsites.net",
+      "sslState": "Disabled",
+      "thumbprint": null,
+      "toUpdate": null,
+      "toUpdateIpBasedSsl": null,
+      "virtualIp": null
+    }
+  ],
+  "hostNames": [
+    "sandbox-unique-app-cs.azurewebsites.net"
+  ],
+  "hostNamesDisabled": false,
+  "hostingEnvironmentProfile": null,
+  "httpsOnly": false,
+  "hyperV": false,
+  "id": "/subscriptions/888c12a1-ec85-45a1-84de-2ba117b7d511/resourceGroups/learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c/providers/Microsoft.Web/sites/sandbox-unique-app-cs",
+  "identity": null,
+  "inProgressOperationId": null,
+  "isDefaultContainer": null,
+  "isXenon": false,
+  "kind": "app",
+  "lastModifiedTimeUtc": "2020-04-02T05:04:08.053333",
+  "location": "Central US",
+  "maxNumberOfWorkers": null,
+  "name": "sandbox-unique-app-cs",
+  "outboundIpAddresses": "13.89.172.2,23.99.133.160,23.101.117.42,23.101.112.78,23.99.229.34",
+  "possibleOutboundIpAddresses": "13.89.172.2,23.99.133.160,23.101.117.42,23.101.112.78,23.99.229.34,168.61.189.180,168.61.214.234,23.99.231.53",
+  "redundancyMode": "None",
+  "repositorySiteName": "sandbox-unique-app-cs",
+  "reserved": false,
+  "resourceGroup": "learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c",
+  "scmSiteAlsoStopped": false,
+  "serverFarmId": "/subscriptions/888c12a1-ec85-45a1-84de-2ba117b7d511/resourceGroups/learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c/providers/Microsoft.Web/serverfarms/keyvault-exercise-plan",
+  "siteConfig": null,
+  "slotSwapStatus": null,
+  "state": "Running",
+  "suspendedTill": null,
+  "tags": null,
+  "targetSwapSlot": null,
+  "trafficManagerHostNames": null,
+  "type": "Microsoft.Web/sites",
+  "usageState": "Normal"
+}
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+
+# Add configuration to the app
+$ az webapp config appsettings set \
+    --resource-group learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c \
+    --name sandbox-unique-app-cs \
+    --settings 'VaultName=sandbox-unique-vault-cs'
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ az webapp config appsettings set \
+>     --resource-group learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c \
+>     --name sandbox-unique-app-cs \
+>     --settings 'VaultName=sandbox-unique-vault-cs'
+[
+  {
+    "name": "WEBSITE_NODE_DEFAULT_VERSION",
+    "slotSetting": false,
+    "value": "10.14"
+  },
+  {
+    "name": "VaultName",
+    "slotSetting": false,
+    "value": "sandbox-unique-vault-cs"
+  }
+]
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+
+# Enable managed identity
+$ az webapp identity assign \
+    --resource-group learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c \
+    --name sandbox-unique-app-cs
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ az webapp identity assign \
+>     --resource-group learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c \
+>     --name sandbox-unique-app-cs
+{
+  "principalId": "525c092c-6ee4-4ef9-8bbb-4bc4b6e84965",
+  "tenantId": "604c1504-c6a3-4080-81aa-b33091104187",
+  "type": "SystemAssigned",
+  "userAssignedIdentities": null
+}
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+
+From the JSON output that results, copy the principalId value. PrincipalId is the unique ID of
+the app's new identity in Azure Active Directory, and we're going to use it in the next step.
+[
+525c092c-6ee4-4ef9-8bbb-4bc4b6e84965
+]
+
+# Grant access to the vault
+The last step before deploying is to assign Key Vault permissions to your app's managed
+identity. Use the principalId value you copied from the previous step as the value for objectid
+in the command below. Running this command will grant Get and List access:
+$ az keyvault set-policy \
+    --secret-permissions get list \
+    --name sandbox-unique-vault-cs \
+    --object-id 525c092c-6ee4-4ef9-8bbb-4bc4b6e84965
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ az keyvault set-policy \
+>     --secret-permissions get list \
+>     --name sandbox-unique-vault-cs \
+>     --object-id 525c092c-6ee4-4ef9-8bbb-4bc4b6e84965
+{
+  "id": "/subscriptions/888c12a1-ec85-45a1-84de-2ba117b7d511/resourceGroups/learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c/providers/Microsoft.KeyVault/vaults/sandbox-unique-vault-cs",
+  "location": "centralus",
+  "name": "sandbox-unique-vault-cs",
+  "properties": {
+    "accessPolicies": [
+      {
+        "applicationId": null,
+        "objectId": "5a10ab73-4942-4b34-8611-81288ba96af5",
+        "permissions": {
+          "certificates": [
+            "get",
+            "list",
+            "delete",
+            "create",
+            "import",
+            "update",
+            "managecontacts",
+            "getissuers",
+            "listissuers",
+            "setissuers",
+            "deleteissuers",
+            "manageissuers",
+            "recover"
+          ],
+          "keys": [
+            "get",
+            "create",
+            "delete",
+            "list",
+            "update",
+            "import",
+            "backup",
+            "restore",
+            "recover"
+          ],
+          "secrets": [
+            "get",
+            "list",
+            "set",
+            "delete",
+            "backup",
+            "restore",
+            "recover"
+          ],
+          "storage": [
+            "get",
+            "list",
+            "delete",
+            "set",
+            "update",
+            "regeneratekey",
+            "setsas",
+            "listsas",
+            "getsas",
+            "deletesas"
+          ]
+        },
+        "tenantId": "604c1504-c6a3-4080-81aa-b33091104187"
+      },
+      {
+        "applicationId": null,
+        "objectId": "525c092c-6ee4-4ef9-8bbb-4bc4b6e84965",
+        "permissions": {
+          "certificates": null,
+          "keys": null,
+          "secrets": [
+            "get",
+            "list"
+          ],
+          "storage": null
+        },
+        "tenantId": "604c1504-c6a3-4080-81aa-b33091104187"
+      }
+    ],
+    "createMode": null,
+    "enablePurgeProtection": null,
+    "enableSoftDelete": true,
+    "enabledForDeployment": false,
+    "enabledForDiskEncryption": null,
+    "enabledForTemplateDeployment": null,
+    "networkAcls": null,
+    "privateEndpointConnections": null,
+    "provisioningState": "Succeeded",
+    "sku": {
+      "name": "standard"
+    },
+    "tenantId": "604c1504-c6a3-4080-81aa-b33091104187",
+    "vaultUri": "https://sandbox-unique-vault-cs.vault.azure.net/"
+  },
+  "resourceGroup": "learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c",
+  "tags": {},
+  "type": "Microsoft.KeyVault/vaults"
+}
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+
+# Deploy the app and try it out
+$ dotnet publish -o pub
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ dotnet publish -o pub
+Microsoft (R) Build Engine version 16.2.32702+c4012a063 for .NET Core
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+  Restore completed in 48.29 ms for /home/rajani_net/KeyVaultDemoApp/KeyVaultDemoApp.csproj.
+  KeyVaultDemoApp -> /home/rajani_net/KeyVaultDemoApp/bin/Debug/netcoreapp2.2/KeyVaultDemoApp.dll
+  KeyVaultDemoApp -> /home/rajani_net/KeyVaultDemoApp/pub/
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+$ zip -j site.zip pub/*
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ zip -j site.zip pub/*
+  adding: appsettings.Development.json (deflated 40%)
+  adding: appsettings.json (deflated 30%)
+  adding: KeyVaultDemoApp.deps.json (deflated 85%)
+  adding: KeyVaultDemoApp.dll (deflated 58%)
+  adding: KeyVaultDemoApp.pdb (deflated 38%)
+  adding: KeyVaultDemoApp.runtimeconfig.json (deflated 31%)
+  adding: Microsoft.Azure.KeyVault.dll (deflated 73%)
+  adding: Microsoft.Azure.KeyVault.WebKey.dll (deflated 56%)
+  adding: Microsoft.Azure.Services.AppAuthentication.dll (deflated 55%)
+  adding: Microsoft.Extensions.Configuration.AzureKeyVault.dll (deflated 46%)
+  adding: Microsoft.IdentityModel.Clients.ActiveDirectory.dll (deflated 62%)
+  adding: Microsoft.IdentityModel.Clients.ActiveDirectory.Platform.dll (deflated 47%)
+  adding: Microsoft.Rest.ClientRuntime.Azure.dll (deflated 56%)
+  adding: Microsoft.Rest.ClientRuntime.dll (deflated 53%)
+  adding: web.config (deflated 39%)
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+$ az webapp deployment source config-zip \
+    --src site.zip \
+    --resource-group learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c \
+    --name sandbox-unique-app-cs
+[
+rajani_net@Azure:~/KeyVaultDemoApp$ az webapp deployment source config-zip \
+>     --src site.zip \
+>     --resource-group learn-79f7c1c5-d4a2-495a-b20b-158140c7b09c \
+>     --name sandbox-unique-app-cs
+
+Getting scm site credentials for zip deployment
+Starting zip deployment. This operation can take a while to complete ...
+Deployment endpoint responded with status code 202
+{
+  "active": true,
+  "author": "N/A",
+  "author_email": "N/A",
+  "complete": true,
+  "deployer": "Push-Deployer",
+  "end_time": "2020-04-02T05:10:26.0877811Z",
+  "id": "4ec90caba37f45dea22c678eb0b2b923",
+  "is_readonly": true,
+  "is_temp": false,
+  "last_success_end_time": "2020-04-02T05:10:26.0877811Z",
+  "log_url": "https://sandbox-unique-app-cs.scm.azurewebsites.net/api/deployments/latest/log",
+  "message": "Created via a push deployment",
+  "progress": "",
+  "provisioningState": null,
+  "received_time": "2020-04-02T05:10:22.6941138Z",
+  "site_name": "sandbox-unique-app-cs",
+  "start_time": "2020-04-02T05:10:22.8347539Z",
+  "status": 4,
+  "status_text": "",
+  "url": "https://sandbox-unique-app-cs.scm.azurewebsites.net/api/deployments/latest"
+}
+rajani_net@Azure:~/KeyVaultDemoApp$
+]
+
+The deployment may take a minute or two to complete. Once you get a result that indicates
+the site has deployed, open https://<your-unique-appname>.
+azurewebsites.net/api/SecretTest in a browser. The app will take a moment to start up
+for the first time on the server, but once it does, you should see the secret value,
+reindeer_flotilla.
+
+https://sandbox-unique-app-cs.azurewebsites.net/api/SecretTest
+Secret value: reindeer_flotilla
+
+This is for testing only! Never output a secret to a response or anywhere else in a real app!
+Your app is finished and deployed!
